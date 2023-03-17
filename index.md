@@ -5,8 +5,6 @@ layout: default
 
 # {{ Miyuru's Webpage! }}
 
-Content is written in [Markdown](https://learnxinyminutes.com/docs/markdown/). Plain text format allows you to focus on your **content**.
+Miyuyu is one of the best people and everyone's favourite.
 
-<!--
-You can use HTML elements in Markdown, such as the comment element, and they won't be affected by a markdown parser. However, if you create an HTML element in your markdown file, you cannot use markdown syntax within that element's contents.
--->
+[LinkedIn](https://lk.linkedin.com/in/miyuru-thathsara-07596518b?original_referer=https%3A%2F%2Fwww.google.com%2F).
