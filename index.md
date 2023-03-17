@@ -7,4 +7,4 @@ layout: default
 
 Miyuyu is one of the best people and everyone's favourite.
 
-[LinkedIn](https://lk.linkedin.com/in/miyuru-thathsara-07596518b?original_referer=https%3A%2F%2Fwww.google.com%2F).
+Connect to me via my [LinkedIn](https://lk.linkedin.com/in/miyuru-thathsara-07596518b?original_referer=https%3A%2F%2Fwww.google.com%2F).
