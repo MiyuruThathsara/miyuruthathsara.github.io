@@ -11,11 +11,11 @@ I’m a friendly person who enjoys working in flexible environments with a minds
 ## Research Interests
 - Embedded systems and FPGA-based acceleration
 - Reconfigurable hardware design for machine learning and SLAM
-- Hardware/software co-design and high-level synthesis
+- Hardware/software co-design
 - Algorithm development for efficient computing
 
 ## Education
-- **PhD Student**, School of Computer Science and Engineering, Nanyang Technological University, Singapore *(2022 – present)*
+- **PhD Student**, College of Computing and Data Science, Nanyang Technological University, Singapore *(2022 – present)*
 - **BSc (Hons) in Electronics and Telecommunication Engineering**, University of Moratuwa, Sri Lanka *(2016 – 2021, GPA 3.74/4.2, First Class)*  
   Digital IC Design (A+), Advanced Digital System (A+)
 - **Certificate Level in Management**, Achievers Lanka Business School *(2015 – 2016)*
@@ -48,10 +48,9 @@ I’m a friendly person who enjoys working in flexible environments with a minds
 - Chess team captain (2005–2010) with national‑level placements
 
 ## Activities & Hobbies
-Enjoy robotics projects, hiking, chess and sharing knowledge with the community.
+Enjoy playing badminton, cricket and chess. More keen of sharing knowledge with my research and development community.
 
 ## Contact
 - Email: [mthathsara@outlook.com](mailto:mthathsara@outlook.com)
 - LinkedIn: [Miyuru Thathsara](https://lk.linkedin.com/in/miyuru-thathsara-07596518b)
-- Twitter: [@ThathsaraMiyuru](https://twitter.com/ThathsaraMiyuru)
 - GitHub: [MiyuruThathsara](https://github.com/MiyuruThathsara)
