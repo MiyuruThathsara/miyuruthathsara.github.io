@@ -47,7 +47,7 @@ I’m a friendly person who enjoys working in flexible environments. I have a pr
 
 ## Activities & Hobbies
 - Enjoy playing badminton, cricket, and chess. 
-- More keen on sharing knowledge with my research and development community.
+- More keen on sharing knowledge with my research community.
 
 ## Contact
 - Email: [mthathsara@outlook.com](mailto:mthathsara@outlook.com)
