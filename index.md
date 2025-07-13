@@ -1,6 +1,11 @@
 ---
+layout: about
 title: Miyuru Thathsara
-layout: default
+permalink: /
+profile:
+  align: right
+  image: me.jpeg
+  image_circular: true
 ---
 
 ![Miyuru Thathsara](me.jpeg)
