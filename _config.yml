@@ -1,3 +1,11 @@
-theme: jekyll-theme-cayman
+remote_theme: alshedivat/al-folio
+plugins:
+  - jekyll-remote-theme
+
+# Site settings
+# Basic details
+
 title: Miyuru Thathsara
-description: PhD student at NTU Singapore researching FPGA-based hardware acceleration
+description: >-
+  PhD student at NTU Singapore researching FPGA-based hardware acceleration
+max_width: 930px

@@ -1,0 +1,7 @@
+/vendor/
+.bundle/
+_config.yml.bak
+index.md.bak
+
+# Ignore Ruby build artifacts
+Gemfile.lock
