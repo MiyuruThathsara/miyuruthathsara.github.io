@@ -2,7 +2,6 @@
 .bundle/
 _config.yml.bak
 index.md.bak
-_site/
 
 # Ignore Ruby build artifacts
 Gemfile.lock
