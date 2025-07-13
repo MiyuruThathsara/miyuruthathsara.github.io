@@ -15,7 +15,7 @@ I’m a friendly person who enjoys working in flexible environments. I have a pr
 - Algorithm development for efficient computing
 
 ## Education
-- **PhD Student**, College of Computing and Data Science, Nanyang Technological University, Singapore *(2022 – present)*
+- **PhD Student**, College of Computing and Data Science, Nanyang Technological University, Singapore *(2023 – present)*
 - **BSc (Hons) in Electronics and Telecommunication Engineering**, University of Moratuwa, Sri Lanka *(2016 – 2021, GPA 3.74/4.2, First Class)*  
   Digital IC Design (A+), Advanced Digital System (A+)
 - **Certificate Level in Management**, Achievers Lanka Business School *(2015 – 2016)*
