@@ -149,10 +149,12 @@ Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs
 
 ## Research Interests
 <ul class="ri-grid">
-  <li>Embedded systems and FPGA-based acceleration</li>
-  <li>Reconfigurable hardware design for machine learning and SLAM</li>
+  <li>Computer architecture</li>
+  <li>Low-power edge AI systems</li>
+  <li>Domain-specific accelerators (DSA)</li>
+  <li>RISC-V co-processors</li>
   <li>Hardware/software co-design</li>
-  <li>Algorithm development for efficient computing</li>
+  <li>Adaptive / reconfigurable hardware</li>
 </ul>
 
 ---
