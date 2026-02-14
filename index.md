@@ -36,7 +36,7 @@ As a PhD Researcher at NTU, Singapore, I develop real-time, resource-efficient V
 - **Project Officer (Research)**, HESL, SCSE, NTU Singapore *(Jul 2022 – Jan 2023)*  
   - Implemented a SLAM algorithm on FPGA (system prototyping and acceleration)
 - **Engineer, Accelerated Systems (HWAC Team)**, LSEG Technologies Sri Lanka *(May 2021 – Aug 2022)*  
-  - Developed a **custom AXI DMA engine** (Deployed)  
+  - Developed a **custom AXI DMA engine**
   - Worked on **partial reconfiguration support** for hardware acceleration workflows
 - **Research Assistant**, HESL, SCSE, NTU Singapore *(Jul 2019 – Dec 2019)*  
   - Designed **streaming hardware architectures** for deep learning and a self-organization map classifier 
