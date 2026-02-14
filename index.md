@@ -80,6 +80,30 @@ permalink: /
     margin-right: auto !important;
   }
 
+  /* Research Interests: 2-column grid */
+  .ri-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;   /* two columns */
+    gap: 0.5rem 1.5rem;               /* row gap, column gap */
+    padding-left: 0;
+    list-style: none;                 /* remove default bullets */
+    margin: 0.5rem 0 0 0;
+  }
+  .ri-grid li{
+    position: relative;
+    padding-left: 1.1rem;             /* space for custom bullet */
+  }
+  .ri-grid li::before{
+    content: "•";
+    position: absolute;
+    left: 0;
+  }
+
+  /* Mobile: back to one column */
+  @media (max-width: 900px){
+    .ri-grid{ grid-template-columns: 1fr; }
+  }
+
 </style>
 
 <div class="two-col">
@@ -124,10 +148,12 @@ permalink: /
 Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs, with emphasis on efficient salient keypoint extraction, descriptor matching, keypoint/keyframe selection, and system-level optimization under tight power constraints.
 
 ## Research Interests
-- Embedded systems and FPGA-based acceleration  
-- Reconfigurable hardware design for machine learning and SLAM  
-- Hardware/software co-design  
-- Algorithm development for efficient computing  
+<ul class="ri-grid">
+  <li>Embedded systems and FPGA-based acceleration</li>
+  <li>Reconfigurable hardware design for machine learning and SLAM</li>
+  <li>Hardware/software co-design</li>
+  <li>Algorithm development for efficient computing</li>
+</ul>
 
 ---
 
