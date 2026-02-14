@@ -80,28 +80,30 @@ permalink: /
     margin-right: auto !important;
   }
 
-  /* Research Interests: 2-column centered grid */
+  /* Research Interests: 2-column clean grid (no bullets) */
   .ri-grid{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.6rem 1.5rem;
+    gap: 0.75rem 1rem;
     padding-left: 0;
     list-style: none;
-    margin: 0.5rem 0 0 0;
+    margin: 0.6rem 0 0 0;
   }
 
   .ri-grid li{
-    text-align: center;      /* centers text in each column cell */
-    position: relative;
-    padding-left: 0;         /* remove left padding */
+    text-align: center;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 12px;
+    background: rgba(0,0,0,0.03);
   }
 
-  /* Optional: keep a bullet above each item (clean + centered) */
-  .ri-grid li::before{
-    content: "•";
-    display: block;
-    line-height: 1;
-    margin-bottom: 0.2rem;
+  /* Dark mode friendly (optional) */
+  @media (prefers-color-scheme: dark){
+    .ri-grid li{
+      border-color: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+    }
   }
 
   /* Mobile: single column */
