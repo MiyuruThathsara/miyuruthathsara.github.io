@@ -71,6 +71,15 @@ permalink: /
     .left-col { max-width: 100%; }
     .profile-pic { max-width: 220px; }
   }
+
+  /* Widen the overall page container (theme override) */
+  .wrapper, .container, .main-content, .page-content, .markdown-body, article, main, #main_content {
+    max-width: 1200px !important; /* try 1200–1400 */
+    width: 95% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
 </style>
 
 <div class="two-col">
