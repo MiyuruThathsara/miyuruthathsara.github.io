@@ -93,13 +93,35 @@ permalink: /
   <p>As a PhD Researcher at NTU, Singapore, I develop real-time, resource-efficient Visual SLAM systems by combining algorithm design with FPGA-based acceleration on embedded platforms. My research has produced top-tier first-author publications on stereo visual SLAM, feature matching, and hardware-efficient keypoint selection, with demonstrated improvements in latency and energy efficiency. I’m motivated by building systems that are both scientifically solid and practical to deploy.</p>
 </div>
 
+<h2>Activities &amp; Hobbies</h2>
+
+<div class="profile-overview">
+  <ul style="list-style: none; padding-left: 0; margin: 0.5rem 0 1rem 0;">
+    <li>Badminton, cricket, and chess</li>
+    <li>Enjoy sharing knowledge with the research community</li>
+  </ul>
+</div>
+
+<h2>Contact</h2>
+
+<div class="profile-overview">
+  <ul style="list-style: none; padding-left: 0; margin: 0.5rem 0 0 0;">
+    <li>Personal Email: <a href="mailto:mthathsara@outlook.com">mthathsara@outlook.com</a></li>
+    <li>Work Email: <a href="mailto:miyuruth001@e.ntu.edu.sg">miyuruth001@e.ntu.edu.sg</a></li>
+    <li>Google Scholar: <a href="https://scholar.google.com/citations?user=_F2z9wYAAAAJ&amp;hl=en">Miyuru Thathsara</a></li>
+    <li>LinkedIn: <a href="https://lk.linkedin.com/in/miyuru-thathsara-07596518b">Miyuru Thathsara</a></li>
+    <li>GitHub: <a href="https://github.com/MiyuruThathsara">MiyuruThathsara</a></li>
+  </ul>
+</div>
+
+
 </div>
 
 <div class="right-col" markdown="1">
 
 ## Current: Research Focus
 
-Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs, with emphasis on efficient salient feature extraction, descriptor matching, keypoint/keyframe selection, and system-level optimization under tight power constraints.
+Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs, with emphasis on efficient salient keypoint extraction, descriptor matching, keypoint/keyframe selection, and system-level optimization under tight power constraints.
 
 ## Research Interests
 - Embedded systems and FPGA-based acceleration  
@@ -183,20 +205,7 @@ Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs
 - Chess: School team captain (2005–2010) with national-level placements  
   - All Island 25th (Individual) • Provincial 5th (Individual) • All Island 3rd (Team) ×2
 
----
-
-## Activities & Hobbies
-- Badminton, cricket, and chess  
-- Enjoy sharing knowledge with the research community  
-
----
-
-## Contact
-- Personal Email: [mthathsara@outlook.com](mailto:mthathsara@outlook.com)
-- Work Email: [miyuruth001@e.ntu.edu.sg](mailto:miyuruth001@e.ntu.edu.sg)
-- Google Scholar: [Miyuru Thathsara](https://scholar.google.com/citations?user=_F2z9wYAAAAJ&hl=en)
-- LinkedIn: [Miyuru Thathsara](https://lk.linkedin.com/in/miyuru-thathsara-07596518b)
-- GitHub: [MiyuruThathsara](https://github.com/MiyuruThathsara)
+<!-- --- -->
 
 </div>
 </div>
