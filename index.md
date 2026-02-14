@@ -74,8 +74,8 @@ permalink: /
 
   /* Widen the overall page container (theme override) */
   .wrapper, .container, .main-content, .page-content, .markdown-body, article, main, #main_content {
-    max-width: 1400px !important; /* try 1200–1400 */
-    width: 100% !important;
+    max-width: 1600px !important; /* try 1200–1400 */
+    width: 95% !important;
     margin-left: auto !important;
     margin-right: auto !important;
   }
