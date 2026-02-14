@@ -154,13 +154,16 @@ permalink: /
     margin: 0 0 0.65rem 0;
     opacity: 0.9;
   }
+  
+  /* Bullets with minimal indent (only inside publications) */
   .pub-points{
-    list-style: none;
-    margin: 0.35rem 0 0 0;
-    padding-left: 0;
+    margin: 0.35rem 0 0 0 !important;   /* no extra left margin */
+    padding-left: 0.95rem !important;   /* minimal indent for bullets */
+    list-style-position: outside;       /* bullet sits outside text block */
   }
+
   .pub-points li{
-    margin: 0.35rem 0;
+    margin: 0.25rem 0;
   }
 
   @media (prefers-color-scheme: dark){
