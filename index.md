@@ -154,7 +154,7 @@ permalink: /
     margin: 0 0 0.65rem 0;
     opacity: 0.9;
   }
-  
+
   /* Bullets with minimal indent (only inside publications) */
   .pub-points{
     margin: 0.35rem 0 0 0 !important;   /* no extra left margin */
@@ -167,16 +167,33 @@ permalink: /
   }
 
   @media (prefers-color-scheme: dark){
-    .pub {
-      border-color: rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.05);
+      .pub {
+        border-color: rgba(255,255,255,0.16);
+        background: rgba(255,255,255,0.05);
+      }
     }
+
+    /* Mobile: stack media above text */
+    @media (max-width: 900px){
+      .pub { grid-template-columns: 1fr; }
+    }
+
+    /* Desktop: show sidebar blocks, hide mobile footer */
+  .sidebar-only { display: block; }
+  .mobile-only  { display: none; }
+
+  /* Mobile: hide sidebar blocks, show mobile footer at end */
+  @media (max-width: 900px){
+    .sidebar-only { display: none; }
+    .mobile-only  { display: block; }
+
+    /* optional: make it look nice at bottom */
+    .mobile-only { margin-top: 1.5rem; }
+    .mobile-only h2 { text-align: center; }
+    .mobile-only ul { list-style: none; padding-left: 0; margin: 0.5rem 0 0 0; }
+    .mobile-only li { margin: 0.35rem 0; }
   }
 
-  /* Mobile: stack media above text */
-  @media (max-width: 900px){
-    .pub { grid-template-columns: 1fr; }
-  }
 </style>
 
 <div class="two-col">
@@ -190,25 +207,27 @@ permalink: /
   <p>As a PhD Researcher at NTU, Singapore, I develop real-time, resource-efficient Visual SLAM systems by combining algorithm design with FPGA-based acceleration on embedded platforms. My research has produced top-tier first-author publications on stereo visual SLAM, feature matching, and hardware-efficient keypoint selection, with demonstrated improvements in latency and energy efficiency. I’m motivated by building systems that are both scientifically solid and practical to deploy.</p>
 </div>
 
-<h2>Activities &amp; Hobbies</h2>
+<div class="sidebar-only">
+  <h2>Activities &amp; Hobbies</h2>
 
-<div class="profile-overview">
-  <ul style="list-style: none; padding-left: 0; margin: 0.5rem 0 1rem 0;">
-    <li>Badminton, cricket, and chess</li>
-    <li>Enjoy sharing knowledge with the research community</li>
-  </ul>
-</div>
+  <div class="profile-overview">
+    <ul style="list-style: none; padding-left: 0; margin: 0.5rem 0 1rem 0;">
+      <li>Badminton, cricket, and chess</li>
+      <li>Enjoy sharing knowledge with the research community</li>
+    </ul>
+  </div>
 
-<h2>Contact</h2>
+  <h2>Contact</h2>
 
-<div class="profile-overview">
-  <ul style="list-style: none; padding-left: 0; margin: 0.5rem 0 0 0;">
-    <li>Personal Email: <a href="mailto:mthathsara@outlook.com">mthathsara@outlook.com</a></li>
-    <li>Work Email: <a href="mailto:miyuruth001@e.ntu.edu.sg">miyuruth001@e.ntu.edu.sg</a></li>
-    <li>Google Scholar: <a href="https://scholar.google.com/citations?user=_F2z9wYAAAAJ&amp;hl=en">Miyuru Thathsara</a></li>
-    <li>LinkedIn: <a href="https://lk.linkedin.com/in/miyuru-thathsara-07596518b">Miyuru Thathsara</a></li>
-    <li>GitHub: <a href="https://github.com/MiyuruThathsara">MiyuruThathsara</a></li>
-  </ul>
+  <div class="profile-overview">
+    <ul style="list-style: none; padding-left: 0; margin: 0.5rem 0 0 0;">
+      <li>Personal Email: <a href="mailto:mthathsara@outlook.com">mthathsara@outlook.com</a></li>
+      <li>Work Email: <a href="mailto:miyuruth001@e.ntu.edu.sg">miyuruth001@e.ntu.edu.sg</a></li>
+      <li>Google Scholar: <a href="https://scholar.google.com/citations?user=_F2z9wYAAAAJ&amp;hl=en">Miyuru Thathsara</a></li>
+      <li>LinkedIn: <a href="https://lk.linkedin.com/in/miyuru-thathsara-07596518b">Miyuru Thathsara</a></li>
+      <li>GitHub: <a href="https://github.com/MiyuruThathsara">MiyuruThathsara</a></li>
+    </ul>
+  </div>
 </div>
 
 </div>
@@ -353,7 +372,24 @@ Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs
 - Chess: School team captain (2005–2010) with national-level placements  
   - All Island 25th (Individual) • Provincial 5th (Individual) • All Island 3rd (Team) ×2
 
-<!-- --- -->
+<div class="mobile-only">
+  <hr/>
+
+  <h2>Activities &amp; Hobbies</h2>
+  <ul>
+    <li>Badminton, cricket, and chess</li>
+    <li>Enjoy sharing knowledge with the research community</li>
+  </ul>
+
+  <h2>Contact</h2>
+  <ul>
+    <li>Personal Email: <a href="mailto:mthathsara@outlook.com">mthathsara@outlook.com</a></li>
+    <li>Work Email: <a href="mailto:miyuruth001@e.ntu.edu.sg">miyuruth001@e.ntu.edu.sg</a></li>
+    <li>Google Scholar: <a href="https://scholar.google.com/citations?user=_F2z9wYAAAAJ&amp;hl=en">Miyuru Thathsara</a></li>
+    <li>LinkedIn: <a href="https://lk.linkedin.com/in/miyuru-thathsara-07596518b">Miyuru Thathsara</a></li>
+    <li>GitHub: <a href="https://github.com/MiyuruThathsara">MiyuruThathsara</a></li>
+  </ul>
+</div>
 
 </div>
 </div>
