@@ -17,10 +17,15 @@ layout: default
   }
 
   .profile-overview {
-    font-size: 0.90rem;   /* try 0.88–0.95 */
+    font-size: 0.90rem;
     line-height: 1.5;
   }
 
+  /* Center section titles (## -> h2) */
+  .right-col h2 { text-align: center; }
+
+  /* Optional: center the left column heading too */
+  .left-col h2 { text-align: center; }
 
   /* Mobile */
   @media (max-width: 900px) {
@@ -45,8 +50,8 @@ layout: default
 
 <div class="right-col" markdown="1">
 
-## Current Research Focus
-Algorithm–architecture co-design for real-time stereo SLAM on FPGA SoCs, with emphasis on efficient salient feature extraction, descriptor matching, keypoint/keyframe selection, and system-level optimization under tight power constraints.
+## Current: Research Focus
+Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs, with emphasis on efficient salient feature extraction, descriptor matching, keypoint/keyframe selection, and system-level optimization under tight power constraints.
 
 ## Research Interests
 - Embedded systems and FPGA-based acceleration  
