@@ -351,14 +351,14 @@ Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs
 
 ## Experience
 **Project Officer (Research)**, HESL, SCSE, NTU Singapore *(Jul 2022 – Jan 2023)*<br>
-&nbsp;&nbsp;Implemented a SLAM algorithm on FPGA (system prototyping and acceleration)<br>
+&nbsp;&nbsp;Designed and developed a visual SLAM algorithm on FPGA SoC (system prototyping and acceleration)<br>
 **Engineer, Accelerated Systems (HWAC Team)**, LSEG Technologies Sri Lanka *(May 2021 – Aug 2022)*<br>
-&nbsp;&nbsp;Developed a **custom AXI DMA engine**<br>
+&nbsp;&nbsp;Developed a **customized multi-channel AXI DMA engine**, later integrated with LSEG market data disemmination pipeline<br>
 &nbsp;&nbsp;Worked on **partial reconfiguration support** for hardware acceleration workflows<br>
 **Research Assistant**, HESL, SCSE, NTU Singapore *(Jul 2019 – Dec 2019)*<br>
-&nbsp;&nbsp;Designed **streaming hardware architectures** for deep learning and a self-organization map classifier<br>
+&nbsp;&nbsp;Developed **streaming hardware architectures** for deep learning and a self-organization map classifiers<br>
 **Research Assistant**, UAV Lab, University of Moratuwa *(Jan 2018 – Dec 2018)*<br>
-&nbsp;&nbsp;Built a PWM resolver (Arduino Mega) for a multi-rotor platform
+&nbsp;&nbsp;Designed and developed a multi-rotor controller hexacopter platform
 
 ---
 
@@ -374,11 +374,10 @@ Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs
 ---
 
 ## Awards & Achievements
-- **NTU Research Scholarship Awardee** (2023, 4 years)
-- **Dean’s List**, University of Moratuwa (Semesters 1, 2, 3, 6, 8)
-- Distinction, 2014 Olympiad Mathematics Competition
-- Chess: School team captain (2005–2010) with national-level placements  
-  - All Island 25th (Individual) • Provincial 5th (Individual) • All Island 3rd (Team) ×2
+**NTU Research Scholarship Awardee** — 2023 (4 years)<br>
+**Dean’s List** — University of Moratuwa (Semesters 1, 2, 3, 6, 8)<br>
+**Distinction** — 2014 Olympiad Mathematics Competition<br>
+**Chess** — School team captain (2005–2010); All Island 25th (Individual) • Provincial 5th (Individual) • All Island 3rd (Team) ×2
 
 <div class="mobile-only">
   <hr/>
