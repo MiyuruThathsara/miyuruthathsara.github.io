@@ -110,25 +110,25 @@ Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs
 ---
 
 ## Education
-*(2025 – Present):* **PhD Candidate**, College of Computing and Data Science, Nanyang Technological University, Singapore
-*(2023 – 2025):* **PhD Student**, College of Computing and Data Science, Nanyang Technological University, Singapore
+*(2025 – Present):* **PhD Candidate**, College of Computing and Data Science, Nanyang Technological University, Singapore 
+*(2023 – 2025):* **PhD Student**, College of Computing and Data Science, Nanyang Technological University, Singapore 
 *(2016 – 2021):* **BSc (Hons) Electronics and Telecommunication Engineering (First Class)**, University of Moratuwa, Sri Lanka  
-  - GPA **3.74/4.2** • Key modules: Digital IC Design (A+), Advanced Digital Systems (A+)
-*(2015 – 2016):* **Certificate Level in Management**, Achievers Lanka Business School
+  - GPA **3.74/4.2** • Key modules: Digital IC Design (A+), Advanced Digital Systems (A+) 
+*(2015 – 2016):* **Certificate Level in Management**, Achievers Lanka Business School 
 *(2002 – 2015):* **High School: Nalanda College, Colombo**  
   - Z-score **2.5017** (Island Rank **119**) • A grades: Combined Mathematics, Chemistry, Physics • 9 A’s (O/L)
 
 ---
 
 ## Experience
-*(Jul 2022 – Jan 2023): * **Project Officer (Research)**, HESL, SCSE, NTU Singapore
-  - Implemented a SLAM algorithm on FPGA (system prototyping and acceleration)
-*(May 2021 – Aug 2022):* **Engineer, Accelerated Systems (HWAC Team)**, LSEG Technologies Sri Lanka
-  - Developed a **custom AXI DMA engine**
-  - Worked on **partial reconfiguration support** for hardware acceleration workflows
-*(Jul 2019 – Dec 2019):* **Research Assistant**, HESL, SCSE, NTU Singapore
-  - Designed **streaming hardware architectures** for deep learning and a self-organization map classifier
-*(Jan 2018 - Dec 2018):* **Research Assistant**, UAV Lab, University of Moratuwa
+*(Jul 2022 – Jan 2023): * **Project Officer (Research)**, HESL, SCSE, NTU Singapore 
+  - Implemented a SLAM algorithm on FPGA (system prototyping and acceleration) 
+*(May 2021 – Aug 2022):* **Engineer, Accelerated Systems (HWAC Team)**, LSEG Technologies Sri Lanka 
+  - Developed a **custom AXI DMA engine** 
+  - Worked on **partial reconfiguration support** for hardware acceleration workflows 
+*(Jul 2019 – Dec 2019):* **Research Assistant**, HESL, SCSE, NTU Singapore 
+  - Designed **streaming hardware architectures** for deep learning and a self-organization map classifier 
+*(Jan 2018 - Dec 2018):* **Research Assistant**, UAV Lab, University of Moratuwa 
   - Built a PWM resolver (Arduino Mega) for a multi-rotor platform
 
 ---
