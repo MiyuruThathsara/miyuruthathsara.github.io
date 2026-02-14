@@ -74,7 +74,7 @@ permalink: /
 
   /* Widen the overall page container (theme override) */
   .wrapper, .container, .main-content, .page-content, .markdown-body, article, main, #main_content {
-    max-width: 1400px !important; /* try 1200–1400 */
+    max-width: 1400px !important;
     width: 95% !important;
     margin-left: auto !important;
     margin-right: auto !important;
@@ -98,7 +98,6 @@ permalink: /
     background: rgba(0,0,0,0.03);
   }
 
-  /* Dark mode friendly (optional) */
   @media (prefers-color-scheme: dark){
     .ri-grid li{
       border-color: rgba(255,255,255,0.18);
@@ -106,11 +105,70 @@ permalink: /
     }
   }
 
-  /* Mobile: single column */
   @media (max-width: 900px){
     .ri-grid{ grid-template-columns: 1fr; }
   }
 
+  /* Publications: media on the LEFT, text on the RIGHT */
+  .pub {
+    display: grid;
+    grid-template-columns: minmax(240px, 320px) 1fr;
+    gap: 1rem 1.25rem;
+    align-items: start;
+    margin: 1.25rem 0;
+    padding: 0.9rem 1rem;
+    border: 1px solid rgba(0,0,0,0.10);
+    border-radius: 14px;
+    background: rgba(0,0,0,0.02);
+  }
+
+  .pub-media {
+    width: 100%;
+  }
+
+  .pub-vid {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  .pub-vid iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: 0;
+  }
+
+  .pub-img {
+    width: 100%;
+    border-radius: 12px;
+    display: block;
+  }
+
+  .pub-title {
+    margin: 0 0 0.35rem 0;
+    font-weight: 700;
+  }
+  .pub-meta {
+    margin: 0 0 0.65rem 0;
+    opacity: 0.9;
+  }
+  .pub-points {
+    margin: 0.25rem 0 0 1.1rem; /* keep bullet points for contribution bullets */
+  }
+
+  @media (prefers-color-scheme: dark){
+    .pub {
+      border-color: rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.05);
+    }
+  }
+
+  /* Mobile: stack media above text */
+  @media (max-width: 900px){
+    .pub { grid-template-columns: 1fr; }
+  }
 </style>
 
 <div class="two-col">
@@ -144,7 +202,6 @@ permalink: /
     <li>GitHub: <a href="https://github.com/MiyuruThathsara">MiyuruThathsara</a></li>
   </ul>
 </div>
-
 
 </div>
 
@@ -191,45 +248,93 @@ Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs
 ---
 
 ## Selected Publications
-- **FPGA Stereo Visual SLAM with Efficient Stereo Feature Matching and Key-frame Generation** *(FPL 2025) — First Author*
-  - First FPGA SoC implementation of stereo visual SLAM  
-  - Reduced stereo matching latency via **region-aware + similarity-based descriptor grouping**  
-  - Proposed **tracking-status-based keyframe generation** to avoid unnecessary map expansion and improve stability  
-  - Validated on benchmarks + real-world experiments • *[Accepted]*
-  <!-- Demo video (autoplays muted) -->
-  <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin:0.75rem 0 1.5rem 0;">
-    <iframe
-      src="https://www.youtube.com/embed/vtGebB7Yoc8?autoplay=1&mute=1&loop=1&playlist=vtGebB7Yoc8&controls=1&rel=0&modestbranding=1"
-      title="FPGA Stereo Visual SLAM Demo"
-      frameborder="0"
-      allow="autoplay; encrypted-media; picture-in-picture"
-      allowfullscreen
-      style="position:absolute;top:0;left:0;width:100%;height:100%;">
-    </iframe>
+
+<div class="pub">
+  <div class="pub-media">
+    <div class="pub-vid">
+      <iframe
+        src="https://www.youtube.com/embed/vtGebB7Yoc8?autoplay=1&mute=1&loop=1&playlist=vtGebB7Yoc8&controls=1&rel=0&modestbranding=1"
+        title="FPGA Stereo Visual SLAM Demo"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+    </div>
   </div>
+  <div class="pub-text">
+    <p class="pub-title">FPGA Stereo Visual SLAM with Efficient Stereo Feature Matching and Key-frame Generation</p>
+    <p class="pub-meta"><em>(FPL 2025 — First Author) • Accepted</em></p>
+    <ul class="pub-points">
+      <li>First FPGA SoC implementation of stereo visual SLAM</li>
+      <li>Reduced stereo matching latency via <strong>region-aware + similarity-based descriptor grouping</strong></li>
+      <li>Proposed <strong>tracking-status-based keyframe generation</strong> to avoid unnecessary map expansion and improve stability</li>
+      <li>Validated on benchmarks + real-world experiments</li>
+    </ul>
+  </div>
+</div>
 
+<div class="pub">
+  <div class="pub-media">
+    <!-- Replace this placeholder with your own image file, e.g., assets/img/fpt24.png -->
+    <img class="pub-img" src="assets/img/fpt24.png" alt="FPT 2024 paper diagram/teaser" />
+  </div>
+  <div class="pub-text">
+    <p class="pub-title">Hardware-Efficient Homogenized Key-Point Selection for Visual SLAM</p>
+    <p class="pub-meta"><em>(FPT 2024 — First Author • Technology Disclosure)</em> • <a href="https://ieeexplore.ieee.org/abstract/document/11113393">IEEE Xplore</a></p>
+    <ul class="pub-points">
+      <li>Real-time FPGA accelerator for <strong>uniform keypoint selection</strong> in streaming video</li>
+      <li>Grid-based streaming architecture + efficient neighbor sorting for dynamic input sizes</li>
+      <li>Improves robustness and resource efficiency while meeting real-time constraints</li>
+    </ul>
+  </div>
+</div>
 
-- **Hardware-Efficient Homogenized Key-Point Selection for Visual SLAM** *(FPT 2024) — First Author* *(Technology Disclosure)*
-  - Real-time FPGA accelerator for **uniform keypoint selection** in streaming video  
-  - Grid-based streaming architecture + efficient neighbor sorting for dynamic input sizes  
-  - Improves robustness and resource efficiency while meeting real-time constraints  
-  - [IEEE Xplore](https://ieeexplore.ieee.org/abstract/document/11113393)
+<div class="pub">
+  <div class="pub-media">
+    <!-- Replace this placeholder with your own image file, e.g., assets/img/iscas24.png -->
+    <img class="pub-img" src="assets/img/iscas24.png" alt="ISCAS 2024 paper diagram/teaser" />
+  </div>
+  <div class="pub-text">
+    <p class="pub-title">Hardware Accelerator for Feature Matching with Binary Search Tree</p>
+    <p class="pub-meta"><em>(ISCAS 2024 — First Author • Patent Pending)</em> • <a href="https://ieeexplore.ieee.org/document/10558431">IEEE Xplore</a></p>
+    <ul class="pub-points">
+      <li>Stream-processing FPGA matcher using a <strong>balanced BST</strong> + <strong>ratio-test</strong> outlier rejection</li>
+      <li>~<strong>12× faster</strong> than linear exhaustive search on FPGA</li>
+      <li>Scalable, resource-efficient design</li>
+    </ul>
+  </div>
+</div>
 
-- **Hardware Accelerator for Feature Matching with Binary Search Tree** *(ISCAS 2024) — First Author* *(Patent Pending)*
-  - Stream-processing FPGA feature matcher using a **balanced BST** + **ratio-test** outlier rejection  
-  - ~**12× faster** than linear exhaustive search on FPGA, with scalable and resource-efficient design  
-  - [IEEE Xplore](https://ieeexplore.ieee.org/document/10558431)
+<div class="pub">
+  <div class="pub-media">
+    <!-- Replace this placeholder with your own image file, e.g., assets/img/fpl20.png -->
+    <img class="pub-img" src="assets/img/fpl20.png" alt="FPL 2020 paper diagram/teaser" />
+  </div>
+  <div class="pub-text">
+    <p class="pub-title">Dynamically Growing Neural Network Architecture for Lifelong Deep Learning on the Edge</p>
+    <p class="pub-meta"><em>(FPL 2020 — Co-author 2nd)</em> • <a href="https://ieeexplore.ieee.org/document/9221575">IEEE Xplore</a></p>
+    <ul class="pub-points">
+      <li>FPGA architecture for lifelong learning with efficient scheduling/resource reuse</li>
+      <li>Designed to meet tight edge constraints</li>
+      <li>Reported strong results on Core50</li>
+    </ul>
+  </div>
+</div>
 
-- **Dynamically Growing Neural Network Architecture for Lifelong Deep Learning on the Edge** *(FPL 2020) — Co-author (2nd)*
-  - FPGA architecture for self-organization neural networks enabling class-incremental lifelong learning on edge devices  
-  - Efficient scheduling/resource reuse + approximate computing for tight constraints  
-  - Strong results on Core50; outperforms CPU/GPU baselines in the study  
-  - [IEEE Xplore](https://ieeexplore.ieee.org/document/9221575)
-
-- **Feasibility Study of a Novel Cross Assembled Multi-quadrotor UAV** *(ICIAfS 2018) — Acknowledged*
-  - Proof-of-concept prototype for cross-assembled multi-quadrotor design  
-  - Demonstrated stabilization using a controller designed for single quadrotors (with minimal modifications)  
-  - [IEEE Xplore](https://ieeexplore.ieee.org/document/8913338)
+<div class="pub">
+  <div class="pub-media">
+    <!-- Replace this placeholder with your own image file, e.g., assets/img/iciafs18.png -->
+    <img class="pub-img" src="assets/img/iciafs18.png" alt="ICIAfS 2018 paper diagram/teaser" />
+  </div>
+  <div class="pub-text">
+    <p class="pub-title">Feasibility Study of a Novel Cross Assembled Multi-quadrotor UAV</p>
+    <p class="pub-meta"><em>(ICIAfS 2018 — Acknowledged)</em> • <a href="https://ieeexplore.ieee.org/document/8913338">IEEE Xplore</a></p>
+    <ul class="pub-points">
+      <li>Proof-of-concept prototype and stabilization validation</li>
+      <li>Demonstrated control reuse from single-quadrotor design with minimal changes</li>
+      <li>Plug-and-play replacement concept for improved robustness</li>
+    </ul>
+  </div>
+</div>
 
 ---
 
