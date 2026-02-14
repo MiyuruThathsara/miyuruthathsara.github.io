@@ -77,6 +77,18 @@ As a PhD Researcher at NTU, Singapore, I develop real-time, resource-efficient V
   - Reduced stereo matching latency via **region-aware + similarity-based descriptor grouping**  
   - Proposed **tracking-status-based keyframe generation** to avoid unnecessary map expansion and improve stability  
   - Validated on benchmarks + real-world experiments • *[Accepted]*
+  <!-- Demo video (autoplays muted) -->
+  <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin:0.75rem 0 1.5rem 0;">
+    <iframe
+      src="https://www.youtube.com/embed/vtGebB7Yoc8?autoplay=1&mute=1&loop=1&playlist=vtGebB7Yoc8&controls=1&rel=0&modestbranding=1"
+      title="FPGA Stereo Visual SLAM Demo"
+      frameborder="0"
+      allow="autoplay; encrypted-media; picture-in-picture"
+      allowfullscreen
+      style="position:absolute;top:0;left:0;width:100%;height:100%;">
+    </iframe>
+  </div>
+
 
 - **Hardware-Efficient Homogenized Key-Point Selection for Visual SLAM** *(FPT 2024) — First Author* *(Technology Disclosure)*
   - Real-time FPGA accelerator for **uniform keypoint selection** in streaming video  
