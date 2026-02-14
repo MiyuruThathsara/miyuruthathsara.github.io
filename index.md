@@ -16,6 +16,12 @@ layout: default
     margin: 0 0 1rem 0;
   }
 
+  .profile-overview {
+    font-size: 0.70rem;   /* try 0.88–0.95 */
+    line-height: 1.5;
+  }
+
+
   /* Mobile */
   @media (max-width: 900px) {
     .two-col { flex-direction: column; }
@@ -29,11 +35,12 @@ layout: default
 <div class="left-col" markdown="1">
 <img class="profile-pic" src="me.jpeg" alt="Miyuru Thathsara" />
 
-## Profile
+<h2>Profile</h2>
 
-As a PhD Researcher at NTU, Singapore, I develop real-time, resource-efficient Visual SLAM systems by combining algorithm design with FPGA-based acceleration on embedded platforms. My research has produced top-tier first-author publications on stereo visual SLAM, feature matching, and hardware-efficient keypoint selection, with demonstrated improvements in latency and energy efficiency. I’m motivated by building systems that are both scientifically solid and practical to deploy.
-
-**Current focus:** Algorithm–architecture co-design for real-time stereo SLAM on FPGA SoCs, with emphasis on efficient descriptor matching, keypoint/keyframe selection, and system-level optimization under tight power constraints.
+<div class="profile-overview">
+  <p>As a PhD Researcher at NTU, Singapore, I develop real-time, resource-efficient Visual SLAM systems by combining algorithm design with FPGA-based acceleration on embedded platforms. My research has produced top-tier first-author publications on stereo visual SLAM, feature matching, and hardware-efficient keypoint selection, with demonstrated improvements in latency and energy efficiency. I’m motivated by building systems that are both scientifically solid and practical to deploy.</p>
+  <p><strong>Current focus:</strong> Algorithm–architecture co-design for real-time stereo SLAM on FPGA SoCs, with emphasis on efficient descriptor matching, keypoint/keyframe selection, and system-level optimization under tight power constraints.</p>
+</div>
 
 </div>
 
