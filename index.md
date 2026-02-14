@@ -156,7 +156,7 @@ Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs
 ## Contact
 - Personal Email: [mthathsara@outlook.com](mailto:mthathsara@outlook.com)
 - Work Email: [miyuruth001@e.ntu.edu.sg](mailto:miyuruth001@e.ntu.edu.sg)
-- Google Scholar: [Miyuru Thathsara] (https://scholar.google.com/citations?user=_F2z9wYAAAAJ&hl=en)
+- Google Scholar: [MiyuruThathsara] (https://scholar.google.com/citations?user=_F2z9wYAAAAJ&hl=en)
 - LinkedIn: [Miyuru Thathsara](https://lk.linkedin.com/in/miyuru-thathsara-07596518b)
 - GitHub: [MiyuruThathsara](https://github.com/MiyuruThathsara)
 
