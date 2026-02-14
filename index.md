@@ -154,8 +154,13 @@ permalink: /
     margin: 0 0 0.65rem 0;
     opacity: 0.9;
   }
-  .pub-points {
-    margin: 0.25rem 0 0 1.1rem; /* keep bullet points for contribution bullets */
+  .pub-points{
+    list-style: none;
+    margin: 0.35rem 0 0 0;
+    padding-left: 0;
+  }
+  .pub-points li{
+    margin: 0.35rem 0;
   }
 
   @media (prefers-color-scheme: dark){
@@ -220,30 +225,6 @@ Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs
   <li>Hardware/software co-design</li>
   <li>Adaptive / reconfigurable hardware</li>
 </ul>
-
----
-
-## Education
-**PhD Candidate**, College of Computing and Data Science, Nanyang Technological University, Singapore *(2025 – Present)*<br>
-**PhD Student**, College of Computing and Data Science, Nanyang Technological University, Singapore *(2023 – 2025)*<br>
-**BSc (Hons) Electronics and Telecommunication Engineering (First Class)**, University of Moratuwa, Sri Lanka *(2016 – 2021)*<br>
-&nbsp;&nbsp;GPA **3.74/4.2** • Key modules: Digital IC Design (A+), Advanced Digital Systems (A+)<br>
-**Certificate Level in Management**, Achievers Lanka Business School *(2015 – 2016)*<br>
-**High School: Nalanda College, Colombo** *(2002 – 2015)*<br>
-&nbsp;&nbsp;Z-score **2.5017** (Island Rank **119**) • A grades: Combined Mathematics, Chemistry, Physics • 9 A’s (O/L)
-
----
-
-## Experience
-**Project Officer (Research)**, HESL, SCSE, NTU Singapore *(Jul 2022 – Jan 2023)*<br>
-&nbsp;&nbsp;Implemented a SLAM algorithm on FPGA (system prototyping and acceleration)<br>
-**Engineer, Accelerated Systems (HWAC Team)**, LSEG Technologies Sri Lanka *(May 2021 – Aug 2022)*<br>
-&nbsp;&nbsp;Developed a **custom AXI DMA engine**<br>
-&nbsp;&nbsp;Worked on **partial reconfiguration support** for hardware acceleration workflows<br>
-**Research Assistant**, HESL, SCSE, NTU Singapore *(Jul 2019 – Dec 2019)*<br>
-&nbsp;&nbsp;Designed **streaming hardware architectures** for deep learning and a self-organization map classifier<br>
-**Research Assistant**, UAV Lab, University of Moratuwa *(Jan 2018 – Dec 2018)*<br>
-&nbsp;&nbsp;Built a PWM resolver (Arduino Mega) for a multi-rotor platform
 
 ---
 
@@ -335,6 +316,30 @@ Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs
     </ul>
   </div>
 </div>
+
+---
+
+## Experience
+**Project Officer (Research)**, HESL, SCSE, NTU Singapore *(Jul 2022 – Jan 2023)*<br>
+&nbsp;&nbsp;Implemented a SLAM algorithm on FPGA (system prototyping and acceleration)<br>
+**Engineer, Accelerated Systems (HWAC Team)**, LSEG Technologies Sri Lanka *(May 2021 – Aug 2022)*<br>
+&nbsp;&nbsp;Developed a **custom AXI DMA engine**<br>
+&nbsp;&nbsp;Worked on **partial reconfiguration support** for hardware acceleration workflows<br>
+**Research Assistant**, HESL, SCSE, NTU Singapore *(Jul 2019 – Dec 2019)*<br>
+&nbsp;&nbsp;Designed **streaming hardware architectures** for deep learning and a self-organization map classifier<br>
+**Research Assistant**, UAV Lab, University of Moratuwa *(Jan 2018 – Dec 2018)*<br>
+&nbsp;&nbsp;Built a PWM resolver (Arduino Mega) for a multi-rotor platform
+
+---
+
+## Education
+**PhD Candidate**, College of Computing and Data Science, Nanyang Technological University, Singapore *(2025 – Present)*<br>
+**PhD Student**, College of Computing and Data Science, Nanyang Technological University, Singapore *(2023 – 2025)*<br>
+**BSc (Hons) Electronics and Telecommunication Engineering (First Class)**, University of Moratuwa, Sri Lanka *(2016 – 2021)*<br>
+&nbsp;&nbsp;GPA **3.74/4.2** • Key modules: Digital IC Design (A+), Advanced Digital Systems (A+)<br>
+**Certificate Level in Management**, Achievers Lanka Business School *(2015 – 2016)*<br>
+**High School: Nalanda College, Colombo** *(2002 – 2015)*<br>
+&nbsp;&nbsp;Z-score **2.5017** (Island Rank **119**) • A grades: Combined Mathematics, Chemistry, Physics • 9 A’s (O/L)
 
 ---
 
