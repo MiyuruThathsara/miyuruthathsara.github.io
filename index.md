@@ -114,7 +114,7 @@ permalink: /
     display: grid;
     grid-template-columns: minmax(240px, 320px) 1fr;
     gap: 1rem 1.25rem;
-    align-items: start;
+    align-items: center;
     margin: 1.25rem 0;
     padding: 0.9rem 1rem;
     border: 1px solid rgba(0,0,0,0.10);
@@ -279,7 +279,7 @@ Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs
   </div>
   <div class="pub-text">
     <p class="pub-title">Hardware-Efficient Homogenized Key-Point Selection for Visual SLAM</p>
-    <p class="pub-meta"><em>(FPT 2024 — First Author • Technology Disclosure)</em> • <a href="https://ieeexplore.ieee.org/abstract/document/11113393">IEEE Xplore</a></p>
+    <p class="pub-meta"><em>(FPT 2024 — First Author • Technology Disclosure)</em> • <a href="https://ieeexplore.ieee.org/abstract/document/11113393">Paper</a></p>
     <ul class="pub-points">
       <li>Real-time FPGA accelerator for <strong>uniform keypoint selection</strong> in streaming video</li>
       <li>Grid-based streaming architecture + efficient neighbor sorting for dynamic input sizes</li>
@@ -295,7 +295,7 @@ Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs
   </div>
   <div class="pub-text">
     <p class="pub-title">Hardware Accelerator for Feature Matching with Binary Search Tree</p>
-    <p class="pub-meta"><em>(ISCAS 2024 — First Author • Patent Pending)</em> • <a href="https://ieeexplore.ieee.org/document/10558431">IEEE Xplore</a></p>
+    <p class="pub-meta"><em>(ISCAS 2024 — First Author • Patent Pending)</em> • <a href="https://ieeexplore.ieee.org/document/10558431">Paper</a></p>
     <ul class="pub-points">
       <li>Stream-processing FPGA matcher using a <strong>balanced BST</strong> + <strong>ratio-test</strong> outlier rejection</li>
       <li>~<strong>12× faster</strong> than linear exhaustive search on FPGA</li>
@@ -311,7 +311,7 @@ Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs
   </div>
   <div class="pub-text">
     <p class="pub-title">Dynamically Growing Neural Network Architecture for Lifelong Deep Learning on the Edge</p>
-    <p class="pub-meta"><em>(FPL 2020 — Co-author 2nd)</em> • <a href="https://ieeexplore.ieee.org/document/9221575">IEEE Xplore</a></p>
+    <p class="pub-meta"><em>(FPL 2020 — Co-author 2nd)</em> • <a href="https://ieeexplore.ieee.org/document/9221575">Paper</a></p>
     <ul class="pub-points">
       <li>FPGA architecture for lifelong learning with efficient scheduling/resource reuse</li>
       <li>Designed to meet tight edge constraints</li>
@@ -327,7 +327,7 @@ Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs
   </div>
   <div class="pub-text">
     <p class="pub-title">Feasibility Study of a Novel Cross Assembled Multi-quadrotor UAV</p>
-    <p class="pub-meta"><em>(ICIAfS 2018 — Acknowledged)</em> • <a href="https://ieeexplore.ieee.org/document/8913338">IEEE Xplore</a></p>
+    <p class="pub-meta"><em>(ICIAfS 2018 — Acknowledged)</em> • <a href="https://ieeexplore.ieee.org/document/8913338">Paper</a></p>
     <ul class="pub-points">
       <li>Proof-of-concept prototype and stabilization validation</li>
       <li>Demonstrated control reuse from single-quadrotor design with minimal changes</li>
