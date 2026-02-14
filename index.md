@@ -3,6 +3,7 @@ title: Miyuru Thathsara
 layout: default
 ---
 
+
 <style>
   .two-col { display: flex; gap: 2rem; align-items: flex-start; }
   .left-col { flex: 1; max-width: 280px; }
@@ -13,7 +14,7 @@ layout: default
     max-width: 240px;
     border-radius: 14px;
     display: block;
-    margin: 0 0 1rem 0;
+    margin: 0 auto 1rem auto; /* center image */
   }
 
   .profile-overview {
@@ -21,11 +22,19 @@ layout: default
     line-height: 1.5;
   }
 
-  /* Center section titles (## -> h2) */
-  .right-col h2 { text-align: center; }
+  /* Keep general body text left */
+  .right-col { text-align: left; }
 
-  /* Optional: center the left column heading too */
+  /* Center headings only (## -> h2) */
+  .right-col > h2 { text-align: center; }
   .left-col h2 { text-align: center; }
+
+  /* Center Overview paragraph */
+  .left-col .profile-overview { text-align: center; }
+
+  /* Center "Current: Research Focus" heading + its paragraph */
+  .right-col > h2:first-of-type { text-align: center; }
+  .right-col > h2:first-of-type + p { text-align: center; }
 
   /* Mobile */
   @media (max-width: 900px) {
@@ -51,6 +60,7 @@ layout: default
 <div class="right-col" markdown="1">
 
 ## Current: Research Focus
+
 Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs, with emphasis on efficient salient feature extraction, descriptor matching, keypoint/keyframe selection, and system-level optimization under tight power constraints.
 
 ## Research Interests
