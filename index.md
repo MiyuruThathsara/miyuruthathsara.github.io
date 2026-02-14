@@ -34,7 +34,7 @@ layout: default
 </style>
 
 <div class="two-col">
-  <div class="left-col">
+  <div class="left-col" markdown="1">
 
 <img class="profile-pic" src="me.jpeg" alt="Miyuru Thathsara" />
 
@@ -45,7 +45,7 @@ As a PhD Researcher at NTU, Singapore, I develop real-time, resource-efficient V
 
   </div>
 
-  <div class="right-col">
+  <div class="right-col" markdown="1">
 
 ---
 
