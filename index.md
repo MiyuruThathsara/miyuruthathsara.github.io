@@ -358,7 +358,7 @@ Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs
 **Research Assistant**, HESL, SCSE, NTU Singapore *(Jul 2019 – Dec 2019)*<br>
 &nbsp;&nbsp;Developed **streaming hardware architectures** for deep learning and a self-organization map classifiers<br>
 **Research Assistant**, UAV Lab, University of Moratuwa *(Jan 2018 – Dec 2018)*<br>
-&nbsp;&nbsp;Designed and developed a multi-rotor controller hexacopter platform
+&nbsp;&nbsp;Designed and developed a multi-rotor controller for an hexacopter platform
 
 ---
 
