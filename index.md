@@ -3,13 +3,49 @@ title: Miyuru Thathsara
 layout: default
 ---
 
-![Miyuru Thathsara](me.jpeg)
+<style>
+  .two-col {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+  .left-col {
+    flex: 1;           /* 1 part */
+    max-width: 260px;  /* keeps it clean on large screens */
+    position: sticky;
+    top: 1.5rem;
+  }
+  .right-col {
+    flex: 3;           /* 3 parts */
+    min-width: 0;
+  }
+  .profile-pic {
+    width: 100%;
+    max-width: 240px;
+    border-radius: 14px;
+    display: block;
+    margin-bottom: 1rem;
+  }
+  @media (max-width: 900px) {
+    .two-col { flex-direction: column; }
+    .left-col { max-width: 100%; position: static; }
+    .profile-pic { max-width: 220px; }
+  }
+</style>
+
+<div class="two-col">
+  <div class="left-col">
+
+<img class="profile-pic" src="me.jpeg" alt="Miyuru Thathsara" />
 
 ## Profile
-
-As a PhD Researcher at NTU, Singapore, I develop real-time, resource-efficient Visual SLAM systems by combining algorithm design with FPGA-based acceleration on embedded platforms. My research has produced Top-Tier first-author publications on stereo visual SLAM, feature matching, and hardware-efficient keypoint selection, with demonstrated improvements in latency and energy efficiency. I’m motivated by building systems that are both scientifically solid and practical to deploy.
+As a PhD Researcher at NTU, Singapore, I develop real-time, resource-efficient Visual SLAM systems by combining algorithm design with FPGA-based acceleration on embedded platforms. My research has produced top-tier first-author publications on stereo visual SLAM, feature matching, and hardware-efficient keypoint selection, with demonstrated improvements in latency and energy efficiency. I’m motivated by building systems that are both scientifically solid and practical to deploy.
 
 **Current focus:** Algorithm–architecture co-design for real-time stereo SLAM on FPGA SoCs, with emphasis on efficient descriptor matching, keypoint/keyframe selection, and system-level optimization under tight power constraints.
+
+  </div>
+
+  <div class="right-col">
 
 ---
 
@@ -52,6 +88,16 @@ As a PhD Researcher at NTU, Singapore, I develop real-time, resource-efficient V
   - Reduced stereo matching latency via **region-aware + similarity-based descriptor grouping**  
   - Proposed **tracking-status-based keyframe generation** to avoid unnecessary map expansion and improve stability  
   - Validated on benchmarks + real-world experiments • *[Accepted]*
+  <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+  <iframe
+    src="https://youtu.be/vtGebB7Yoc8"
+    title="Demo video"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+    style="position:absolute;top:0;left:0;width:100%;height:100%;">
+  </iframe>
+</div>
 
 - **Hardware-Efficient Homogenized Key-Point Selection for Visual SLAM** *(FPT 2024) — First Author*  *(Technology Disclosure)*
   - Real-time FPGA accelerator for **uniform keypoint selection** in streaming video  
@@ -96,3 +142,6 @@ As a PhD Researcher at NTU, Singapore, I develop real-time, resource-efficient V
 - Email: [mthathsara@outlook.com](mailto:mthathsara@outlook.com)
 - LinkedIn: [Miyuru Thathsara](https://lk.linkedin.com/in/miyuru-thathsara-07596518b)
 - GitHub: [MiyuruThathsara](https://github.com/MiyuruThathsara)
+
+  </div>
+</div>
