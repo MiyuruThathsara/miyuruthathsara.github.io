@@ -196,7 +196,7 @@ permalink: /
       padding-left: 0;
       margin: 0.5rem auto 1rem auto;
       display: inline-block;   /* keeps the list centered as a block */
-      text-align: left;        /* keeps lines readable; change to center if you want */
+      text-align: center;        /* keeps lines readable; change to center if you want */
     }
 
     .mobile-only li{ margin: 0.35rem 0; }
