@@ -1,8 +1,37 @@
 ---
 title: Miyuru Thathsara
 layout: default
+permalink: /
 ---
 
+<!-- SEO + Structured Data (works even for one-page sites) -->
+<meta name="description" content="PhD candidate at NTU, Singapore working on FPGA-accelerated, energy-efficient Stereo Visual SLAM and RISC-V hardware/software co-design for edge robotics." />
+
+<!-- Optional but nice for social previews -->
+<meta property="og:title" content="Miyuru Thathsara | FPGA-Accelerated Stereo Visual SLAM (NTU)" />
+<meta property="og:description" content="FPGA-accelerated Stereo Visual SLAM, feature extraction, stereo matching, and hardware/software co-design for edge robotics." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://MiyuruThathsara.github.io/" />
+
+<!-- Structured data: helps Google understand your identity -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Miyuru Thathsara",
+  "url": "https://MiyuruThathsara.github.io/",
+  "jobTitle": "PhD Candidate",
+  "affiliation": {
+    "@type": "Organization",
+    "name": "Nanyang Technological University"
+  },
+  "sameAs": [
+    "https://github.com/MiyuruThathsara",
+    "https://lk.linkedin.com/in/miyuru-thathsara-07596518b",
+    "https://scholar.google.com/citations?user=_F2z9wYAAAAJ&hl=en"
+  ]
+}
+</script>
 
 <style>
   .two-col { display: flex; gap: 2rem; align-items: flex-start; }
