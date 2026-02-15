@@ -208,6 +208,24 @@ permalink: /
     .mobile-only li{ margin: 0.35rem 0; }
   }
 
+  /* Force boxes to be visible everywhere */
+  .right-col .pub,
+  .right-col .ri-grid li{
+    border: 2px solid #bdbdbd !important;
+    background: #f5f5f5 !important;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.12) !important; /* makes it obvious */
+  }
+
+  /* Dark mode */
+  @media (prefers-color-scheme: dark){
+    .right-col .pub,
+    .right-col .ri-grid li{
+      border: 2px solid rgba(255,255,255,0.35) !important;
+      background: rgba(255,255,255,0.10) !important;
+      box-shadow: 0 1px 10px rgba(0,0,0,0.45) !important;
+    }
+  }
+
 </style>
 
 <div class="two-col">
