@@ -90,24 +90,18 @@ permalink: /
     margin: 0.6rem 0 0 0;
   }
 
-  /* Research Interests boxes */
   .ri-grid li{
     text-align: center;
     padding: 0.55rem 0.7rem;
-    border: 1px solid #cfcfcf;      /* stronger than rgba */
+    border: 1px solid rgba(0,0,0,0.12);
     border-radius: 12px;
-    background: #f7f7f7;            /* visible on most screens */
+    background: rgba(0,0,0,0.03);
   }
 
-  /* Dark mode versions */
   @media (prefers-color-scheme: dark){
     .ri-grid li{
-      border: 1px solid rgba(255,255,255,0.28);
-      background: rgba(255,255,255,0.08);
-    }
-    .pub{
-      border: 1px solid rgba(255,255,255,0.28);
-      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
     }
   }
 
@@ -115,17 +109,17 @@ permalink: /
     .ri-grid{ grid-template-columns: 1fr; }
   }
 
-  /* Publication boxes */
-  .pub{
+  /* Publications: media on the LEFT, text on the RIGHT */
+  .pub {
     display: grid;
     grid-template-columns: minmax(240px, 320px) 1fr;
     gap: 1rem 1.25rem;
     align-items: center;
     margin: 1.25rem 0;
     padding: 0.9rem 1rem;
-    border: 1px solid #d0d0d0;      /* stronger border */
+    border: 1px solid rgba(0,0,0,0.10);
     border-radius: 14px;
-    background: #fafafa;            /* more visible */
+    background: rgba(0,0,0,0.02);
   }
 
   .pub-media {
