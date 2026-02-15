@@ -202,21 +202,31 @@ permalink: /
     .mobile-only li{ margin: 0.35rem 0; }
   }
 
-  /* Force boxes to be visible everywhere */
+  /* Soft, appealing cards (light mode) */
   .right-col .pub,
   .right-col .ri-grid li{
-    border: 2px solid #bdbdbd !important;
-    background: #f5f5f5 !important;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.12) !important; /* makes it obvious */
+    border: 1px solid rgba(0,0,0,0.10) !important;
+    background: rgba(0,0,0,0.015) !important;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06) !important;
   }
 
-  /* Dark mode */
+  /* Optional: slightly nicer hover (desktop) */
+  @media (hover:hover){
+    .right-col .pub:hover,
+    .right-col .ri-grid li:hover{
+      box-shadow: 0 10px 26px rgba(0,0,0,0.09) !important;
+      transform: translateY(-1px);
+      transition: box-shadow 160ms ease, transform 160ms ease;
+    }
+  }
+
+  /* Dark mode version */
   @media (prefers-color-scheme: dark){
     .right-col .pub,
     .right-col .ri-grid li{
-      border: 2px solid rgba(255,255,255,0.35) !important;
-      background: rgba(255,255,255,0.10) !important;
-      box-shadow: 0 1px 10px rgba(0,0,0,0.45) !important;
+      border: 1px solid rgba(255,255,255,0.16) !important;
+      background: rgba(255,255,255,0.06) !important;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.35) !important;
     }
   }
 
