@@ -29,6 +29,8 @@ const context = await browser.newContext({ viewport: { width: 1440, height: 1100
 const page = await context.newPage();
 const pageErrors = [];
 const pdfInspections = new Map();
+let websiteSummaries = [];
+let newsHeadlines = [];
 page.on('pageerror', error => pageErrors.push(error.message));
 
 async function audit() {
@@ -39,7 +41,7 @@ async function audit() {
 async function readPdf(bytes, name, render = false) {
   const task = getDocument({ data: new Uint8Array(bytes), standardFontDataUrl: resolve('node_modules/pdfjs-dist/standard_fonts') + sep });
   const pdf = await task.promise;
-  const inspection = { links: [], firstPage: null };
+  const inspection = { links: [], firstPage: null, pages: [], pageCount: pdf.numPages };
   let text = '';
   for (let number = 1; number <= pdf.numPages; number++) {
     const pdfPage = await pdf.getPage(number);
@@ -48,6 +50,8 @@ async function readPdf(bytes, name, render = false) {
     const items = content.items.filter(item => item.str?.trim());
     inspection.links.push(...(await pdfPage.getAnnotations()).filter(annotation => annotation.subtype === 'Link'));
     if (number === 1) inspection.firstPage = { items, width: viewport.width };
+    inspection.pages.push(items);
+    assert(Object.values(content.styles).every(style => style.fontFamily === 'sans-serif'), `Use consistent sans-serif typography in ${name}`);
     assert(items.length > 5, `Unexpected empty page in ${name}`);
     for (const item of items) {
       const x = item.transform[4], y = item.transform[5];
@@ -63,6 +67,9 @@ async function readPdf(bytes, name, render = false) {
     }
   }
   console.log(`PDF ${name}: ${pdf.numPages} pages; selectable text and margins verified`);
+  assert(!/\bNEWS\b/.test(text), `News must never appear in ${name}`);
+  assert(newsHeadlines.every(headline => !text.includes(headline)), `Website news leaked into ${name}`);
+  assert(websiteSummaries.every(summary => !text.includes(summary)), `Use formal CV paper descriptions, not website copy, in ${name}`);
   pdfInspections.set(name, inspection);
   await task.destroy();
   return text;
@@ -87,7 +94,17 @@ try {
   assert.match(await page.locator('#review').innerText(), /External Reviewer[\s\S]*ICCAD 2026/);
   assert(!/\bSCSE\b/.test(await page.locator('main').innerText()));
   assert.match(await page.locator('#experience').innerText(), /HESL, CCDS/);
-  for (const width of [1440, 1024, 768, 390, 320]) {
+  assert.equal(await page.locator('h1').count(), 1, 'Keep a single profile name for all screen sizes');
+  assert.equal(await page.locator('.news-list li').count(), 3);
+  newsHeadlines = await page.locator('.news-list h3').allTextContents();
+  assert(await page.locator('nav a[href="#news"]').isVisible());
+  websiteSummaries = await page.locator('.publication > p:not(.publication-venue), .publication > div > p:not(.publication-venue)').allTextContents();
+  assert.equal(websiteSummaries.length, 5);
+  assert(websiteSummaries.every(summary => summary.trim().split(/\s+/).length <= 40), 'Website paper summaries should be brief');
+  for (const link of await page.locator('.news-list a').all()) {
+    assert.equal(await page.locator(await link.getAttribute('href')).count(), 1, 'News links should target existing sections');
+  }
+  for (const width of [1440, 1024, 800, 768, 540, 390, 320]) {
     await page.setViewportSize({ width, height: 1100 });
     for (const img of await page.locator('main img').all()) {
       await img.scrollIntoViewIfNeeded();
@@ -99,6 +116,22 @@ try {
     assert(frame.width >= 220);
     assert(Math.abs(photo.width / photo.height - 1) < 0.01, 'The full square photograph must retain its proportions');
     assert(photo.x >= frame.x - 1 && photo.y >= frame.y - 1 && photo.x + photo.width <= frame.x + frame.width + 1 && photo.y + photo.height <= frame.y + frame.height + 1, 'The photograph must fit completely inside its frame');
+    if (width <= 800) {
+      const heading = await page.locator('.profile-heading').boundingBox();
+      assert(heading.y + heading.height <= photo.y + 1, 'Mobile name and headline must precede the photograph');
+      const nav = await page.locator('.site-header nav').boundingBox();
+      const rows = new Map();
+      for (const link of await page.locator('.site-header nav a').all()) {
+        const box = await link.boundingBox();
+        const key = Math.round(box.y);
+        rows.set(key, [...(rows.get(key) || []), box]);
+      }
+      for (const boxes of rows.values()) {
+        const left = Math.min(...boxes.map(box => box.x));
+        const right = Math.max(...boxes.map(box => box.x + box.width));
+        assert(Math.abs((left + right) / 2 - nav.x - nav.width / 2) < 2, `Every mobile navigation row should be centered at ${width}`);
+      }
+    }
     for (const figure of await page.locator('.publication-media').all()) {
       const bounds = await figure.boundingBox();
       assert(bounds.width <= 240 && bounds.height <= 215, 'Publication previews should remain compact');
@@ -108,6 +141,7 @@ try {
       await audit();
       await page.screenshot({ path: join(artifacts, `profile-${width}.png`) });
       await page.locator('.publication').nth(2).screenshot({ path: join(artifacts, `diagram-${width}.png`) });
+      await page.locator('#news').screenshot({ path: join(artifacts, `news-${width}.png`) });
     }
     console.log(`PASS: ${width}px image sizing and page layout`);
   }
@@ -156,6 +190,7 @@ try {
 
   await page.setViewportSize({ width: 1440, height: 1100 });
   await page.locator('[data-open-cv]').click();
+  assert.equal(await page.locator('input[data-group="sections"][data-key="news"]').count(), 0);
   let pdfText = await downloadPdf('academic', true);
   assert.match(pdfText, /External Reviewer/);
   assert.match(pdfText, /ICCAD 2026/);
@@ -167,6 +202,22 @@ try {
   assert(!pdfText.includes('scholar.google.com'));
   assert(!pdfText.includes('linkedin.com/in/'));
   const academic = pdfInspections.get('academic');
+  assert.equal(academic.pageCount, 2, 'The default academic CV should occupy two well-spaced pages');
+  assert(pdfText.includes('region-aware descriptor grouping'));
+  assert(pdfText.includes('approximately 12x faster matching than linear exhaustive search on FPGA'));
+  assert(pdfText.includes('FPL 2025 | First author'));
+  assert(pdfText.includes('[1]') && pdfText.includes('[4]'));
+  const dates = await page.locator('.cv-entry-date').allTextContents();
+  assert(dates.length >= 7);
+  for (const date of dates) {
+    const expected = date.replace(/[\u2010-\u2015]/g, '-');
+    const containingPage = academic.pages.find(items => items.some(item => item.str === expected));
+    const item = containingPage?.find(item => item.str === expected);
+    assert(item, `Missing date: ${date}`);
+    assert(Math.abs(item.transform[4] + item.width - academic.firstPage.width + 48) < 2, `Right-align date: ${date}`);
+    const title = containingPage.find(other => other !== item && Math.abs(other.transform[5] - item.transform[5]) < 0.1);
+    assert(title && title.transform[4] + title.width + 8 < item.transform[4], `Keep the title separate from its date: ${date}`);
+  }
   const { items, width: paperWidth } = academic.firstPage;
   for (const item of items.slice(0, 3)) {
     assert(Math.abs(item.transform[4] + item.width / 2 - paperWidth / 2) < 2, `CV header should be centered: ${item.str}`);
@@ -234,6 +285,7 @@ try {
 
   await page.locator('input[name="audience"][value="company"]').check();
   pdfText = await downloadPdf('company', true);
+  assert.equal(pdfInspections.get('company').pageCount, 1, 'The default company CV should fit one page without a sparse continuation');
   assert(pdfText.includes('AXI DMA'));
   assert(pdfText.indexOf('PROFESSIONAL EXPERIENCE') < pdfText.indexOf('EDUCATION'));
   assert(!pdfText.includes('External Reviewer'));
@@ -251,6 +303,12 @@ try {
   assert(pdfText.includes('Acknowledged contributor'));
   assert(pdfText.includes('Chess'));
   assert(pdfText.includes('ICCAD 2026'));
+  assert(pdfText.includes('Acknowledged contribution to prototype development'));
+  await page.locator('#cv-descriptions').uncheck();
+  const withoutDescriptions = await downloadPdf('all-sections-no-descriptions');
+  assert(withoutDescriptions.includes('Hardware Accelerator for Feature Matching'));
+  assert(!withoutDescriptions.includes('region-aware descriptor grouping'));
+  assert(!withoutDescriptions.includes('Acknowledged contribution to prototype development'));
 
   for (const checkbox of await page.locator('input[data-group="sections"]').all()) await checkbox.uncheck();
   assert(await page.locator('#cv-download').isDisabled());
@@ -291,7 +349,7 @@ try {
   const [retryDownload] = await Promise.all([retryPage.waitForEvent('download'), retryPage.locator('#cv-download').click()]);
   assert(retryDownload.suggestedFilename().endsWith('.pdf'));
   await retryContext.close();
-  console.log('PASS: image zoom, keyboard focus, CV presets, selection, persistence, centered headers, horizontal links, print option, empty state, PDF downloads, retry, and accessibility');
+  console.log('PASS: centered mobile navigation, name before photo, News exclusion, separate paper descriptions, PDF typography and dates, image zoom, keyboard focus, CV presets, selection, persistence, centered headers, horizontal links, print option, empty state, PDF downloads, retry, and accessibility');
   console.log(`Artifacts: ${artifacts}`);
 } finally {
   await browser.close();

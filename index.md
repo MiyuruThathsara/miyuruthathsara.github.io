@@ -5,6 +5,11 @@ permalink: /
 ---
 
 <div class="profile-layout">
+  <header class="profile-heading">
+    <p class="eyebrow">Embedded Intelligence <span aria-hidden="true">|</span> Hardware Acceleration</p>
+    <h1 id="profile-title">Miyuru Thathsara</h1>
+    <p class="intro-subtitle">Ph.D. Candidate at Nanyang Technological University</p>
+  </header>
   <aside class="profile-sidebar" aria-label="Profile and links">
     <a class="profile-photo-link" href="{{ '/me.jpeg' | relative_url }}" data-image-viewer data-image-title="Miyuru Thathsara" aria-label="View full photograph of Miyuru Thathsara">
       <span class="profile-photo-frame"><img class="profile-photo" src="{{ '/me.jpeg' | relative_url }}" alt="Miyuru Thathsara beside the Google sign" width="800" height="800" fetchpriority="high"></span>
@@ -28,9 +33,6 @@ permalink: /
 
   <div class="profile-content">
     <section class="introduction" aria-labelledby="profile-title">
-      <p class="eyebrow">Embedded Intelligence <span aria-hidden="true">|</span> Hardware Acceleration</p>
-      <h1 id="profile-title">Miyuru Thathsara</h1>
-      <p class="intro-subtitle">Ph.D. Candidate at Nanyang Technological University</p>
       <p>I develop efficient onboard computing to help robots understand their surroundings and find their way. My work combines camera-based vision with hardware acceleration so that small robots can process information and respond in real time, within limited power and computing budgets.</p>
       <p>My long-term goal is collaborative autonomy: teams of robots that share what they observe, build a common understanding of their environment, and coordinate useful work. I focus on the intelligence within each robot that makes this possible.</p>
       <div class="profile-actions">
@@ -38,6 +40,24 @@ permalink: /
         <a class="text-link" href="#contact">Contact me <span aria-hidden="true">↗</span></a>
       </div>
       <noscript><p class="section-note">Enable JavaScript to customize and download a PDF CV.</p></noscript>
+    </section>
+
+    <section class="content-section news-section" id="news" aria-labelledby="news-title">
+      <div class="section-heading">
+        <h2 id="news-title">News</h2>
+        <span class="section-index" aria-hidden="true">Latest updates</span>
+      </div>
+      <ol class="news-list">
+        {% for update in site.data.news %}
+        <li>
+          <time datetime="{{ update.date | escape }}">{{ update.date | escape }}</time>
+          <div>
+            <h3>{{ update.title | escape }}</h3>
+            <p>{{ update.summary | escape }} <a href="{{ update.link | escape }}">{{ update.link_label | escape }} <span aria-hidden="true">↗</span></a></p>
+          </div>
+        </li>
+        {% endfor %}
+      </ol>
     </section>
 
     <section class="content-section" id="research" aria-labelledby="research-title">
@@ -73,10 +93,10 @@ permalink: /
       </div>
       <p class="section-note">Research in reconfigurable computing and embedded systems. <a href="{{ site.scholar_url | escape }}">View Google Scholar <span aria-hidden="true">↗</span></a></p>
 
-      <article class="publication publication-featured">
+      <article class="publication publication-featured" data-cv-id="fpl2025">
         <p class="publication-venue">FPL 2025 <span>First author · Accepted</span></p>
         <h3>FPGA Stereo Visual SLAM with Efficient Stereo Feature Matching and Key-frame Generation</h3>
-        <p>A stereo visual SLAM implementation on an FPGA SoC, with region-aware and similarity-based descriptor grouping to reduce matching latency. Tracking-status-based keyframe generation limits unnecessary map expansion and improves stability, with validation on benchmarks and real-world experiments.</p>
+        <p>Helps a robot use two cameras to track its movement and build a map. Custom FPGA hardware matches image features faster, while selective map updates help keep tracking stable.</p>
         <details class="demo-disclosure">
           <summary>View research demonstration</summary>
           <div class="video-frame">
@@ -86,7 +106,7 @@ permalink: /
         </details>
       </article>
 
-      <article class="publication">
+      <article class="publication" data-cv-id="fpt2024">
         <a class="publication-media" href="{{ '/assets/img/fpt24.png' | relative_url }}" data-image-viewer data-image-title="Hardware-efficient keypoint selection" aria-label="Enlarge the keypoint selection diagram">
           <picture><source srcset="{{ '/assets/img/fpt24.webp' | relative_url }}" type="image/webp"><img src="{{ '/assets/img/fpt24.png' | relative_url }}" alt="Keypoint selection results on visual SLAM image sequences" width="1809" height="1564" loading="lazy" decoding="async"></picture>
           <span class="image-caption">View full-size figure <span aria-hidden="true">↗</span></span>
@@ -94,12 +114,12 @@ permalink: /
         <div>
           <p class="publication-venue">FPT 2024 <span>First author · Technology disclosure</span></p>
           <h3><a href="https://ieeexplore.ieee.org/abstract/document/11113393">Hardware-Efficient Homogenized Key-Point Selection for Visual SLAM</a></h3>
-          <p>A streaming FPGA accelerator for uniform keypoint selection. Grid-based processing and efficient neighbor sorting support dynamic input sizes while improving robustness and resource efficiency.</p>
+          <p>Selects useful visual landmarks evenly across an image so a robot can track its movement reliably. The FPGA design handles this task efficiently as the number of image features changes.</p>
           <a class="publication-link" href="https://ieeexplore.ieee.org/abstract/document/11113393" aria-label="Read Hardware-Efficient Homogenized Key-Point Selection for Visual SLAM on IEEE Xplore">Paper <span aria-hidden="true">↗</span></a>
         </div>
       </article>
 
-      <article class="publication">
+      <article class="publication" data-cv-id="iscas2024">
         <a class="publication-media" href="{{ '/assets/img/iscas24.png' | relative_url }}" data-image-viewer data-image-title="Binary search tree feature matcher" data-vector-url="{{ '/assets/img/iscas24.pdf' | relative_url }}" aria-label="Enlarge the feature matching architecture diagram">
           <picture><source srcset="{{ '/assets/img/iscas24.webp' | relative_url }}" type="image/webp"><img src="{{ '/assets/img/iscas24.png' | relative_url }}" alt="Binary search tree architecture for accelerated feature matching" width="721" height="517" loading="lazy" decoding="async"></picture>
           <span class="image-caption">View full-size figure <span aria-hidden="true">↗</span></span>
@@ -107,12 +127,12 @@ permalink: /
         <div>
           <p class="publication-venue">ISCAS 2024 <span>First author · Patent pending</span></p>
           <h3><a href="https://ieeexplore.ieee.org/document/10558431">Hardware Accelerator for Feature Matching with Binary Search Tree</a></h3>
-          <p>A stream-processing FPGA matcher using a balanced binary search tree and ratio-test outlier rejection. The design achieves approximately 12× faster matching than linear exhaustive search on FPGA.</p>
+          <p>Matches visual landmarks between images to help a robot track its movement. An organized search on FPGA makes matching about 12 times faster than checking every possible match on FPGA.</p>
           <a class="publication-link" href="https://ieeexplore.ieee.org/document/10558431" aria-label="Read Hardware Accelerator for Feature Matching with Binary Search Tree on IEEE Xplore">Paper <span aria-hidden="true">↗</span></a>
         </div>
       </article>
 
-      <article class="publication">
+      <article class="publication" data-cv-id="fpl2020">
         <a class="publication-media" href="{{ '/assets/img/fpl20.png' | relative_url }}" data-image-viewer data-image-title="Lifelong learning architecture" aria-label="Enlarge the lifelong learning architecture diagram">
           <picture><source srcset="{{ '/assets/img/fpl20.webp' | relative_url }}" type="image/webp"><img src="{{ '/assets/img/fpl20.png' | relative_url }}" alt="Dynamically growing neural network architecture for lifelong learning" width="612" height="389" loading="lazy" decoding="async"></picture>
           <span class="image-caption">View full-size figure <span aria-hidden="true">↗</span></span>
@@ -120,13 +140,13 @@ permalink: /
         <div>
           <p class="publication-venue">FPL 2020 <span>Second author</span></p>
           <h3><a href="https://ieeexplore.ieee.org/document/9221575">Dynamically Growing Neural Network Architecture for Lifelong Deep Learning on the Edge</a></h3>
-          <p>An FPGA architecture for lifelong learning under edge resource constraints, using efficient scheduling and resource reuse, evaluated on the CORe50 benchmark.</p>
+          <p>Supports neural networks that learn new tasks over time on small, resource-limited devices. The FPGA design reuses computing resources to make this ongoing learning more efficient.</p>
           <a class="publication-link" href="https://ieeexplore.ieee.org/document/9221575" aria-label="Read Dynamically Growing Neural Network Architecture for Lifelong Deep Learning on the Edge on IEEE Xplore">Paper <span aria-hidden="true">↗</span></a>
         </div>
       </article>
 
       <h3 class="subheading contribution-heading">Additional research contribution</h3>
-      <article class="publication publication-contribution">
+      <article class="publication publication-contribution" data-cv-id="iciafs2018">
         <a class="publication-media" href="{{ '/assets/img/iciafs18.png' | relative_url }}" data-image-viewer data-image-title="Cross-assembled multi-quadrotor UAV" aria-label="Enlarge the multi-quadrotor UAV photograph">
           <picture><source srcset="{{ '/assets/img/iciafs18.webp' | relative_url }}" type="image/webp"><img src="{{ '/assets/img/iciafs18.png' | relative_url }}" alt="Cross-assembled multi-quadrotor UAV prototype" width="656" height="371" loading="lazy" decoding="async"></picture>
           <span class="image-caption">View full-size figure <span aria-hidden="true">↗</span></span>
@@ -134,7 +154,7 @@ permalink: /
         <div>
           <p class="publication-venue">ICIAfS 2018 <span>Acknowledged contributor</span></p>
           <h3><a href="https://ieeexplore.ieee.org/document/8913338">Feasibility Study of a Novel Cross Assembled Multi-quadrotor UAV</a></h3>
-          <p>Prototype development and stabilization validation, demonstrating control reuse from a single-quadrotor design and a modular replacement concept for improved robustness.</p>
+          <p>Contributed to building and testing a drone assembled from multiple quadrotor units. The study explored stable flight, reuse of existing flight controls, and replaceable modules.</p>
           <a class="publication-link" href="https://ieeexplore.ieee.org/document/8913338" aria-label="Read Feasibility Study of a Novel Cross Assembled Multi-quadrotor UAV on IEEE Xplore">Paper <span aria-hidden="true">↗</span></a>
         </div>
       </article>

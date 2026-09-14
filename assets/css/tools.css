@@ -43,18 +43,26 @@ dialog::backdrop { background: #13252fe0; }
 .text-button { min-height: 44px; padding: 0.5rem 0; border: 0; background: transparent; color: var(--heading); font-size: 0.8rem; text-decoration: underline; text-underline-offset: 4px; }
 .cv-preview-panel { min-width: 0; padding: 1.5rem; background: var(--wash); }
 .cv-preview-label { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; color: var(--muted); font-size: 0.75rem; }
-.cv-preview { min-height: 440px; padding: 2.5rem; border: 1px solid var(--line); background: #fff; color: #202a30; font-family: Georgia, "Times New Roman", serif; font-size: 0.87rem; line-height: 1.6; }
-.cv-preview h3 { margin: 0 0 0.4rem; font-family: Georgia, "Times New Roman", serif; font-size: 1.8rem; }
-.cv-preview-header { text-align: center; }
+.cv-preview { min-height: 440px; padding: 2.5rem; border: 1px solid var(--line); background: #fff; color: #24272b; font-family: Arial, Helvetica, sans-serif; font-size: 0.81rem; line-height: 1.5; }
+.cv-preview h3 { margin: 0 0 0.4rem; color: #202428; font-family: inherit; font-size: 1.65rem; font-weight: 700; letter-spacing: 0; }
+.cv-preview-header { margin-bottom: 1.3rem; text-align: center; }
 .cv-preview .cv-headline { margin-bottom: 0.5rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 0.78rem; }
 .cv-preview .cv-contact-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.25rem 1rem; margin-bottom: 0.25rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 0.72rem; }
 .cv-contact-row > * { min-width: 0; overflow-wrap: anywhere; }
-.cv-preview h4 { margin: 1.5rem 0 0.75rem; padding-bottom: 0.35rem; border-bottom: 1px solid #cbd0d2; color: var(--heading); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; }
-.cv-preview h5 { margin: 0 0 0.2rem; font-size: 0.88rem; }
-.cv-preview p { margin-bottom: 0.55rem; }
-.cv-preview-item { margin-bottom: 1rem; }
+.cv-preview h4 { margin: 1.2rem 0 0.65rem; padding-bottom: 0.3rem; border-bottom: 1px solid #aab0b5; color: #202428; font-family: inherit; font-size: 0.76rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.cv-preview h5 { margin: 0 0 0.2rem; color: #202428; font-size: 0.82rem; line-height: 1.5; }
+.cv-preview p { margin-bottom: 0.4rem; }
+.cv-preview-item { position: relative; margin-bottom: 0.85rem; }
+.cv-entry-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem 1rem; }
+.cv-entry-heading h5 { min-width: 0; }
+.cv-entry-date { flex-shrink: 0; color: #50565c; font-size: 0.71rem; font-variant-numeric: tabular-nums; }
+.cv-publication-item { padding-left: 1.6rem; }
+.cv-publication-number { position: absolute; top: 0; left: 0; font-size: 0.75rem; }
+.cv-entry-bullets { margin: 0; padding-left: 1rem; }
+.cv-entry-bullets li { padding-left: 0.2rem; }
 .cv-preview .cv-item-meta { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 0.72rem; color: #596269; }
-.cv-preview .cv-entry-link { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 0.72rem; }
+.cv-preview .cv-entry-link { color: inherit; font: inherit; text-decoration: none; }
+.cv-preview .cv-entry-link:hover { text-decoration: underline; }
 .cv-download-bar { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem 1.5rem; padding: 1rem 1.5rem; border-top: 1px solid var(--line); background: var(--paper); }
 .cv-download-bar p { margin: 0; font-size: 0.8rem; }
 .cv-download-bar .cv-help { margin-top: 0.2rem; font-size: 0.7rem; }
@@ -64,6 +72,7 @@ dialog::backdrop { background: #13252fe0; }
   .cv-workspace { grid-template-columns: 280px minmax(0, 1fr); }
   .cv-settings, .cv-preview-panel { padding: 1.1rem; }
   .cv-preview { padding: 1.5rem; }
+  .cv-entry-heading { flex-wrap: wrap; gap: 0 0.75rem; }
 }
 @media (max-width: 700px) {
   dialog { max-width: calc(100% - 16px); max-height: calc(100dvh - 16px); }

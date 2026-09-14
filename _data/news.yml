@@ -1,0 +1,16 @@
+# Website-only updates, newest first. Use only confirmed dates (a year is sufficient).
+- date: "2026"
+  title: ICCAD external review
+  summary: External Reviewer for ICCAD 2026.
+  link: "#review"
+  link_label: Review experience
+- date: "2025"
+  title: FPL paper acceptance
+  summary: First-author paper on FPGA-based stereo visual SLAM accepted at FPL 2025.
+  link: "#publications"
+  link_label: Research and publications
+- date: "2025"
+  title: Ph.D. candidacy
+  summary: Advanced to Ph.D. candidacy at Nanyang Technological University.
+  link: "#education"
+  link_label: Education

@@ -17,10 +17,24 @@ const paragraphs = node => [...node.querySelectorAll(':scope > p')].map(text).fi
 const entry = (title = '', meta = '', values = [], url = '') => ({ title, meta, paragraphs: values, url });
 const records = selector => [...document.querySelectorAll(selector)].map(record => {
   const body = record.querySelector('div');
-  return entry(text(body.querySelector('h3')), [text(record.querySelector('.record-date')), text(body.querySelector('.record-organization'))].filter(Boolean).join(' | '), [...body.querySelectorAll(':scope > p:not(.record-organization)')].map(text));
+  const date = text(record.querySelector('.record-date'));
+  const sourceOrganization = body.querySelector('.record-organization');
+  const formattedOrganization = sourceOrganization?.cloneNode(true);
+  formattedOrganization?.querySelectorAll('br').forEach(br => br.replaceWith(' · '));
+  return { ...entry(text(body.querySelector('h3')), [date, text(sourceOrganization)].filter(Boolean).join(' | '), [...body.querySelectorAll(':scope > p:not(.record-organization)')].map(text)), date, organization: text(formattedOrganization) };
 });
-const publications = selector => [...document.querySelectorAll(selector)].map(record => entry(text(record.querySelector('h3')), text(record.querySelector('.publication-venue')), [text(record.querySelector(':scope > p:not(.publication-venue), :scope > div > p:not(.publication-venue)'))].filter(Boolean), record.querySelector('h3 a')?.href || ''));
+const publications = selector => [...document.querySelectorAll(selector)].map(record => {
+  const venue = record.querySelector('.publication-venue');
+  const conference = venue.cloneNode(true);
+  conference.querySelector('span')?.remove();
+  return {
+    ...entry(text(record.querySelector('h3')), text(venue), [text(record.querySelector(':scope > p:not(.publication-venue), :scope > div > p:not(.publication-venue)'))].filter(Boolean), record.querySelector('h3 a')?.href || ''),
+    cvId: record.dataset.cvId,
+    citationMeta: [text(conference), text(venue.querySelector('span'))].filter(Boolean).join(' | ')
+  };
+});
 
+// Deliberate allowlist: website News updates are never offered or exported as CV content.
 const sections = [
   { id: 'summary', title: 'Profile', items: [entry('', '', [...document.querySelectorAll('.introduction > p:not([class])')].map(text))] },
   { id: 'expertise', title: 'Technical expertise', items: wording.expertise.map(value => entry('', '', [value])) },
@@ -134,12 +148,19 @@ function model() {
     })),
     sections: orders[state.audience].filter(id => state.sections[id]).map(id => {
       const section = sections.find(value => value.id === id);
-      const items = section.items.filter(item => state.entries[item.id]).map(item => {
+      const items = section.items.filter(item => state.entries[item.id]).map((item, index) => {
         let values = [...item.paragraphs];
-        if (id === 'summary' && state.audience === 'company') values = [wording.company_summary];
+        if (id === 'summary') values = [state.audience === 'company' ? wording.company_summary : wording.academic_summary];
+        if (id === 'research') values = [wording.research_focus];
+        if (item.cvId && wording.publications[item.cvId]) values = [wording.publications[item.cvId]];
         if (!state.descriptions && ['experience', 'publications', 'contributions'].includes(id)) values = [];
         if (!state.grades && ['education', 'earlier'].includes(id)) values = values.filter(value => !/coursework|A\/L:|O\/L:/.test(value)).map(value => value.replace(/ · GPA:.*/, ''));
-        return { title: item.title, meta: item.meta, paragraphs: values, url: state.hyperlinks ? item.url : '' };
+        if (id === 'awards') return entry('', '', [[item.title, ...values].join(' — ')]);
+        return {
+          title: item.title, meta: item.citationMeta ?? item.organization ?? item.meta,
+          date: item.date, number: id === 'publications' ? index + 1 : undefined,
+          bullets: id === 'experience', paragraphs: values, url: state.hyperlinks ? item.url : ''
+        };
       });
       return {
         title: id === 'summary' && state.audience === 'company' ? 'Professional profile' : section.title,
@@ -171,16 +192,28 @@ function renderPreview(data) {
     preview.append(element('h4', '', section.title));
     section.items.forEach(item => {
       const block = element('div', 'cv-preview-item');
-      if (item.title) block.append(element('h5', '', item.title));
-      if (item.meta) block.append(element('p', 'cv-item-meta', item.meta));
-      item.paragraphs.forEach(value => block.append(element('p', '', value)));
-      if (item.url) {
-        const link = element('a', 'cv-entry-link', 'Publication');
-        link.href = item.url;
-        link.target = '_blank';
-        link.rel = 'noopener';
-        block.append(link);
+      if (item.number) {
+        block.classList.add('cv-publication-item');
+        block.append(element('span', 'cv-publication-number', `[${item.number}]`));
       }
+      if (item.title) {
+        const heading = element('div', 'cv-entry-heading');
+        const title = element('h5', '', item.title);
+        if (item.url) {
+          const link = element('a', 'cv-entry-link', item.title);
+          link.href = item.url; link.target = '_blank'; link.rel = 'noopener';
+          title.replaceChildren(link);
+        }
+        heading.append(title);
+        if (item.date) heading.append(element('span', 'cv-entry-date', item.date));
+        block.append(heading);
+      }
+      if (item.meta) block.append(element('p', 'cv-item-meta', item.meta));
+      if (item.bullets && item.paragraphs.length) {
+        const list = element('ul', 'cv-entry-bullets');
+        item.paragraphs.forEach(value => list.append(element('li', '', value)));
+        block.append(list);
+      } else item.paragraphs.forEach(value => block.append(element('p', '', value)));
       preview.append(block);
     });
   });

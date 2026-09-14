@@ -6,9 +6,9 @@ export function createCvPdf(jsPDF, model) {
   const margin = 48;
   const width = pageWidth - margin * 2;
   const bottom = pageHeight - 50;
-  const ink = [32, 42, 48];
+  const ink = [36, 39, 43];
   const navy = [24, 59, 78];
-  const muted = [80, 91, 98];
+  const muted = [80, 86, 92];
   let y = margin;
   const clean = value => String(value).normalize('NFC').replace(/[\u2010-\u2015]/g, '-').replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"').replace(/\u00a0/g, ' ').replace(/\u2197/g, '').replace(/\u00d7/g, 'x');
 
@@ -27,17 +27,18 @@ export function createCvPdf(jsPDF, model) {
     if (y + height > bottom) newPage();
   }
 
-  function paragraph(value, { font = 'times', style = 'normal', size = 10.5, color = ink, after = 5, url, align = 'left' } = {}) {
+  function paragraph(value, { style = 'normal', size = 10, color = ink, after = 3, url, align = 'left', indent = 0, maxWidth = width - indent, bullet = false } = {}) {
     const text = clean(value);
     if (!text) return;
-    pdf.setFont(font, style).setFontSize(size);
-    const lines = pdf.splitTextToSize(text, width);
-    const lineHeight = size * 1.35;
-    for (const line of lines) {
+    pdf.setFont('helvetica', style).setFontSize(size);
+    const lines = pdf.splitTextToSize(text, maxWidth);
+    const lineHeight = size * 1.3;
+    for (const [index, line] of lines.entries()) {
       ensure(lineHeight);
-      pdf.setFont(font, style).setFontSize(size).setTextColor(...color);
-      const textWidth = Math.min(width, pdf.getTextWidth(line));
-      const x = align === 'center' ? (pageWidth - textWidth) / 2 : margin;
+      pdf.setFont('helvetica', style).setFontSize(size).setTextColor(...color);
+      const textWidth = Math.min(maxWidth, pdf.getTextWidth(line));
+      const x = align === 'center' ? (pageWidth - textWidth) / 2 : margin + indent;
+      if (bullet && index === 0) pdf.text('•', x - 10, y + size);
       pdf.text(line, x, y + size);
       if (url) pdf.link(x, y, textWidth, lineHeight, { url });
       y += lineHeight;
@@ -45,12 +46,27 @@ export function createCvPdf(jsPDF, model) {
     y += after;
   }
 
-  function entryStartHeight(item) {
-    pdf.setFont('times', 'bold').setFontSize(11);
-    const title = item.title ? pdf.splitTextToSize(clean(item.title), width).length * 15 : 0;
-    pdf.setFont('helvetica', 'normal').setFontSize(8.5);
-    const meta = item.meta ? pdf.splitTextToSize(clean(item.meta), width).length * 12 : 0;
-    return title + meta + (item.paragraphs.length ? 30 : 8);
+  function textHeight(value, size, style, maxWidth) {
+    if (!value) return 0;
+    pdf.setFont('helvetica', style).setFontSize(size);
+    return pdf.splitTextToSize(clean(value), maxWidth).length * size * 1.3;
+  }
+
+  function entryLayout(item) {
+    const indent = item.number ? 22 : 0;
+    pdf.setFont('helvetica', 'normal').setFontSize(9);
+    const dateWidth = item.date ? pdf.getTextWidth(clean(item.date)) + 16 : 0;
+    const titleWidth = width - indent - dateWidth;
+    const titleHeight = item.title ? textHeight(item.title, 10.5, 'bold', titleWidth) + 2 : 0;
+    const metaHeight = item.meta ? textHeight(item.meta, 9, 'normal', width - indent) + 3 : 0;
+    const bodyHeight = item.paragraphs.reduce((height, value) => height + textHeight(value, 10, 'normal', width - indent - (item.bullets ? 10 : 0)) + 3, 0);
+    return { indent, titleWidth, height: titleHeight + metaHeight + bodyHeight + (item.title ? 7 : 0), startHeight: titleHeight + metaHeight + (bodyHeight ? 26 : 0) };
+  }
+
+  function reserveEntry(item) {
+    const layout = entryLayout(item);
+    // Keep normal CV entries together. Very long future entries can flow across pages.
+    return layout.height <= bottom - margin - 32 ? layout.height : layout.startHeight;
   }
 
   function contactRows(contacts) {
@@ -89,25 +105,34 @@ export function createCvPdf(jsPDF, model) {
     }
   }
 
-  paragraph(model.name, { size: 27, color: navy, after: 4, align: 'center' });
-  paragraph(model.headline, { font: 'helvetica', size: 9.5, after: 9, align: 'center' });
+  paragraph(model.name, { size: 23, style: 'bold', after: 3, align: 'center' });
+  paragraph(model.headline, { size: 9.5, after: 7, align: 'center' });
   contactRows(model.contacts.filter(contact => contact.kind === 'email'));
   contactRows(model.contacts.filter(contact => contact.kind === 'web'));
-  y += 7;
+  y += 6;
 
   for (const section of model.sections) {
-    // Reserve room for the section title and the start of its first entry.
-    ensure(34 + entryStartHeight(section.items[0]));
+    if (!section.items.length) continue;
+    ensure(32 + reserveEntry(section.items[0]));
     y += 8;
-    paragraph(section.title.toUpperCase(), { font: 'helvetica', style: 'bold', size: 10, color: navy, after: 4 });
-    pdf.setDrawColor(184, 193, 198).setLineWidth(0.5).line(margin, y, pageWidth - margin, y);
-    y += 9;
+    paragraph(section.title.toUpperCase(), { style: 'bold', size: 9.5, after: 4 });
+    pdf.setDrawColor(170, 176, 181).setLineWidth(0.5).line(margin, y, pageWidth - margin, y);
+    y += 6;
     for (const item of section.items) {
-      ensure(entryStartHeight(item));
-      if (item.title) paragraph(item.title, { style: 'bold', size: 11, after: 2, url: item.url });
-      if (item.meta) paragraph(item.meta, { font: 'helvetica', size: 8.5, color: muted, after: 4 });
-      item.paragraphs.forEach(value => paragraph(value));
-      y += item.title ? 6 : 2;
+      ensure(reserveEntry(item));
+      const { indent, titleWidth } = entryLayout(item);
+      if (item.number) {
+        pdf.setFont('helvetica', 'normal').setFontSize(9).setTextColor(...ink);
+        pdf.text(`[${item.number}]`, margin, y + 10.5);
+      }
+      if (item.date) {
+        pdf.setFont('helvetica', 'normal').setFontSize(9).setTextColor(...muted);
+        pdf.text(clean(item.date), pageWidth - margin, y + 10.5, { align: 'right' });
+      }
+      if (item.title) paragraph(item.title, { style: 'bold', size: 10.5, after: 2, url: item.url, indent, maxWidth: titleWidth });
+      if (item.meta) paragraph(item.meta, { size: 9, color: muted, indent });
+      item.paragraphs.forEach(value => paragraph(value, { indent: indent + (item.bullets ? 10 : 0), bullet: item.bullets }));
+      y += item.title ? 7 : 0;
     }
   }
 

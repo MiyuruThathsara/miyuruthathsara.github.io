@@ -1,5 +1,13 @@
 # Only CV-specific wording lives here. Entries and contact details come from the profile page.
 company_summary: FPGA and embedded systems researcher with experience in real-time visual SLAM, hardware acceleration, and hardware/software co-design. Developed an AXI DMA engine for the LSEG market data pipeline and FPGA-based vision systems at Nanyang Technological University.
+academic_summary: Ph.D. candidate at Nanyang Technological University specializing in FPGA-based visual SLAM and hardware/software co-design. Research addresses efficient onboard perception and localization for resource-constrained robots, with a long-term focus on collaborative autonomy.
+research_focus: Algorithm and architecture co-design for stereo visual SLAM, including feature selection, feature matching, and keyframe generation. The broader objective is energy-efficient onboard intelligence that enables robots to share spatial information and coordinate their actions.
+publications:
+  fpl2025: FPGA-SoC implementation of stereo visual SLAM with region-aware descriptor grouping for low-latency feature matching and tracking-driven keyframe generation. Evaluated on benchmark sequences and in real-world experiments.
+  fpt2024: Streaming FPGA architecture for spatially uniform keypoint selection, combining grid-based processing with efficient neighbour sorting to accommodate variable input sizes and improve resource efficiency.
+  iscas2024: Stream-processing FPGA architecture for feature matching using a balanced binary search tree and ratio-test outlier rejection. Achieves approximately 12× faster matching than linear exhaustive search on FPGA.
+  fpl2020: FPGA architecture for lifelong deep learning on resource-constrained edge devices, using computation scheduling and hardware reuse. Evaluated on the CORe50 benchmark.
+  iciafs2018: Acknowledged contribution to prototype development and flight-stabilization validation for a modular multi-quadrotor UAV, investigating controller reuse and replaceable quadrotor units.
 expertise:
   - FPGA acceleration and reconfigurable computing
   - Hardware/software co-design
