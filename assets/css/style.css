@@ -70,10 +70,12 @@ nav a:hover { text-decoration: underline; }
 .research-focus { padding: 1.25rem 1.5rem; border-left: 2px solid var(--accent); background: var(--wash); font-size: 0.93rem; }
 .research-focus h3 { margin-bottom: 0.5rem; font-size: 0.73rem; letter-spacing: 0.08em; text-transform: uppercase; }
 .research-focus p { margin: 0; }
+.research-focus p + p { margin-top: 0.85rem; }
+.research-themes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-top: 1.25rem; }
+.research-theme { padding: 1.1rem; border: 1px solid var(--line); }
+.research-theme h3 { font-size: 0.86rem; }
+.research-theme p { margin: 0; font-size: 0.81rem; line-height: 1.7; }
 .subheading { margin: 1.5rem 0 0.6rem; font-size: 0.8rem; }
-.interest-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem 1.5rem; margin: 0; padding: 0; list-style: none; font-size: 0.86rem; }
-.interest-list li { position: relative; padding-left: 0.9rem; }
-.interest-list li::before { content: ""; position: absolute; top: 0.8em; left: 0; width: 4px; height: 4px; background: var(--accent); }
 .section-note { font-size: 0.83rem; color: var(--muted); }
 .publication { display: grid; grid-template-columns: 172px minmax(0, 1fr); align-items: start; gap: 1.5rem; padding: 1.75rem 0; border-bottom: 1px solid var(--line); }
 .publication-featured { display: block; padding-top: 0.6rem; }
@@ -128,7 +130,7 @@ summary::marker { color: var(--accent); }
   nav { gap: 0.5rem 1.1rem; }
   .publication { grid-template-columns: 140px minmax(0, 1fr); gap: 1.2rem; }
   .record { grid-template-columns: 120px minmax(0, 1fr); gap: 1rem; }
-  .interest-list { column-gap: 1rem; }
+  .research-themes { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 800px) {
@@ -169,7 +171,6 @@ summary::marker { color: var(--accent); }
   .introduction > p:not([class]) { font-size: 0.93rem; }
   .content-section { margin-top: 2.6rem; }
   .research-focus { padding: 1rem 1.1rem; font-size: 0.87rem; }
-  .interest-list { grid-template-columns: 1fr; }
   .publication { grid-template-columns: 1fr; gap: 1rem; }
   .publication-media { min-height: 0; padding: 16px; }
   .publication-media img { max-height: 180px; }
@@ -201,6 +202,6 @@ summary::marker { color: var(--accent); }
   .publication { grid-template-columns: 100px minmax(0, 1fr); }
   .publication-media { min-height: 0; }
   .record { grid-template-columns: 100px minmax(0, 1fr); }
-  .publication, .record, .award-list li { break-inside: avoid; }
+  .publication, .record, .award-list li, .research-theme { break-inside: avoid; }
   .section-heading { break-after: avoid; }
 }

@@ -1,6 +1,6 @@
-# Miyuru Thathsara — Academic Profile
+# Miyuru Thathsara — Profile
 
-A responsive academic website built with Jekyll and hosted on GitHub Pages.
+A responsive profile and research website built with Jekyll and hosted on GitHub Pages.
 
 ## Local preview
 

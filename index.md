@@ -25,11 +25,11 @@ permalink: /
 
   <div class="profile-content">
     <section class="introduction" aria-labelledby="profile-title">
-      <p class="eyebrow">Computer architecture · Embedded intelligence</p>
+      <p class="eyebrow">Embedded Intelligence <span aria-hidden="true">|</span> Hardware Acceleration</p>
       <h1 id="profile-title">Miyuru Thathsara</h1>
       <p class="intro-subtitle">Ph.D. Candidate at Nanyang Technological University</p>
-      <p>I develop real-time, energy-efficient visual simultaneous localization and mapping (SLAM) systems for embedded platforms. My research combines algorithm design and FPGA acceleration to enable practical perception for edge robotics.</p>
-      <p>My work spans stereo visual SLAM, feature matching, and hardware-efficient keypoint selection, with an emphasis on latency, resource utilization, and energy efficiency.</p>
+      <p>I develop efficient onboard computing to help robots understand their surroundings and find their way. My work combines camera-based vision with hardware acceleration so that small robots can process information and respond in real time, within limited power and computing budgets.</p>
+      <p>My long-term goal is collaborative autonomy: teams of robots that share what they observe, build a common understanding of their environment, and coordinate useful work. I focus on the intelligence within each robot that makes this possible.</p>
       <a class="text-link" href="#contact">Contact me <span aria-hidden="true">↗</span></a>
     </section>
 
@@ -40,17 +40,23 @@ permalink: /
       </div>
       <div class="research-focus">
         <h3>Current focus</h3>
-        <p>Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA systems-on-chip. I investigate salient keypoint extraction, descriptor matching, keypoint and keyframe selection, and system-level optimization under constrained power budgets.</p>
+        <p>My current research helps a robot estimate its position and build a map using cameras, a process known as visual simultaneous localization and mapping (SLAM). I design the algorithms and the computing hardware together, using reconfigurable chips called FPGAs to make demanding vision tasks faster and more energy efficient.</p>
+        <p>This work provides a foundation for robots that can share spatial information and act together. I aim to support practical applications such as precision agriculture, infrastructure inspection, and environmental monitoring.</p>
       </div>
-      <h3 class="subheading">Research interests</h3>
-      <ul class="interest-list">
-        <li>Computer architecture</li>
-        <li>Low-power edge AI systems</li>
-        <li>Domain-specific accelerators</li>
-        <li>RISC-V co-processors</li>
-        <li>Hardware/software co-design</li>
-        <li>Adaptive and reconfigurable hardware</li>
-      </ul>
+      <div class="research-themes">
+        <div class="research-theme">
+          <h3>Visual understanding</h3>
+          <p>Using camera images to recognize landmarks, track movement, and build a map of the surroundings.</p>
+        </div>
+        <div class="research-theme">
+          <h3>Efficient onboard computing</h3>
+          <p>Combining software and tailored hardware to process sensor data quickly while using less energy.</p>
+        </div>
+        <div class="research-theme">
+          <h3>Collaborative autonomy</h3>
+          <p>Working toward teams of robots that share useful observations, align their maps, and coordinate their actions.</p>
+        </div>
+      </div>
     </section>
 
     <section class="content-section" id="publications" aria-labelledby="publications-title">
