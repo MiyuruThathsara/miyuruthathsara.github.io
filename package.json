@@ -1,0 +1,16 @@
+{
+  "name": "miyuru-personal-profile",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/profile.test.mjs",
+    "vendor:pdf": "cp node_modules/jspdf/dist/jspdf.umd.min.js assets/vendor/jspdf.umd.min.js && cp node_modules/jspdf/LICENSE assets/vendor/jspdf-LICENSE.txt"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@napi-rs/canvas": "1.0.9",
+    "jspdf": "4.2.1",
+    "pdfjs-dist": "6.3.289",
+    "playwright": "1.63.0"
+  }
+}

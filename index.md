@@ -6,7 +6,10 @@ permalink: /
 
 <div class="profile-layout">
   <aside class="profile-sidebar" aria-label="Profile and links">
-    <img class="profile-photo" src="{{ '/me.jpeg' | relative_url }}" alt="Miyuru Thathsara" width="800" height="800" fetchpriority="high">
+    <a class="profile-photo-link" href="{{ '/me.jpeg' | relative_url }}" data-image-viewer data-image-title="Miyuru Thathsara" aria-label="View full photograph of Miyuru Thathsara">
+      <span class="profile-photo-frame"><img class="profile-photo" src="{{ '/me.jpeg' | relative_url }}" alt="Miyuru Thathsara beside the Google sign" width="800" height="800" fetchpriority="high"></span>
+      <span class="image-caption">View full photograph <span aria-hidden="true">↗</span></span>
+    </a>
     <div class="profile-affiliation">
       <p class="sidebar-label">Ph.D. Candidate</p>
       <p>College of Computing<br>and Data Science</p>
@@ -30,7 +33,11 @@ permalink: /
       <p class="intro-subtitle">Ph.D. Candidate at Nanyang Technological University</p>
       <p>I develop efficient onboard computing to help robots understand their surroundings and find their way. My work combines camera-based vision with hardware acceleration so that small robots can process information and respond in real time, within limited power and computing budgets.</p>
       <p>My long-term goal is collaborative autonomy: teams of robots that share what they observe, build a common understanding of their environment, and coordinate useful work. I focus on the intelligence within each robot that makes this possible.</p>
-      <a class="text-link" href="#contact">Contact me <span aria-hidden="true">↗</span></a>
+      <div class="profile-actions">
+        <button class="button" type="button" data-open-cv hidden>Download CV <span class="button-format">PDF</span></button>
+        <a class="text-link" href="#contact">Contact me <span aria-hidden="true">↗</span></a>
+      </div>
+      <noscript><p class="section-note">Enable JavaScript to customize and download a PDF CV.</p></noscript>
     </section>
 
     <section class="content-section" id="research" aria-labelledby="research-title">
@@ -80,9 +87,10 @@ permalink: /
       </article>
 
       <article class="publication">
-        <div class="publication-media">
-          <img src="{{ '/assets/img/fpt24.png' | relative_url }}" alt="Keypoint selection results on visual SLAM image sequences" width="1809" height="1564" loading="lazy" decoding="async">
-        </div>
+        <a class="publication-media" href="{{ '/assets/img/fpt24.png' | relative_url }}" data-image-viewer data-image-title="Hardware-efficient keypoint selection" aria-label="Enlarge the keypoint selection diagram">
+          <picture><source srcset="{{ '/assets/img/fpt24.webp' | relative_url }}" type="image/webp"><img src="{{ '/assets/img/fpt24.png' | relative_url }}" alt="Keypoint selection results on visual SLAM image sequences" width="1809" height="1564" loading="lazy" decoding="async"></picture>
+          <span class="image-caption">View full-size figure <span aria-hidden="true">↗</span></span>
+        </a>
         <div>
           <p class="publication-venue">FPT 2024 <span>First author · Technology disclosure</span></p>
           <h3><a href="https://ieeexplore.ieee.org/abstract/document/11113393">Hardware-Efficient Homogenized Key-Point Selection for Visual SLAM</a></h3>
@@ -92,9 +100,10 @@ permalink: /
       </article>
 
       <article class="publication">
-        <div class="publication-media">
-          <img src="{{ '/assets/img/iscas24.png' | relative_url }}" alt="Binary search tree architecture for accelerated feature matching" width="721" height="517" loading="lazy" decoding="async">
-        </div>
+        <a class="publication-media" href="{{ '/assets/img/iscas24.png' | relative_url }}" data-image-viewer data-image-title="Binary search tree feature matcher" data-vector-url="{{ '/assets/img/iscas24.pdf' | relative_url }}" aria-label="Enlarge the feature matching architecture diagram">
+          <picture><source srcset="{{ '/assets/img/iscas24.webp' | relative_url }}" type="image/webp"><img src="{{ '/assets/img/iscas24.png' | relative_url }}" alt="Binary search tree architecture for accelerated feature matching" width="721" height="517" loading="lazy" decoding="async"></picture>
+          <span class="image-caption">View full-size figure <span aria-hidden="true">↗</span></span>
+        </a>
         <div>
           <p class="publication-venue">ISCAS 2024 <span>First author · Patent pending</span></p>
           <h3><a href="https://ieeexplore.ieee.org/document/10558431">Hardware Accelerator for Feature Matching with Binary Search Tree</a></h3>
@@ -104,9 +113,10 @@ permalink: /
       </article>
 
       <article class="publication">
-        <div class="publication-media">
-          <img src="{{ '/assets/img/fpl20.png' | relative_url }}" alt="Dynamically growing neural network architecture for lifelong learning" width="612" height="389" loading="lazy" decoding="async">
-        </div>
+        <a class="publication-media" href="{{ '/assets/img/fpl20.png' | relative_url }}" data-image-viewer data-image-title="Lifelong learning architecture" aria-label="Enlarge the lifelong learning architecture diagram">
+          <picture><source srcset="{{ '/assets/img/fpl20.webp' | relative_url }}" type="image/webp"><img src="{{ '/assets/img/fpl20.png' | relative_url }}" alt="Dynamically growing neural network architecture for lifelong learning" width="612" height="389" loading="lazy" decoding="async"></picture>
+          <span class="image-caption">View full-size figure <span aria-hidden="true">↗</span></span>
+        </a>
         <div>
           <p class="publication-venue">FPL 2020 <span>Second author</span></p>
           <h3><a href="https://ieeexplore.ieee.org/document/9221575">Dynamically Growing Neural Network Architecture for Lifelong Deep Learning on the Edge</a></h3>
@@ -117,9 +127,10 @@ permalink: /
 
       <h3 class="subheading contribution-heading">Additional research contribution</h3>
       <article class="publication publication-contribution">
-        <div class="publication-media">
-          <img src="{{ '/assets/img/iciafs18.png' | relative_url }}" alt="Cross-assembled multi-quadrotor UAV prototype" width="656" height="371" loading="lazy" decoding="async">
-        </div>
+        <a class="publication-media" href="{{ '/assets/img/iciafs18.png' | relative_url }}" data-image-viewer data-image-title="Cross-assembled multi-quadrotor UAV" aria-label="Enlarge the multi-quadrotor UAV photograph">
+          <picture><source srcset="{{ '/assets/img/iciafs18.webp' | relative_url }}" type="image/webp"><img src="{{ '/assets/img/iciafs18.png' | relative_url }}" alt="Cross-assembled multi-quadrotor UAV prototype" width="656" height="371" loading="lazy" decoding="async"></picture>
+          <span class="image-caption">View full-size figure <span aria-hidden="true">↗</span></span>
+        </a>
         <div>
           <p class="publication-venue">ICIAfS 2018 <span>Acknowledged contributor</span></p>
           <h3><a href="https://ieeexplore.ieee.org/document/8913338">Feasibility Study of a Novel Cross Assembled Multi-quadrotor UAV</a></h3>
@@ -223,10 +234,24 @@ permalink: /
       </ul>
     </section>
 
+    <section class="content-section" id="review" aria-labelledby="review-title">
+      <div class="section-heading">
+        <h2 id="review-title">Review Experience</h2>
+        <span class="section-index" aria-hidden="true">06</span>
+      </div>
+      <div class="record">
+        <p class="record-date">2026</p>
+        <div>
+          <h3>External Reviewer</h3>
+          <p class="record-organization">ICCAD 2026</p>
+        </div>
+      </div>
+    </section>
+
     <section class="content-section contact-section" id="contact" aria-labelledby="contact-title">
       <div class="section-heading">
         <h2 id="contact-title">Contact</h2>
-        <span class="section-index" aria-hidden="true">06</span>
+        <span class="section-index" aria-hidden="true">07</span>
       </div>
       <p>For research correspondence and professional enquiries, please get in touch by email.</p>
       <dl class="contact-list">

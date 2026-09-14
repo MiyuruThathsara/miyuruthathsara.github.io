@@ -1,0 +1,80 @@
+[hidden] { display: none !important; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: wait; opacity: 0.55; }
+.button { display: inline-flex; justify-content: center; align-items: center; gap: 0.65rem; min-height: 44px; padding: 0.65rem 1.1rem; border: 1px solid var(--heading); border-radius: 2px; background: var(--heading); color: #fff; font-size: 0.85rem; font-weight: 600; line-height: 1.4; text-decoration: none; }
+.button:hover { background: #285369; color: #fff; }
+.button-secondary { background: var(--paper); color: var(--heading); border-color: var(--line); }
+.button-secondary:hover { background: var(--wash); color: var(--heading); }
+.button-format { padding-left: 0.65rem; border-left: 1px solid #ffffff60; font-size: 0.68rem; letter-spacing: 0.04em; }
+.profile-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem 1.5rem; margin-top: 1.4rem; }
+body:has(dialog[open]) { overflow: hidden; }
+dialog { max-width: calc(100% - 32px); max-height: calc(100dvh - 32px); padding: 0; border: 1px solid var(--line); border-radius: 4px; background: var(--paper); color: var(--ink); box-shadow: 0 20px 80px #14252e40; }
+dialog::backdrop { background: #13252fe0; }
+.dialog-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--line); background: var(--paper); }
+.dialog-header h2 { font-size: 1.65rem; }
+.dialog-header .eyebrow { margin-bottom: 0.35rem; }
+.image-dialog { width: 1200px; }
+.image-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; padding: 1rem 1.5rem 0; }
+.image-controls .button { padding: 0.5rem 0.8rem; }
+.image-controls a { margin-left: 0.5rem; font-size: 0.85rem; }
+.image-controls output { min-width: 3.5rem; text-align: center; font-variant-numeric: tabular-nums; }
+.image-help { margin: 0; padding: 0.5rem 1.5rem 1rem; font-size: 0.8rem; color: var(--muted); }
+.image-viewport { height: min(72dvh, 900px); overflow: auto; background: #fff; border-top: 1px solid var(--line); overscroll-behavior: contain; }
+.image-viewport img { max-width: none; height: auto; margin: 0 auto; }
+.cv-dialog { width: 1240px; }
+.cv-dialog > .dialog-header { position: sticky; top: 0; z-index: 2; }
+.cv-workspace { display: grid; grid-template-columns: 340px minmax(0, 1fr); }
+.cv-settings { padding: 1.5rem; border-right: 1px solid var(--line); }
+.cv-settings fieldset { min-width: 0; margin: 0 0 1.5rem; padding: 0; border: 0; }
+.cv-settings legend { margin-bottom: 0.8rem; font-size: 0.9rem; font-weight: 600; color: var(--heading); }
+.cv-settings label { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.45rem 0; font-size: 0.82rem; line-height: 1.6; cursor: pointer; }
+.cv-settings input { flex-shrink: 0; width: 18px; height: 18px; margin: 0.1rem 0 0; accent-color: var(--heading); }
+.cv-settings input:disabled { opacity: 0.5; }
+.cv-purpose { display: flex; flex-wrap: wrap; gap: 0.6rem 1.5rem; }
+.cv-settings .cv-purpose { margin-bottom: 0.4rem; }
+.cv-help { margin: 0 0 0.75rem; color: var(--muted); font-size: 0.75rem; line-height: 1.6; }
+.cv-selection-group { padding: 0.4rem 0; border-bottom: 1px solid var(--line); }
+.cv-selection-group > label { font-weight: 600; }
+.cv-selection-group details { padding: 0 0 0.4rem 1.8rem; }
+.cv-selection-group summary { min-height: 28px; font-size: 0.75rem; font-weight: 400; }
+.cv-selection-group details label { font-size: 0.75rem; }
+.text-button { min-height: 44px; padding: 0.5rem 0; border: 0; background: transparent; color: var(--heading); font-size: 0.8rem; text-decoration: underline; text-underline-offset: 4px; }
+.cv-preview-panel { min-width: 0; padding: 1.5rem; background: var(--wash); }
+.cv-preview-label { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; color: var(--muted); font-size: 0.75rem; }
+.cv-preview { min-height: 440px; padding: 2.5rem; border: 1px solid var(--line); background: #fff; color: #202a30; font-family: Georgia, "Times New Roman", serif; font-size: 0.87rem; line-height: 1.6; }
+.cv-preview h3 { margin: 0 0 0.4rem; font-family: Georgia, "Times New Roman", serif; font-size: 1.8rem; }
+.cv-preview .cv-headline { margin-bottom: 0.5rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 0.78rem; }
+.cv-preview .cv-contact-line { margin-bottom: 0.25rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 0.72rem; overflow-wrap: anywhere; }
+.cv-preview h4 { margin: 1.5rem 0 0.75rem; padding-bottom: 0.35rem; border-bottom: 1px solid #cbd0d2; color: var(--heading); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.cv-preview h5 { margin: 0 0 0.2rem; font-size: 0.88rem; }
+.cv-preview p { margin-bottom: 0.55rem; }
+.cv-preview-item { margin-bottom: 1rem; }
+.cv-preview .cv-item-meta { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 0.72rem; color: #596269; }
+.cv-preview .cv-entry-link { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 0.72rem; }
+.cv-download-bar { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem 1.5rem; padding: 1rem 1.5rem; border-top: 1px solid var(--line); background: var(--paper); }
+.cv-download-bar p { margin: 0; font-size: 0.8rem; }
+.cv-download-bar .cv-help { margin-top: 0.2rem; font-size: 0.7rem; }
+.cv-download-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+
+@media (max-width: 900px) {
+  .cv-workspace { grid-template-columns: 280px minmax(0, 1fr); }
+  .cv-settings, .cv-preview-panel { padding: 1.1rem; }
+  .cv-preview { padding: 1.5rem; }
+}
+@media (max-width: 700px) {
+  dialog { max-width: calc(100% - 16px); max-height: calc(100dvh - 16px); }
+  .dialog-header { padding: 1rem; }
+  .dialog-header h2 { font-size: 1.35rem; }
+  .dialog-header .eyebrow { font-size: 0.6rem; }
+  .cv-workspace { grid-template-columns: 1fr; }
+  .cv-settings { border-right: 0; }
+  .cv-preview { padding: 1.2rem; }
+  .cv-download-bar { padding: 0.75rem 1rem; }
+  .cv-download-bar .cv-help { display: none; }
+  .cv-download-actions { width: 100%; }
+  .cv-download-actions .button { flex: 1; }
+  .image-controls { padding: 0.75rem 1rem 0; gap: 0.5rem; }
+  .image-help { padding: 0.5rem 1rem 0.75rem; }
+  .image-viewport { height: 60dvh; }
+}

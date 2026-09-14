@@ -1,0 +1,61 @@
+<script id="cv-wording" type="application/json">{{ site.data.cv | jsonify }}</script>
+<dialog class="image-dialog" id="image-dialog" aria-labelledby="image-title">
+  <div class="dialog-header">
+    <h2 id="image-title">Full-size image</h2>
+    <button class="button button-secondary" type="button" data-close-image autofocus>Close</button>
+  </div>
+  <div class="image-controls" aria-label="Image controls">
+    <button class="button button-secondary" type="button" id="image-zoom-out" aria-label="Zoom out">−</button>
+    <output id="image-scale" aria-live="polite">100%</output>
+    <button class="button button-secondary" type="button" id="image-zoom-in" aria-label="Zoom in">+</button>
+    <button class="button button-secondary" type="button" id="image-fit">Fit image</button>
+    <a id="image-original" target="_blank" rel="noopener">Open original</a>
+    <a id="image-vector" target="_blank" rel="noopener" hidden>Open vector PDF</a>
+  </div>
+  <p class="image-help">Zoom in for detail, then scroll or swipe to move around the image.</p>
+  <div class="image-viewport" tabindex="0" role="region" aria-label="Scrollable full-size image">
+    <img id="image-full" alt="">
+  </div>
+</dialog>
+
+<dialog class="cv-dialog" id="cv-dialog" aria-labelledby="cv-title" data-pdf-library="{{ '/assets/vendor/jspdf.umd.min.js' | relative_url }}">
+  <div class="dialog-header">
+    <div><p class="eyebrow">Your profile, ready to share</p><h2 id="cv-title">Create your CV</h2></div>
+    <button class="button button-secondary" type="button" data-close-cv autofocus>Close</button>
+  </div>
+  <form id="cv-form">
+    <div class="cv-workspace">
+      <div class="cv-settings">
+        <fieldset class="cv-purpose">
+          <legend>1. Choose a purpose</legend>
+          <label><input type="radio" name="audience" value="company"> Company</label>
+          <label><input type="radio" name="audience" value="academia" checked> Academia</label>
+        </fieldset>
+        <p class="cv-help" id="cv-preset-description">Emphasizes research, publications, and academic service.</p>
+        <p class="cv-help">Changing the purpose applies a fresh preset. You can customize it below.</p>
+        <fieldset>
+          <legend>2. Choose what to include</legend>
+          <div id="cv-selections"></div>
+        </fieldset>
+        <fieldset>
+          <legend>3. Contact details</legend>
+          <div id="cv-contacts" class="cv-contact-options"></div>
+        </fieldset>
+        <fieldset class="cv-detail-options">
+          <legend>4. Level of detail</legend>
+          <label><input type="checkbox" id="cv-descriptions" checked> Role and publication descriptions</label>
+          <label><input type="checkbox" id="cv-grades" checked> Grades and coursework</label>
+        </fieldset>
+        <button class="text-button" type="button" id="cv-reset">Reset to this preset</button>
+      </div>
+      <div class="cv-preview-panel">
+        <p class="cv-preview-label">Content preview <span id="cv-selection-count" role="status"></span></p>
+        <article class="cv-preview" id="cv-preview" aria-label="Selected CV content"></article>
+      </div>
+    </div>
+    <div class="cv-download-bar">
+      <div><p id="cv-status" role="status">Choose your sections, then download your CV.</p><p class="cv-help">A4 PDF with selectable text and page numbers. Your choices are remembered on this device.</p></div>
+      <div class="cv-download-actions"><a id="cv-open-pdf" class="button button-secondary" target="_blank" rel="noopener" hidden>Open PDF</a><button class="button" id="cv-download" type="submit">Download PDF</button></div>
+    </div>
+  </form>
+</dialog>

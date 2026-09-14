@@ -1,0 +1,9 @@
+# Only CV-specific wording lives here. Entries and contact details come from the profile page.
+company_summary: FPGA and embedded systems researcher with experience in real-time visual SLAM, hardware acceleration, and hardware/software co-design. Developed an AXI DMA engine for the LSEG market data pipeline and FPGA-based vision systems at Nanyang Technological University.
+expertise:
+  - FPGA acceleration and reconfigurable computing
+  - Hardware/software co-design
+  - Visual SLAM, localization, and feature matching
+  - Streaming hardware architectures
+  - AXI DMA and data movement
+  - Energy-efficient embedded systems

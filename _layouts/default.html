@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ page.title | default: site.title | escape }} | Profile</title>
+    <title>{{ page.title | default: site.title | escape }} | Personal Profile</title>
     <meta name="description" content="{{ site.description | escape }}">
     <meta name="theme-color" content="#183b4e">
     <link rel="canonical" href="{{ page.url | absolute_url }}">
-    <meta property="og:title" content="{{ site.title | escape }} | Profile">
+    <meta property="og:title" content="{{ site.title | escape }} | Personal Profile">
     <meta property="og:description" content="{{ site.description | escape }}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ page.url | absolute_url }}">
@@ -16,6 +16,9 @@
     <meta name="twitter:card" content="summary">
     <link rel="icon" href="{{ '/assets/favicon.svg' | relative_url }}" type="image/svg+xml">
     <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    <link rel="stylesheet" href="{{ '/assets/css/tools.css' | relative_url }}">
+    <script src="{{ '/assets/js/images.js' | relative_url }}" defer></script>
+    <script src="{{ '/assets/js/cv.js' | relative_url }}" type="module"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -41,12 +44,13 @@
     <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="site-header">
       <div class="header-inner">
-        <a class="site-brand" href="{{ '/' | relative_url }}" aria-label="Miyuru Thathsara, home"><span class="brand-initials" aria-hidden="true">MT</span><span>Profile</span></a>
+        <a class="site-brand" href="{{ '/' | relative_url }}" aria-label="Miyuru Thathsara, home"><span class="brand-initials" aria-hidden="true">MT</span><span>Personal Profile</span></a>
         <nav aria-label="Main navigation">
           <a href="#research">Research</a>
           <a href="#publications">Publications</a>
           <a href="#experience">Experience</a>
           <a href="#education">Education</a>
+          <a href="#review">Review</a>
           <a href="#contact">Contact</a>
         </nav>
       </div>
@@ -54,6 +58,7 @@
     <main class="page-shell" id="main-content" tabindex="-1">
       {{ content }}
     </main>
+    {% include profile-tools.html %}
     <footer class="site-footer">
       <div class="footer-inner">
         <p>© {{ 'now' | date: '%Y' }} Miyuru Thathsara</p>

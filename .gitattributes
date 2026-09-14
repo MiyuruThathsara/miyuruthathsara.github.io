@@ -1,0 +1,2 @@
+# Keep third-party distributions byte-for-byte identical to their releases.
+assets/vendor/* linguist-vendored -whitespace
