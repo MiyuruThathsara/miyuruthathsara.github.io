@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'en' }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page.title | default: site.title | escape }} | Research &amp; Academic Profile</title>
+    <meta name="description" content="{{ site.description | escape }}">
+    <meta name="theme-color" content="#183b4e">
+    <link rel="canonical" href="{{ page.url | absolute_url }}">
+    <meta property="og:title" content="{{ site.title | escape }} | Research &amp; Academic Profile">
+    <meta property="og:description" content="{{ site.description | escape }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ page.url | absolute_url }}">
+    <meta property="og:image" content="{{ '/me.jpeg' | absolute_url }}">
+    <meta property="og:image:alt" content="Miyuru Thathsara">
+    <meta name="twitter:card" content="summary">
+    <link rel="icon" href="{{ '/assets/favicon.svg' | relative_url }}" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": {{ site.title | jsonify }},
+        "url": {{ '/' | absolute_url | jsonify }},
+        "image": {{ '/me.jpeg' | absolute_url | jsonify }},
+        "jobTitle": "Ph.D. Candidate",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "Nanyang Technological University"
+        },
+        "sameAs": [
+          {{ site.personal_website | jsonify }},
+          {{ site.github_url | jsonify }},
+          {{ site.linkedin_url | jsonify }},
+          {{ site.scholar_url | jsonify }}
+        ]
+      }
+    </script>
+  </head>
+  <body id="top">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="site-brand" href="{{ '/' | relative_url }}" aria-label="Miyuru Thathsara, home"><span class="brand-initials" aria-hidden="true">MT</span><span>Academic profile</span></a>
+        <nav aria-label="Main navigation">
+          <a href="#research">Research</a>
+          <a href="#publications">Publications</a>
+          <a href="#experience">Experience</a>
+          <a href="#education">Education</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </div>
+    </header>
+    <main class="page-shell" id="main-content" tabindex="-1">
+      {{ content }}
+    </main>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <p>© {{ 'now' | date: '%Y' }} Miyuru Thathsara</p>
+        <a href="{{ site.personal_website }}">miyuruthathsara.com <span aria-hidden="true">↗</span></a>
+        <a href="#top">Back to top <span aria-hidden="true">↑</span></a>
+      </div>
+    </footer>
+  </body>
+</html>

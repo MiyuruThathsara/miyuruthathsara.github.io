@@ -1,3 +1,18 @@
-theme: jekyll-theme-cayman
 title: Miyuru Thathsara
-description: Ph.D. Candidate, Nanyang Technological University, Singapore
+description: Ph.D. candidate at Nanyang Technological University, Singapore, researching FPGA-accelerated visual SLAM and energy-efficient embedded systems.
+url: "https://miyuruthathsara.github.io"
+baseurl: ""
+lang: en
+personal_website: "https://miyuruthathsara.com"
+scholar_url: "https://scholar.google.com/citations?user=_F2z9wYAAAAJ&hl=en"
+linkedin_url: "https://lk.linkedin.com/in/miyuru-thathsara-07596518b"
+github_url: "https://github.com/MiyuruThathsara"
+university_email: "miyuruth001@e.ntu.edu.sg"
+personal_email: "mthathsara@outlook.com"
+
+exclude:
+  - changes.md
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor

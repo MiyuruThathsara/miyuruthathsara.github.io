@@ -4,427 +4,231 @@ layout: default
 permalink: /
 ---
 
-<!-- SEO + Structured Data (works even for one-page sites) -->
-<meta name="description" content="PhD candidate at NTU, Singapore working on FPGA-accelerated, energy-efficient Stereo Visual SLAM and RISC-V hardware/software co-design for edge robotics." />
-
-<!-- Optional but nice for social previews -->
-<meta property="og:title" content="Miyuru Thathsara | FPGA-Accelerated Stereo Visual SLAM (NTU)" />
-<meta property="og:description" content="FPGA-accelerated Stereo Visual SLAM, feature extraction, stereo matching, and hardware/software co-design for edge robotics." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://MiyuruThathsara.github.io/" />
-
-<!-- Structured data: helps Google understand your identity -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "Miyuru Thathsara",
-  "url": "https://MiyuruThathsara.github.io/",
-  "jobTitle": "PhD Candidate",
-  "affiliation": {
-    "@type": "Organization",
-    "name": "Nanyang Technological University"
-  },
-  "sameAs": [
-    "https://github.com/MiyuruThathsara",
-    "https://lk.linkedin.com/in/miyuru-thathsara-07596518b",
-    "https://scholar.google.com/citations?user=_F2z9wYAAAAJ&hl=en"
-  ]
-}
-</script>
-
-<style>
-  .two-col { display: flex; gap: 2rem; align-items: flex-start; }
-  .left-col { flex: 1; max-width: 280px; }
-  .right-col { flex: 3; min-width: 0; }
-
-  .profile-pic {
-    width: 100%;
-    max-width: 240px;
-    border-radius: 14px;
-    display: block;
-    margin: 0 auto 1rem auto; /* center image */
-  }
-
-  .profile-overview {
-    font-size: 0.90rem;
-    line-height: 1.5;
-  }
-
-  /* Keep general body text left */
-  .right-col { text-align: left; }
-
-  /* Center headings only (## -> h2) */
-  .right-col > h2 { text-align: center; }
-  .left-col h2 { text-align: center; }
-
-  /* Center Overview paragraph */
-  .left-col .profile-overview { text-align: center; }
-
-  /* Center "Current: Research Focus" heading + its paragraph */
-  .right-col > h2:first-of-type { text-align: center; }
-  .right-col > h2:first-of-type + p { text-align: center; }
-
-  /* Mobile */
-  @media (max-width: 900px) {
-    .two-col { flex-direction: column; }
-    .left-col { max-width: 100%; }
-    .profile-pic { max-width: 220px; }
-  }
-
-  /* Widen the overall page container (theme override) */
-  .wrapper, .container, .main-content, .page-content, .markdown-body, article, main, #main_content {
-    max-width: 1400px !important;
-    width: 95% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
-
-  /* Research Interests: 2-column clean grid (no bullets) */
-  .ri-grid{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem 1rem;
-    padding-left: 0;
-    list-style: none;
-    margin: 0.6rem 0 0 0;
-  }
-
-  .ri-grid li{
-    text-align: center;
-    padding: 0.55rem 0.7rem;
-    border: 1px solid rgba(0,0,0,0.12);
-    border-radius: 12px;
-    background: rgba(0,0,0,0.03);
-  }
-
-  @media (prefers-color-scheme: dark){
-    .ri-grid li{
-      border-color: rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.06);
-    }
-  }
-
-  @media (max-width: 900px){
-    .ri-grid{ grid-template-columns: 1fr; }
-  }
-
-  /* Publications: media on the LEFT, text on the RIGHT */
-  .pub {
-    display: grid;
-    grid-template-columns: minmax(240px, 320px) 1fr;
-    gap: 1rem 1.25rem;
-    align-items: center;
-    margin: 1.25rem 0;
-    padding: 0.9rem 1rem;
-    border: 1px solid rgba(0,0,0,0.10);
-    border-radius: 14px;
-    background: rgba(0,0,0,0.02);
-  }
-
-  .pub-media {
-    width: 100%;
-  }
-
-  .pub-vid {
-    position: relative;
-    padding-bottom: 56.25%;
-    height: 0;
-    overflow: hidden;
-    border-radius: 12px;
-  }
-  .pub-vid iframe {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    border: 0;
-  }
-
-  .pub-img {
-    width: 100%;
-    border-radius: 12px;
-    display: block;
-  }
-
-  .pub-title {
-    margin: 0 0 0.35rem 0;
-    font-weight: 700;
-  }
-  .pub-meta {
-    margin: 0 0 0.65rem 0;
-    opacity: 0.9;
-  }
-
-  /* Bullets with minimal indent (only inside publications) */
-  .pub-points{
-    margin: 0.35rem 0 0 0 !important;   /* no extra left margin */
-    padding-left: 0.95rem !important;   /* minimal indent for bullets */
-    list-style-position: outside;       /* bullet sits outside text block */
-  }
-
-  .pub-points li{
-    margin: 0.25rem 0;
-  }
-
-  @media (prefers-color-scheme: dark){
-      .pub {
-        border-color: rgba(255,255,255,0.16);
-        background: rgba(255,255,255,0.05);
-      }
-    }
-
-    /* Mobile: stack media above text */
-    @media (max-width: 900px){
-      .pub { grid-template-columns: 1fr; }
-    }
-
-    /* Desktop: show sidebar blocks, hide mobile footer */
-  .sidebar-only { display: block; }
-  .mobile-only  { display: none; }
-
-  /* Mobile: hide sidebar blocks, show mobile footer at end */
-  @media (max-width: 900px){
-    .sidebar-only { display: none; }
-    .mobile-only  { display: block; }
-
-    .mobile-only { margin-top: 1.5rem; text-align: center; }
-    .mobile-only h2 { text-align: center; }
-
-    /* Center list items */
-    .mobile-only ul{
-      list-style: none;
-      padding-left: 0;
-      margin: 0.5rem auto 1rem auto;
-      display: inline-block;   /* keeps the list centered as a block */
-      text-align: center;        /* keeps lines readable; change to center if you want */
-    }
-
-    .mobile-only li{ margin: 0.35rem 0; }
-  }
-
-  /* Soft, appealing cards (light mode) */
-  .right-col .pub,
-  .right-col .ri-grid li{
-    border: 1px solid rgba(0,0,0,0.10) !important;
-    background: rgba(0,0,0,0.015) !important;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06) !important;
-  }
-
-  /* Optional: slightly nicer hover (desktop) */
-  @media (hover:hover){
-    .right-col .pub:hover,
-    .right-col .ri-grid li:hover{
-      box-shadow: 0 10px 26px rgba(0,0,0,0.09) !important;
-      transform: translateY(-1px);
-      transition: box-shadow 160ms ease, transform 160ms ease;
-    }
-  }
-
-  /* Dark mode version */
-  @media (prefers-color-scheme: dark){
-    .right-col .pub,
-    .right-col .ri-grid li{
-      border: 1px solid rgba(255,255,255,0.16) !important;
-      background: rgba(255,255,255,0.06) !important;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.35) !important;
-    }
-  }
-
-</style>
-
-<div class="two-col">
-
-<div class="left-col" markdown="1">
-<img class="profile-pic" src="me.jpeg" alt="Miyuru Thathsara" />
-
-<h2>Overview</h2>
-
-<div class="profile-overview">
-  <p>As a PhD Researcher at NTU, Singapore, I develop real-time, resource-efficient Visual SLAM systems by combining algorithm design with FPGA-based acceleration on embedded platforms. My research has produced top-tier first-author publications on stereo visual SLAM, feature matching, and hardware-efficient keypoint selection, with demonstrated improvements in latency and energy efficiency. I’m motivated by building systems that are both scientifically solid and practical to deploy.</p>
-</div>
-
-<div class="sidebar-only">
-  <h2>Activities &amp; Hobbies</h2>
-
-  <div class="profile-overview">
-    <ul style="list-style: none; padding-left: 0; margin: 0.5rem 0 1rem 0;">
-      <li>Badminton, cricket, and chess</li>
-      <li>Enjoy sharing knowledge with the research community</li>
-    </ul>
-  </div>
-
-  <h2>Contact</h2>
-
-  <div class="profile-overview">
-    <ul style="list-style: none; padding-left: 0; margin: 0.5rem 0 0 0;">
-      <li>Personal Email: <a href="mailto:mthathsara@outlook.com">mthathsara@outlook.com</a></li>
-      <li>Work Email: <a href="mailto:miyuruth001@e.ntu.edu.sg">miyuruth001@e.ntu.edu.sg</a></li>
-      <li>Google Scholar: <a href="https://scholar.google.com/citations?user=_F2z9wYAAAAJ&amp;hl=en">Miyuru Thathsara</a></li>
-      <li>LinkedIn: <a href="https://lk.linkedin.com/in/miyuru-thathsara-07596518b">Miyuru Thathsara</a></li>
-      <li>GitHub: <a href="https://github.com/MiyuruThathsara">MiyuruThathsara</a></li>
-    </ul>
-  </div>
-</div>
-
-</div>
-
-<div class="right-col" markdown="1">
-
-## Current: Research Focus
-
-Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA SoCs, with emphasis on efficient salient keypoint extraction, descriptor matching, keypoint/keyframe selection, and system-level optimization under tight power constraints.
-
-## Research Interests
-<ul class="ri-grid">
-  <li>Computer architecture</li>
-  <li>Low-power edge AI systems</li>
-  <li>Domain-specific accelerators (DSA)</li>
-  <li>RISC-V co-processors</li>
-  <li>Hardware/software co-design</li>
-  <li>Adaptive / reconfigurable hardware</li>
-</ul>
-
----
-
-## Selected Publications
-
-<div class="pub">
-  <div class="pub-media">
-    <div class="pub-vid">
-      <iframe
-        src="https://www.youtube.com/embed/vtGebB7Yoc8?autoplay=1&mute=1&loop=1&playlist=vtGebB7Yoc8&controls=1&rel=0&modestbranding=1"
-        title="FPGA Stereo Visual SLAM Demo"
-        allow="autoplay; encrypted-media; picture-in-picture"
-        allowfullscreen>
-      </iframe>
+<div class="profile-layout">
+  <aside class="profile-sidebar" aria-label="Profile and links">
+    <img class="profile-photo" src="{{ '/me.jpeg' | relative_url }}" alt="Miyuru Thathsara" width="800" height="800" fetchpriority="high">
+    <div class="profile-affiliation">
+      <p class="sidebar-label">Ph.D. Candidate</p>
+      <p>College of Computing<br>and Data Science</p>
+      <p>Nanyang Technological University<br><span class="muted">Singapore</span></p>
     </div>
+    <div class="profile-links">
+      <a href="{{ site.scholar_url | escape }}">Google Scholar <span aria-hidden="true">↗</span></a>
+      <a href="{{ site.linkedin_url }}">LinkedIn <span aria-hidden="true">↗</span></a>
+      <a href="{{ site.github_url }}">GitHub <span aria-hidden="true">↗</span></a>
+    </div>
+    <div class="sidebar-website">
+      <p class="sidebar-label">Personal website</p>
+      <a href="{{ site.personal_website }}">miyuruthathsara.com <span aria-hidden="true">↗</span></a>
+    </div>
+  </aside>
+
+  <div class="profile-content">
+    <section class="introduction" aria-labelledby="profile-title">
+      <p class="eyebrow">Computer architecture · Embedded intelligence</p>
+      <h1 id="profile-title">Miyuru Thathsara</h1>
+      <p class="intro-subtitle">Ph.D. Candidate at Nanyang Technological University</p>
+      <p>I develop real-time, energy-efficient visual simultaneous localization and mapping (SLAM) systems for embedded platforms. My research combines algorithm design and FPGA acceleration to enable practical perception for edge robotics.</p>
+      <p>My work spans stereo visual SLAM, feature matching, and hardware-efficient keypoint selection, with an emphasis on latency, resource utilization, and energy efficiency.</p>
+      <a class="text-link" href="#contact">Contact me <span aria-hidden="true">↗</span></a>
+    </section>
+
+    <section class="content-section" id="research" aria-labelledby="research-title">
+      <div class="section-heading">
+        <h2 id="research-title">Research</h2>
+        <span class="section-index" aria-hidden="true">01</span>
+      </div>
+      <div class="research-focus">
+        <h3>Current focus</h3>
+        <p>Algorithm–architecture co-design for real-time stereo visual SLAM on FPGA systems-on-chip. I investigate salient keypoint extraction, descriptor matching, keypoint and keyframe selection, and system-level optimization under constrained power budgets.</p>
+      </div>
+      <h3 class="subheading">Research interests</h3>
+      <ul class="interest-list">
+        <li>Computer architecture</li>
+        <li>Low-power edge AI systems</li>
+        <li>Domain-specific accelerators</li>
+        <li>RISC-V co-processors</li>
+        <li>Hardware/software co-design</li>
+        <li>Adaptive and reconfigurable hardware</li>
+      </ul>
+    </section>
+
+    <section class="content-section" id="publications" aria-labelledby="publications-title">
+      <div class="section-heading">
+        <h2 id="publications-title">Selected publications</h2>
+        <span class="section-index" aria-hidden="true">02</span>
+      </div>
+      <p class="section-note">Research in reconfigurable computing and embedded systems. <a href="{{ site.scholar_url | escape }}">View Google Scholar <span aria-hidden="true">↗</span></a></p>
+
+      <article class="publication publication-featured">
+        <p class="publication-venue">FPL 2025 <span>First author · Accepted</span></p>
+        <h3>FPGA Stereo Visual SLAM with Efficient Stereo Feature Matching and Key-frame Generation</h3>
+        <p>A stereo visual SLAM implementation on an FPGA SoC, with region-aware and similarity-based descriptor grouping to reduce matching latency. Tracking-status-based keyframe generation limits unnecessary map expansion and improves stability, with validation on benchmarks and real-world experiments.</p>
+        <details class="demo-disclosure">
+          <summary>View research demonstration</summary>
+          <div class="video-frame">
+            <iframe src="https://www.youtube-nocookie.com/embed/vtGebB7Yoc8?rel=0" title="FPGA stereo visual SLAM research demonstration" loading="lazy" allow="encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          </div>
+          <p class="video-fallback"><a href="https://www.youtube.com/watch?v=vtGebB7Yoc8">Watch on YouTube <span aria-hidden="true">↗</span></a></p>
+        </details>
+      </article>
+
+      <article class="publication">
+        <div class="publication-media">
+          <img src="{{ '/assets/img/fpt24.png' | relative_url }}" alt="Keypoint selection results on visual SLAM image sequences" width="1809" height="1564" loading="lazy" decoding="async">
+        </div>
+        <div>
+          <p class="publication-venue">FPT 2024 <span>First author · Technology disclosure</span></p>
+          <h3><a href="https://ieeexplore.ieee.org/abstract/document/11113393">Hardware-Efficient Homogenized Key-Point Selection for Visual SLAM</a></h3>
+          <p>A streaming FPGA accelerator for uniform keypoint selection. Grid-based processing and efficient neighbor sorting support dynamic input sizes while improving robustness and resource efficiency.</p>
+          <a class="publication-link" href="https://ieeexplore.ieee.org/abstract/document/11113393" aria-label="Read Hardware-Efficient Homogenized Key-Point Selection for Visual SLAM on IEEE Xplore">Paper <span aria-hidden="true">↗</span></a>
+        </div>
+      </article>
+
+      <article class="publication">
+        <div class="publication-media">
+          <img src="{{ '/assets/img/iscas24.png' | relative_url }}" alt="Binary search tree architecture for accelerated feature matching" width="721" height="517" loading="lazy" decoding="async">
+        </div>
+        <div>
+          <p class="publication-venue">ISCAS 2024 <span>First author · Patent pending</span></p>
+          <h3><a href="https://ieeexplore.ieee.org/document/10558431">Hardware Accelerator for Feature Matching with Binary Search Tree</a></h3>
+          <p>A stream-processing FPGA matcher using a balanced binary search tree and ratio-test outlier rejection. The design achieves approximately 12× faster matching than linear exhaustive search on FPGA.</p>
+          <a class="publication-link" href="https://ieeexplore.ieee.org/document/10558431" aria-label="Read Hardware Accelerator for Feature Matching with Binary Search Tree on IEEE Xplore">Paper <span aria-hidden="true">↗</span></a>
+        </div>
+      </article>
+
+      <article class="publication">
+        <div class="publication-media">
+          <img src="{{ '/assets/img/fpl20.png' | relative_url }}" alt="Dynamically growing neural network architecture for lifelong learning" width="612" height="389" loading="lazy" decoding="async">
+        </div>
+        <div>
+          <p class="publication-venue">FPL 2020 <span>Second author</span></p>
+          <h3><a href="https://ieeexplore.ieee.org/document/9221575">Dynamically Growing Neural Network Architecture for Lifelong Deep Learning on the Edge</a></h3>
+          <p>An FPGA architecture for lifelong learning under edge resource constraints, using efficient scheduling and resource reuse, evaluated on the CORe50 benchmark.</p>
+          <a class="publication-link" href="https://ieeexplore.ieee.org/document/9221575" aria-label="Read Dynamically Growing Neural Network Architecture for Lifelong Deep Learning on the Edge on IEEE Xplore">Paper <span aria-hidden="true">↗</span></a>
+        </div>
+      </article>
+
+      <h3 class="subheading contribution-heading">Additional research contribution</h3>
+      <article class="publication publication-contribution">
+        <div class="publication-media">
+          <img src="{{ '/assets/img/iciafs18.png' | relative_url }}" alt="Cross-assembled multi-quadrotor UAV prototype" width="656" height="371" loading="lazy" decoding="async">
+        </div>
+        <div>
+          <p class="publication-venue">ICIAfS 2018 <span>Acknowledged contributor</span></p>
+          <h3><a href="https://ieeexplore.ieee.org/document/8913338">Feasibility Study of a Novel Cross Assembled Multi-quadrotor UAV</a></h3>
+          <p>Prototype development and stabilization validation, demonstrating control reuse from a single-quadrotor design and a modular replacement concept for improved robustness.</p>
+          <a class="publication-link" href="https://ieeexplore.ieee.org/document/8913338" aria-label="Read Feasibility Study of a Novel Cross Assembled Multi-quadrotor UAV on IEEE Xplore">Paper <span aria-hidden="true">↗</span></a>
+        </div>
+      </article>
+    </section>
+
+    <section class="content-section" id="experience" aria-labelledby="experience-title">
+      <div class="section-heading">
+        <h2 id="experience-title">Experience</h2>
+        <span class="section-index" aria-hidden="true">03</span>
+      </div>
+      <div class="record">
+        <p class="record-date">Jul 2022 – Jan 2023</p>
+        <div>
+          <h3>Project Officer (Research)</h3>
+          <p class="record-organization">HESL, SCSE · Nanyang Technological University, Singapore</p>
+          <p>Designed and developed a visual SLAM algorithm on an FPGA SoC, including system prototyping and hardware acceleration.</p>
+        </div>
+      </div>
+      <div class="record">
+        <p class="record-date">May 2021 – Aug 2022</p>
+        <div>
+          <h3>Engineer, Accelerated Systems</h3>
+          <p class="record-organization">HWAC Team · LSEG Technologies, Sri Lanka</p>
+          <p>Developed a customized multi-channel AXI DMA engine, subsequently integrated into the LSEG market data dissemination pipeline. Contributed partial reconfiguration support for hardware acceleration workflows.</p>
+        </div>
+      </div>
+      <div class="record">
+        <p class="record-date">Jul 2019 – Dec 2019</p>
+        <div>
+          <h3>Research Assistant</h3>
+          <p class="record-organization">HESL, SCSE · Nanyang Technological University, Singapore</p>
+          <p>Developed streaming hardware architectures for deep learning and self-organizing map classifiers.</p>
+        </div>
+      </div>
+      <div class="record">
+        <p class="record-date">Jan 2018 – Dec 2018</p>
+        <div>
+          <h3>Research Assistant</h3>
+          <p class="record-organization">UAV Lab · University of Moratuwa, Sri Lanka</p>
+          <p>Designed and developed a multirotor controller for a hexacopter platform.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section" id="education" aria-labelledby="education-title">
+      <div class="section-heading">
+        <h2 id="education-title">Education</h2>
+        <span class="section-index" aria-hidden="true">04</span>
+      </div>
+      <div class="record">
+        <p class="record-date">2023 – Present</p>
+        <div>
+          <h3>Doctor of Philosophy <span class="degree-status">(in progress)</span></h3>
+          <p class="record-organization">College of Computing and Data Science<br>Nanyang Technological University, Singapore</p>
+          <p>Ph.D. student, 2023–2025; Ph.D. candidate since 2025.</p>
+        </div>
+      </div>
+      <div class="record">
+        <p class="record-date">2016 – 2021</p>
+        <div>
+          <h3>B.Sc. (Hons) in Electronics and Telecommunication Engineering</h3>
+          <p class="record-organization">University of Moratuwa, Sri Lanka</p>
+          <p>First Class Honours · GPA: 3.74/4.2</p>
+          <p>Selected coursework: Digital IC Design (A+), Advanced Digital Systems (A+).</p>
+        </div>
+      </div>
+      <details class="education-details">
+        <summary>Earlier education</summary>
+        <div class="record">
+          <p class="record-date">2015 – 2016</p>
+          <div>
+            <h3>Certificate Level in Management</h3>
+            <p class="record-organization">Achievers Lanka Business School</p>
+          </div>
+        </div>
+        <div class="record">
+          <p class="record-date">2002 – 2015</p>
+          <div>
+            <h3>Nalanda College, Colombo</h3>
+            <p>A/L: A grades in Combined Mathematics, Chemistry, and Physics. Z-score: 2.5017; island rank: 119.</p>
+            <p>O/L: nine A grades.</p>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="content-section" id="awards" aria-labelledby="awards-title">
+      <div class="section-heading">
+        <h2 id="awards-title">Honours &amp; awards</h2>
+        <span class="section-index" aria-hidden="true">05</span>
+      </div>
+      <ul class="award-list">
+        <li><strong>NTU Research Scholarship</strong><span>Awarded in 2023 · Four-year scholarship</span></li>
+        <li><strong>Dean’s List, University of Moratuwa</strong><span>Semesters 1, 2, 3, 6, and 8</span></li>
+        <li><strong>Olympiad Mathematics Competition</strong><span>Distinction · 2014</span></li>
+        <li><strong>Chess</strong><span>School team captain, 2005–2010. Individual: 25th nationally and 5th provincially. Team: 3rd nationally on two occasions.</span></li>
+      </ul>
+    </section>
+
+    <section class="content-section contact-section" id="contact" aria-labelledby="contact-title">
+      <div class="section-heading">
+        <h2 id="contact-title">Contact</h2>
+        <span class="section-index" aria-hidden="true">06</span>
+      </div>
+      <p>For research correspondence and professional enquiries, please get in touch by email.</p>
+      <dl class="contact-list">
+        <div><dt>University</dt><dd><a href="mailto:{{ site.university_email }}">{{ site.university_email }}</a></dd></div>
+        <div><dt>Personal</dt><dd><a href="mailto:{{ site.personal_email }}">{{ site.personal_email }}</a></dd></div>
+        <div><dt>Website</dt><dd><a href="{{ site.personal_website }}">miyuruthathsara.com <span aria-hidden="true">↗</span></a></dd></div>
+      </dl>
+      <p class="personal-note">Outside research, I enjoy badminton, cricket, and chess, as well as sharing knowledge with the research community.</p>
+    </section>
   </div>
-  <div class="pub-text">
-    <p class="pub-title">FPGA Stereo Visual SLAM with Efficient Stereo Feature Matching and Key-frame Generation</p>
-    <p class="pub-meta"><em>(FPL 2025 — First Author) • Accepted</em></p>
-    <ul class="pub-points">
-      <li>First FPGA SoC implementation of stereo visual SLAM</li>
-      <li>Reduced stereo matching latency via <strong>region-aware + similarity-based descriptor grouping</strong></li>
-      <li>Proposed <strong>tracking-status-based keyframe generation</strong> to avoid unnecessary map expansion and improve stability</li>
-      <li>Validated on benchmarks + real-world experiments</li>
-    </ul>
-  </div>
-</div>
-
-<div class="pub">
-  <div class="pub-media">
-    <!-- Replace this placeholder with your own image file, e.g., assets/img/fpt24.png -->
-    <img class="pub-img" src="assets/img/fpt24.png" alt="FPT 2024 paper diagram/teaser" />
-  </div>
-  <div class="pub-text">
-    <p class="pub-title">Hardware-Efficient Homogenized Key-Point Selection for Visual SLAM</p>
-    <p class="pub-meta"><em>(FPT 2024 — First Author • Technology Disclosure)</em> • <a href="https://ieeexplore.ieee.org/abstract/document/11113393">Paper</a></p>
-    <ul class="pub-points">
-      <li>Real-time FPGA accelerator for <strong>uniform keypoint selection</strong> in streaming video</li>
-      <li>Grid-based streaming architecture + efficient neighbor sorting for dynamic input sizes</li>
-      <li>Improves robustness and resource efficiency while meeting real-time constraints</li>
-    </ul>
-  </div>
-</div>
-
-<div class="pub">
-  <div class="pub-media">
-    <!-- Replace this placeholder with your own image file, e.g., assets/img/iscas24.png -->
-    <img class="pub-img" src="assets/img/iscas24.png" alt="ISCAS 2024 paper diagram/teaser" />
-  </div>
-  <div class="pub-text">
-    <p class="pub-title">Hardware Accelerator for Feature Matching with Binary Search Tree</p>
-    <p class="pub-meta"><em>(ISCAS 2024 — First Author • Patent Pending)</em> • <a href="https://ieeexplore.ieee.org/document/10558431">Paper</a></p>
-    <ul class="pub-points">
-      <li>Stream-processing FPGA matcher using a <strong>balanced BST</strong> + <strong>ratio-test</strong> outlier rejection</li>
-      <li>~<strong>12× faster</strong> than linear exhaustive search on FPGA</li>
-      <li>Scalable, resource-efficient design</li>
-    </ul>
-  </div>
-</div>
-
-<div class="pub">
-  <div class="pub-media">
-    <!-- Replace this placeholder with your own image file, e.g., assets/img/fpl20.png -->
-    <img class="pub-img" src="assets/img/fpl20.png" alt="FPL 2020 paper diagram/teaser" />
-  </div>
-  <div class="pub-text">
-    <p class="pub-title">Dynamically Growing Neural Network Architecture for Lifelong Deep Learning on the Edge</p>
-    <p class="pub-meta"><em>(FPL 2020 — Co-author 2nd)</em> • <a href="https://ieeexplore.ieee.org/document/9221575">Paper</a></p>
-    <ul class="pub-points">
-      <li>FPGA architecture for lifelong learning with efficient scheduling/resource reuse</li>
-      <li>Designed to meet tight edge constraints</li>
-      <li>Reported strong results on Core50</li>
-    </ul>
-  </div>
-</div>
-
-<div class="pub">
-  <div class="pub-media">
-    <!-- Replace this placeholder with your own image file, e.g., assets/img/iciafs18.png -->
-    <img class="pub-img" src="assets/img/iciafs18.png" alt="ICIAfS 2018 paper diagram/teaser" />
-  </div>
-  <div class="pub-text">
-    <p class="pub-title">Feasibility Study of a Novel Cross Assembled Multi-quadrotor UAV</p>
-    <p class="pub-meta"><em>(ICIAfS 2018 — Acknowledged)</em> • <a href="https://ieeexplore.ieee.org/document/8913338">Paper</a></p>
-    <ul class="pub-points">
-      <li>Proof-of-concept prototype and stabilization validation</li>
-      <li>Demonstrated control reuse from single-quadrotor design with minimal changes</li>
-      <li>Plug-and-play replacement concept for improved robustness</li>
-    </ul>
-  </div>
-</div>
-
----
-
-## Experience
-**Project Officer (Research)**, HESL, SCSE, NTU Singapore *(Jul 2022 – Jan 2023)*<br>
-&nbsp;&nbsp;Designed and developed a visual SLAM algorithm on FPGA SoC (system prototyping and acceleration)<br>
-**Engineer, Accelerated Systems (HWAC Team)**, LSEG Technologies Sri Lanka *(May 2021 – Aug 2022)*<br>
-&nbsp;&nbsp;Developed a **customized multi-channel AXI DMA engine**, later integrated with LSEG market data disemmination pipeline<br>
-&nbsp;&nbsp;Worked on **partial reconfiguration support** for hardware acceleration workflows<br>
-**Research Assistant**, HESL, SCSE, NTU Singapore *(Jul 2019 – Dec 2019)*<br>
-&nbsp;&nbsp;Developed **streaming hardware architectures** for deep learning and a self-organization map classifiers<br>
-**Research Assistant**, UAV Lab, University of Moratuwa *(Jan 2018 – Dec 2018)*<br>
-&nbsp;&nbsp;Designed and developed a multi-rotor controller for an hexacopter platform
-
----
-
-## Education
-**PhD Candidate**, College of Computing and Data Science, Nanyang Technological University, Singapore *(2025 – Present)*<br>
-**PhD Student**, College of Computing and Data Science, Nanyang Technological University, Singapore *(2023 – 2025)*<br>
-**BSc (Hons) Electronics and Telecommunication Engineering (First Class)**, University of Moratuwa, Sri Lanka *(2016 – 2021)*<br>
-&nbsp;&nbsp;GPA **3.74/4.2** • Key modules: Digital IC Design (A+), Advanced Digital Systems (A+)<br>
-**Certificate Level in Management**, Achievers Lanka Business School *(2015 – 2016)*<br>
-**High School: Nalanda College, Colombo** *(2002 – 2015)*<br>
-&nbsp;&nbsp;Z-score **2.5017** (Island Rank **119**) • A grades: Combined Mathematics, Chemistry, Physics • 9 A’s (O/L)
-
----
-
-## Awards & Achievements
-**NTU Research Scholarship Awardee** — 2023 (4 years)<br>
-**Dean’s List** — University of Moratuwa (Semesters 1, 2, 3, 6, 8)<br>
-**Distinction** — 2014 Olympiad Mathematics Competition<br>
-**Chess** — School team captain (2005–2010); All Island 25th (Individual) • Provincial 5th (Individual) • All Island 3rd (Team) ×2
-
-<div class="mobile-only">
-  <hr/>
-
-  <h2>Activities &amp; Hobbies</h2>
-  <ul>
-    <li>Badminton, cricket, and chess</li>
-    <li>Enjoy sharing knowledge with the research community</li>
-  </ul>
-
-  <h2>Contact</h2>
-  <ul>
-    <li>Personal Email: <a href="mailto:mthathsara@outlook.com">mthathsara@outlook.com</a></li>
-    <li>Work Email: <a href="mailto:miyuruth001@e.ntu.edu.sg">miyuruth001@e.ntu.edu.sg</a></li>
-    <li>Google Scholar: <a href="https://scholar.google.com/citations?user=_F2z9wYAAAAJ&amp;hl=en">Miyuru Thathsara</a></li>
-    <li>LinkedIn: <a href="https://lk.linkedin.com/in/miyuru-thathsara-07596518b">Miyuru Thathsara</a></li>
-    <li>GitHub: <a href="https://github.com/MiyuruThathsara">MiyuruThathsara</a></li>
-  </ul>
-</div>
-
-</div>
 </div>
