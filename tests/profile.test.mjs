@@ -28,6 +28,7 @@ const browser = process.env.BROWSER === 'webkit' ? await webkit.launch() : await
 const context = await browser.newContext({ viewport: { width: 1440, height: 1100 }, reducedMotion: 'reduce', acceptDownloads: true });
 const page = await context.newPage();
 const pageErrors = [];
+const pdfInspections = new Map();
 page.on('pageerror', error => pageErrors.push(error.message));
 
 async function audit() {
@@ -38,12 +39,15 @@ async function audit() {
 async function readPdf(bytes, name, render = false) {
   const task = getDocument({ data: new Uint8Array(bytes), standardFontDataUrl: resolve('node_modules/pdfjs-dist/standard_fonts') + sep });
   const pdf = await task.promise;
+  const inspection = { links: [], firstPage: null };
   let text = '';
   for (let number = 1; number <= pdf.numPages; number++) {
     const pdfPage = await pdf.getPage(number);
     const viewport = pdfPage.getViewport({ scale: 1 });
     const content = await pdfPage.getTextContent();
     const items = content.items.filter(item => item.str?.trim());
+    inspection.links.push(...(await pdfPage.getAnnotations()).filter(annotation => annotation.subtype === 'Link'));
+    if (number === 1) inspection.firstPage = { items, width: viewport.width };
     assert(items.length > 5, `Unexpected empty page in ${name}`);
     for (const item of items) {
       const x = item.transform[4], y = item.transform[5];
@@ -59,6 +63,7 @@ async function readPdf(bytes, name, render = false) {
     }
   }
   console.log(`PDF ${name}: ${pdf.numPages} pages; selectable text and margins verified`);
+  pdfInspections.set(name, inspection);
   await task.destroy();
   return text;
 }
@@ -80,6 +85,8 @@ try {
   assert.equal(await page.title(), 'Miyuru Thathsara | Personal Profile');
   assert.equal(await page.locator('.profile-photo').getAttribute('src'), '/me.jpeg');
   assert.match(await page.locator('#review').innerText(), /External Reviewer[\s\S]*ICCAD 2026/);
+  assert(!/\bSCSE\b/.test(await page.locator('main').innerText()));
+  assert.match(await page.locator('#experience').innerText(), /HESL, CCDS/);
   for (const width of [1440, 1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 1100 });
     for (const img of await page.locator('main img').all()) {
@@ -124,11 +131,26 @@ try {
   for (const width of [1440, 390, 320]) {
     await page.setViewportSize({ width, height: 1100 });
     await page.locator('[data-open-cv]').click();
+    await page.locator('input[data-group="contacts"][data-key="personal"]').check();
     assert(await page.locator('#cv-dialog').evaluate(el => el.scrollWidth <= el.clientWidth + 1), `CV overflow at ${width}`);
+    assert(await page.locator('#cv-preview').evaluate(el => el.scrollWidth <= el.clientWidth + 1), `CV preview overflow at ${width}`);
+    assert.equal(await page.locator('.cv-preview-header').evaluate(el => getComputedStyle(el).textAlign), 'center');
+    const links = page.locator('.cv-contact-row').last().locator('a');
+    assert.deepEqual(await links.allTextContents(), ['Website', 'Google Scholar', 'LinkedIn', 'GitHub']);
+    if (width === 1440) {
+      const boxes = await Promise.all((await links.all()).map(link => link.boundingBox()));
+      assert(boxes.every(box => Math.abs(box.y - boxes[0].y) < 1), 'Desktop profile links should share a horizontal row');
+    }
     const downloadBounds = await page.locator('#cv-download').boundingBox();
     assert(downloadBounds.y + downloadBounds.height <= 1100, `Download button not reachable at ${width}`);
     await audit();
     await page.screenshot({ path: join(artifacts, `builder-${width}.png`) });
+    await page.locator('.cv-preview-header').evaluate(el => el.scrollIntoView({ block: 'center' }));
+    const headerBounds = await page.locator('.cv-preview-header').boundingBox();
+    const barBounds = await page.locator('.cv-download-bar').boundingBox();
+    assert(headerBounds.y + headerBounds.height <= barBounds.y, `CV header should be viewable above the download bar at ${width}`);
+    await page.locator('.cv-preview-header').screenshot({ path: join(artifacts, `cv-header-${width}.png`) });
+    await page.locator('input[data-group="contacts"][data-key="personal"]').uncheck();
     await page.locator('[data-close-cv]').click();
   }
 
@@ -137,10 +159,59 @@ try {
   let pdfText = await downloadPdf('academic', true);
   assert.match(pdfText, /External Reviewer/);
   assert.match(pdfText, /ICCAD 2026/);
+  assert(pdfText.includes('HESL, CCDS') && !pdfText.includes('SCSE'));
   assert.match(pdfText, /Hardware Accelerator for Feature Matching/);
   assert(!pdfText.includes('Nalanda College'));
   assert(!pdfText.includes('Cross Assembled Multi-quadrotor'));
   assert(pdfText.indexOf('RESEARCH FOCUS') < pdfText.indexOf('PROFESSIONAL EXPERIENCE'));
+  assert(!pdfText.includes('scholar.google.com'));
+  assert(!pdfText.includes('linkedin.com/in/'));
+  const academic = pdfInspections.get('academic');
+  const { items, width: paperWidth } = academic.firstPage;
+  for (const item of items.slice(0, 3)) {
+    assert(Math.abs(item.transform[4] + item.width / 2 - paperWidth / 2) < 2, `CV header should be centered: ${item.str}`);
+  }
+  const contactLabels = ['Website', 'Google Scholar', 'LinkedIn', 'GitHub'];
+  const contactItems = contactLabels.map(label => items.find(item => item.str === label));
+  assert(contactItems.every(Boolean), 'Use short website/profile labels in the PDF');
+  assert(contactItems.every(item => item.transform[5] === contactItems[0].transform[5]), 'PDF profile links should share a horizontal row');
+  const firstLink = contactItems[0], lastLink = contactItems.at(-1);
+  assert(Math.abs((firstLink.transform[4] + lastLink.transform[4] + lastLink.width) / 2 - paperWidth / 2) < 2, 'The PDF link row should be centered');
+  const expectedContacts = await page.locator('.cv-contact-row a').evaluateAll(links => links.map(link => ({ label: link.textContent, url: link.href })));
+  for (const contact of expectedContacts) {
+    const item = items.find(item => item.str === contact.label);
+    const annotation = academic.links.find(link => (link.url || link.unsafeUrl) === contact.url);
+    assert(annotation, `Missing clickable PDF contact: ${contact.label}`);
+    assert(Math.abs(annotation.rect[0] - item.transform[4]) < 1 && Math.abs(annotation.rect[2] - item.transform[4] - item.width) < 2, `Misaligned link target: ${contact.label}`);
+  }
+  const publicationUrls = await page.locator('.cv-entry-link').evaluateAll(links => links.map(link => link.href));
+  assert(publicationUrls.length > 0);
+  assert(publicationUrls.every(url => academic.links.some(link => (link.url || link.unsafeUrl) === url)), 'Publication titles remain clickable in a digital CV');
+
+  // Print-friendly output keeps email text and publication content, but no PDF annotations.
+  await page.locator('input[data-group="contacts"][data-key="personal"]').check();
+  await page.locator('input[data-group="contacts"][data-key="github"]').uncheck();
+  await page.locator('#cv-hyperlinks').uncheck();
+  assert.equal(await page.locator('#cv-preview a').count(), 0);
+  assert(await page.locator('input[data-group="contacts"][data-key="website"]').isDisabled());
+  assert(await page.locator('input[data-group="contacts"][data-key="university"]').isEnabled());
+  await audit();
+  pdfText = await downloadPdf('print-academic', true);
+  assert.deepEqual(pdfInspections.get('print-academic').links, []);
+  assert(pdfText.includes('miyuruth001@e.ntu.edu.sg') && pdfText.includes('mthathsara@outlook.com'));
+  assert(contactLabels.every(label => !pdfText.includes(label)));
+  assert(pdfText.includes('Hardware Accelerator for Feature Matching'));
+  assert(pdfText.includes('ICCAD 2026'));
+  await page.reload();
+  await page.locator('[data-open-cv]').click();
+  assert(!await page.locator('#cv-hyperlinks').isChecked(), 'Remember the print setting');
+  assert.equal(await page.locator('#cv-preview a').count(), 0);
+  await page.locator('#cv-hyperlinks').check();
+  assert(await page.locator('input[data-group="contacts"][data-key="website"]').isChecked());
+  assert(!await page.locator('input[data-group="contacts"][data-key="github"]').isChecked(), 'Preserve individual excluded links');
+  assert.equal(await page.locator('.cv-contact-row a').count(), 5);
+  await page.locator('input[data-group="contacts"][data-key="github"]').check();
+  await page.locator('input[data-group="contacts"][data-key="personal"]').uncheck();
 
   await page.locator('[data-section="publications"] summary').click();
   await page.locator('input[data-group="entries"][data-key*="Hardware Accelerator for Feature Matching"]').uncheck();
@@ -149,9 +220,17 @@ try {
   assert(!pdfText.includes('Hardware Accelerator for Feature Matching'));
   assert(pdfText.includes('Hardware-Efficient Homogenized'));
   assert(!pdfText.includes('miyuruth001@e.ntu.edu.sg'));
+  // Existing saved selections created before the hyperlink setting remain compatible.
+  await page.evaluate(() => {
+    const key = 'miyuru-cv-options-v1';
+    const saved = JSON.parse(localStorage.getItem(key));
+    delete saved.hyperlinks;
+    localStorage.setItem(key, JSON.stringify(saved));
+  });
   await page.reload();
   await page.locator('[data-open-cv]').click();
   assert(!await page.locator('input[data-group="contacts"][data-key="university"]').isChecked());
+  assert(await page.locator('#cv-hyperlinks').isChecked());
 
   await page.locator('input[name="audience"][value="company"]').check();
   pdfText = await downloadPdf('company', true);
@@ -181,6 +260,11 @@ try {
   pdfText = await downloadPdf('concise-company');
   assert(pdfText.includes('Project Officer'));
   assert(!pdfText.includes('Contributed partial reconfiguration'));
+  for (const checkbox of await page.locator('input[data-group="contacts"]').all()) await checkbox.uncheck();
+  assert.equal(await page.locator('.cv-contact-row').count(), 0, 'Do not leave empty contact rows');
+  pdfText = await downloadPdf('no-contacts');
+  assert.deepEqual(pdfInspections.get('no-contacts').links, []);
+  assert(!pdfText.includes('mthathsara@outlook.com'));
   assert.deepEqual(pageErrors, []);
 
   // Touch-sized viewport and blocked browser storage must still allow a PDF download.
@@ -207,7 +291,7 @@ try {
   const [retryDownload] = await Promise.all([retryPage.waitForEvent('download'), retryPage.locator('#cv-download').click()]);
   assert(retryDownload.suggestedFilename().endsWith('.pdf'));
   await retryContext.close();
-  console.log('PASS: image zoom, keyboard focus, CV presets, selection, persistence, empty state, PDF downloads, retry, and accessibility');
+  console.log('PASS: image zoom, keyboard focus, CV presets, selection, persistence, centered headers, horizontal links, print option, empty state, PDF downloads, retry, and accessibility');
   console.log(`Artifacts: ${artifacts}`);
 } finally {
   await browser.close();

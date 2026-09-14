@@ -33,6 +33,8 @@ The GitHub Pages address is the canonical URL. The separate personal website, [m
 
 Choose **Download CV** near the introduction, select Company or Academia, and adjust the sections, individual entries, contact details, and level of detail. The preview reflects the selection. **Download PDF** creates a text-based A4 document with page numbers; **Open PDF** provides a fallback for saving or sharing on mobile.
 
+The CV name and headline are centered, followed by centered horizontal rows of email addresses and short, clickable website/profile labels. Rows wrap when needed. For a paper copy, turn off **Include hyperlinks (digital CV)** under Contact details: selected emails remain as plain text, website/profile links are omitted, and publication titles lose their clickable links without removing publication content. Individual contact choices are preserved when links are turned back on. This option is remembered alongside the other settings; resetting or changing the purpose restores the digital preset.
+
 Presets change the section order and emphasis. Company uses the summary in `_data/cv.yml`; Academia uses the profile introduction. An acknowledged research contribution is kept separate from authored publications. Settings are saved in this browser's local storage; no personal selections are sent to a server. PDF creation happens in the browser, using a locally hosted copy of jsPDF 4.2.1 (MIT licence in `assets/vendor/jspdf-LICENSE.txt`). After updating the pinned package, run `npm run vendor:pdf` to refresh that copy.
 
 The Google photograph is preserved. Publication images have lossless WebP alternatives and original PNG fallbacks. The viewer offers zoom and access to the original files, plus the vector PDF for the ISCAS diagram. To update a figure, replace its original and regenerate its matching WebP with `cwebp -lossless -m 6`.
@@ -47,4 +49,4 @@ bundle exec jekyll build
 npm test
 ```
 
-The test starts a temporary server for `_site`, checks desktop and mobile layouts and accessibility, exercises the image viewer and CV options, and inspects the downloaded PDFs for selected content, excluded content, and page bounds. Set `SITE_DIR` to test a different build directory. Set `BROWSER=webkit` after `npx playwright install webkit` to check WebKit as well. Screenshots and sample PDFs are saved in a temporary directory printed by the test.
+The test starts a temporary server for `_site`, checks desktop and mobile layouts and accessibility, exercises the image viewer and CV options, and inspects the downloaded PDFs for selected content, excluded content, centered headers, hyperlink annotations, print-friendly output, and page bounds. Set `SITE_DIR` to test a different build directory. Set `BROWSER=webkit` after `npx playwright install webkit` to check WebKit as well. Screenshots and sample PDFs are saved in a temporary directory printed by the test.

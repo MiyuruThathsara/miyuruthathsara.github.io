@@ -149,7 +149,7 @@ permalink: /
         <p class="record-date">Jul 2022 – Jan 2023</p>
         <div>
           <h3>Project Officer (Research)</h3>
-          <p class="record-organization">HESL, SCSE · Nanyang Technological University, Singapore</p>
+          <p class="record-organization">HESL, CCDS · Nanyang Technological University, Singapore</p>
           <p>Designed and developed a visual SLAM algorithm on an FPGA SoC, including system prototyping and hardware acceleration.</p>
         </div>
       </div>
@@ -165,7 +165,7 @@ permalink: /
         <p class="record-date">Jul 2019 – Dec 2019</p>
         <div>
           <h3>Research Assistant</h3>
-          <p class="record-organization">HESL, SCSE · Nanyang Technological University, Singapore</p>
+          <p class="record-organization">HESL, CCDS · Nanyang Technological University, Singapore</p>
           <p>Developed streaming hardware architectures for deep learning and self-organizing map classifiers.</p>
         </div>
       </div>

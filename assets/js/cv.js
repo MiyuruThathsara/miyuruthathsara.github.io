@@ -40,8 +40,8 @@ const contacts = [...document.querySelectorAll('.contact-list > div')].map(row =
   return { id: text(row.querySelector('dt')).toLowerCase(), label: text(row.querySelector('dt')), text: text(link).replace('↗', '').trim(), url: link.href };
 }).concat([...document.querySelectorAll('.profile-sidebar .profile-links a')].map(link => {
   const label = text(link).replace('↗', '').trim();
-  return { id: label.toLowerCase().replace(/\s/g, '-'), label, text: link.href.replace(/^https?:\/\//, ''), url: link.href };
-}));
+  return { id: label.toLowerCase().replace(/\s/g, '-'), label, text: label, url: link.href };
+})).map(contact => ({ ...contact, kind: contact.url.startsWith('mailto:') ? 'email' : 'web' }));
 
 const orders = {
   company: ['summary', 'expertise', 'experience', 'education', 'publications', 'review', 'research', 'awards', 'contributions', 'earlier', 'interests'],
@@ -61,6 +61,7 @@ function preset(audience) {
     sections: Object.fromEntries(sections.map(section => [section.id, selected.includes(section.id)])),
     entries: Object.fromEntries(sections.flatMap(section => section.items.map(item => [item.id, item.title !== 'Chess']))),
     contacts: Object.fromEntries(contacts.map(contact => [contact.id, ['website', 'github', 'linkedin', audience === 'company' ? 'personal' : 'university', ...(audience === 'academia' ? ['google-scholar'] : [])].includes(contact.id)])),
+    hyperlinks: true,
     descriptions: true,
     grades: audience === 'academia'
   };
@@ -75,7 +76,7 @@ function restore() {
       if (typeof saved?.[group]?.[key] === 'boolean') state[group][key] = saved[group][key];
     }
   }
-  for (const key of ['descriptions', 'grades']) if (typeof saved?.[key] === 'boolean') state[key] = saved[key];
+  for (const key of ['hyperlinks', 'descriptions', 'grades']) if (typeof saved?.[key] === 'boolean') state[key] = saved[key];
 }
 
 function element(tag, className, value) {
@@ -114,6 +115,7 @@ function renderOptions() {
   const contactOptions = document.querySelector('#cv-contacts');
   contactOptions.replaceChildren(...contacts.map(contact => checkbox(contact.label === 'Personal' || contact.label === 'University' ? `${contact.label} email` : contact.label, 'contacts', contact.id, state.contacts[contact.id])));
   form.elements.audience.value = state.audience;
+  document.querySelector('#cv-hyperlinks').checked = state.hyperlinks;
   document.querySelector('#cv-descriptions').checked = state.descriptions;
   document.querySelector('#cv-grades').checked = state.grades;
   document.querySelector('#cv-preset-description').textContent = state.audience === 'company' ? 'Emphasizes engineering expertise and professional experience.' : 'Emphasizes research, publications, and academic service.';
@@ -125,7 +127,11 @@ function model() {
     name: text(document.querySelector('#profile-title')),
     headline: state.audience === 'company' ? 'Embedded Intelligence | Hardware Acceleration' : text(document.querySelector('.intro-subtitle')),
     audience: state.audience,
-    contacts: contacts.filter(contact => state.contacts[contact.id]),
+    contacts: contacts.filter(contact => state.contacts[contact.id] && (state.hyperlinks || contact.kind === 'email')).map(contact => ({
+      ...contact,
+      text: contact.kind === 'email' ? contact.text : contact.label,
+      url: state.hyperlinks ? contact.url : ''
+    })),
     sections: orders[state.audience].filter(id => state.sections[id]).map(id => {
       const section = sections.find(value => value.id === id);
       const items = section.items.filter(item => state.entries[item.id]).map(item => {
@@ -133,7 +139,7 @@ function model() {
         if (id === 'summary' && state.audience === 'company') values = [wording.company_summary];
         if (!state.descriptions && ['experience', 'publications', 'contributions'].includes(id)) values = [];
         if (!state.grades && ['education', 'earlier'].includes(id)) values = values.filter(value => !/coursework|A\/L:|O\/L:/.test(value)).map(value => value.replace(/ · GPA:.*/, ''));
-        return { title: item.title, meta: item.meta, paragraphs: values, url: item.url };
+        return { title: item.title, meta: item.meta, paragraphs: values, url: state.hyperlinks ? item.url : '' };
       });
       return {
         title: id === 'summary' && state.audience === 'company' ? 'Professional profile' : section.title,
@@ -144,15 +150,23 @@ function model() {
 }
 
 function renderPreview(data) {
-  preview.replaceChildren(element('h3', '', data.name), element('p', 'cv-headline', data.headline));
-  data.contacts.forEach(contact => {
-    const line = element('p', 'cv-contact-line');
-    line.append(`${contact.label}: `);
-    const link = element('a', '', contact.text);
-    link.href = contact.url;
-    line.append(link);
-    preview.append(line);
-  });
+  const header = element('header', 'cv-preview-header');
+  header.append(element('h3', '', data.name), element('p', 'cv-headline', data.headline));
+  for (const kind of ['email', 'web']) {
+    const contacts = data.contacts.filter(contact => contact.kind === kind);
+    if (!contacts.length) continue;
+    const row = element('p', 'cv-contact-row');
+    for (const contact of contacts) {
+      const label = element(contact.url ? 'a' : 'span', '', contact.text);
+      if (contact.url) {
+        label.href = contact.url;
+        if (kind === 'web') { label.target = '_blank'; label.rel = 'noopener'; }
+      }
+      row.append(label);
+    }
+    header.append(row);
+  }
+  preview.replaceChildren(header);
   data.sections.forEach(section => {
     preview.append(element('h4', '', section.title));
     section.items.forEach(item => {
@@ -174,6 +188,7 @@ function renderPreview(data) {
 
 function update() {
   form.querySelectorAll('[data-group="entries"]').forEach(input => { input.disabled = !state.sections[input.closest('[data-section]').dataset.section]; });
+  form.querySelectorAll('[data-group="contacts"]').forEach(input => { input.disabled = !state.hyperlinks && contacts.find(contact => contact.id === input.dataset.key).kind === 'web'; });
   const data = model();
   renderPreview(data);
   download.disabled = !data.sections.length;
@@ -215,6 +230,7 @@ form.addEventListener('change', event => {
   const input = event.target;
   if (input.name === 'audience') { state = preset(input.value); renderOptions(); return; }
   if (input.dataset.group) state[input.dataset.group][input.dataset.key] = input.checked;
+  if (input.id === 'cv-hyperlinks') state.hyperlinks = input.checked;
   if (input.id === 'cv-descriptions') state.descriptions = input.checked;
   if (input.id === 'cv-grades') state.grades = input.checked;
   update();
