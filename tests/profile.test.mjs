@@ -87,8 +87,15 @@ try {
       await img.evaluate(image => image.decode());
     }
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Page overflow at ${width}`);
-    assert((await page.locator('.profile-photo-frame').boundingBox()).width >= 220);
-    assert((await page.locator('.publication-media img').first().boundingBox()).width >= (width <= 390 ? 250 : 400));
+    const frame = await page.locator('.profile-photo-frame').boundingBox();
+    const photo = await page.locator('.profile-photo').boundingBox();
+    assert(frame.width >= 220);
+    assert(Math.abs(photo.width / photo.height - 1) < 0.01, 'The full square photograph must retain its proportions');
+    assert(photo.x >= frame.x - 1 && photo.y >= frame.y - 1 && photo.x + photo.width <= frame.x + frame.width + 1 && photo.y + photo.height <= frame.y + frame.height + 1, 'The photograph must fit completely inside its frame');
+    for (const figure of await page.locator('.publication-media').all()) {
+      const bounds = await figure.boundingBox();
+      assert(bounds.width <= 240 && bounds.height <= 215, 'Publication previews should remain compact');
+    }
     if ([1440, 390].includes(width)) {
       await page.evaluate(() => scrollTo(0, 0));
       await audit();
