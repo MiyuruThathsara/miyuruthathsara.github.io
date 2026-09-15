@@ -1,0 +1,15 @@
+---
+layout: section
+title: News
+section: news
+permalink: /news/
+description: Research milestones and academic updates.
+---
+<ol class="news-list">
+  {% for update in site.data.news %}
+  <li>
+    <time datetime="{{ update.date | escape }}">{{ update.date | escape }}</time>
+    <div><h2>{{ update.title | escape }}</h2><p>{{ update.summary | escape }} <a href="{{ update.link | relative_url }}">{{ update.link_label | escape }} <span aria-hidden="true">↗</span></a></p></div>
+  </li>
+  {% endfor %}
+</ol>

@@ -1,0 +1,131 @@
+{
+  "headline": "Ph.D. Candidate at Nanyang Technological University",
+  "summary": [
+    "I develop efficient onboard computing to help robots understand their surroundings and find their way. My work combines camera-based vision with hardware acceleration so that small robots can process information and respond in real time, within limited power and computing budgets.",
+    "My long-term goal is collaborative autonomy: teams of robots that share what they observe, build a common understanding of their environment, and coordinate useful work. I focus on the intelligence within each robot that makes this possible."
+  ],
+  "research": [
+    "My current research helps a robot estimate its position and build a map using cameras, a process known as visual simultaneous localization and mapping (SLAM). I design the algorithms and the computing hardware together, using reconfigurable chips called FPGAs to make demanding vision tasks faster and more energy efficient.",
+    "This work provides a foundation for robots that can share spatial information and act together. I aim to support practical applications such as precision agriculture, infrastructure inspection, and environmental monitoring."
+  ],
+  "themes": [
+    {
+      "title": "Visual understanding",
+      "summary": "Using camera images to recognize landmarks, track movement, and build a map of the surroundings."
+    },
+    {
+      "title": "Efficient onboard computing",
+      "summary": "Combining software and tailored hardware to process sensor data quickly while using less energy."
+    },
+    {
+      "title": "Collaborative autonomy",
+      "summary": "Working toward teams of robots that share useful observations, align their maps, and coordinate their actions."
+    }
+  ],
+  "experience": [
+    {
+      "title": "Project Officer (Research)",
+      "date": "Jul 2022 – Jan 2023",
+      "organization": "HESL, CCDS · Nanyang Technological University, Singapore",
+      "paragraphs": [
+        "Designed and developed a visual SLAM algorithm on an FPGA SoC, including system prototyping and hardware acceleration."
+      ]
+    },
+    {
+      "title": "Engineer, Accelerated Systems",
+      "date": "May 2021 – Aug 2022",
+      "organization": "HWAC Team · LSEG Technologies, Sri Lanka",
+      "paragraphs": [
+        "Developed a customized multi-channel AXI DMA engine, subsequently integrated into the LSEG market data dissemination pipeline. Contributed partial reconfiguration support for hardware acceleration workflows."
+      ]
+    },
+    {
+      "title": "Research Assistant",
+      "date": "Jul 2019 – Dec 2019",
+      "organization": "HESL, CCDS · Nanyang Technological University, Singapore",
+      "paragraphs": [
+        "Developed streaming hardware architectures for deep learning and self-organizing map classifiers."
+      ]
+    },
+    {
+      "title": "Research Assistant",
+      "date": "Jan 2018 – Dec 2018",
+      "organization": "UAV Lab · University of Moratuwa, Sri Lanka",
+      "paragraphs": [
+        "Designed and developed a multirotor controller for a hexacopter platform."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "title": "Doctor of Philosophy (in progress)",
+      "date": "2023 – Present",
+      "organization": "College of Computing and Data Science",
+      "institution": "Nanyang Technological University, Singapore",
+      "paragraphs": [
+        "Ph.D. student, 2023–2025; Ph.D. candidate since 2025."
+      ]
+    },
+    {
+      "title": "B.Sc. (Hons) in Electronics and Telecommunication Engineering",
+      "date": "2016 – 2021",
+      "organization": "University of Moratuwa, Sri Lanka",
+      "paragraphs": [
+        "First Class Honours · GPA: 3.74/4.2",
+        "Selected coursework: Digital IC Design (A+), Advanced Digital Systems (A+)."
+      ]
+    }
+  ],
+  "earlier": [
+    {
+      "title": "Certificate Level in Management",
+      "date": "2015 – 2016",
+      "organization": "Achievers Lanka Business School",
+      "paragraphs": []
+    },
+    {
+      "title": "Nalanda College, Colombo",
+      "date": "2002 – 2015",
+      "organization": "",
+      "paragraphs": [
+        "A/L: A grades in Combined Mathematics, Chemistry, and Physics. Z-score: 2.5017; island rank: 119.",
+        "O/L: nine A grades."
+      ]
+    }
+  ],
+  "review": [
+    {
+      "title": "External Reviewer",
+      "date": "2026",
+      "organization": "ICCAD 2026",
+      "paragraphs": []
+    }
+  ],
+  "awards": [
+    {
+      "title": "NTU Research Scholarship",
+      "paragraphs": [
+        "Awarded in 2023 · Four-year scholarship"
+      ]
+    },
+    {
+      "title": "Dean’s List, University of Moratuwa",
+      "paragraphs": [
+        "Semesters 1, 2, 3, 6, and 8"
+      ]
+    },
+    {
+      "title": "Olympiad Mathematics Competition",
+      "paragraphs": [
+        "Distinction · 2014"
+      ]
+    },
+    {
+      "title": "Chess",
+      "paragraphs": [
+        "School team captain, 2005–2010. Individual: 25th nationally and 5th provincially. Team: 3rd nationally on two occasions."
+      ]
+    }
+  ],
+  "interests": "Outside research, I enjoy badminton, cricket, and chess, as well as sharing knowledge with the research community."
+}

@@ -22,9 +22,13 @@ dialog::backdrop { background: #13252fe0; }
 .image-help { margin: 0; padding: 0.5rem 1.5rem 1rem; font-size: 0.8rem; color: var(--muted); }
 .image-viewport { height: min(72dvh, 900px); overflow: auto; background: #fff; border-top: 1px solid var(--line); overscroll-behavior: contain; }
 .image-viewport img { max-width: none; height: auto; margin: 0 auto; }
-.cv-dialog { width: 1240px; }
-.cv-dialog > .dialog-header { position: sticky; top: 0; z-index: 2; }
-.cv-workspace { display: grid; grid-template-columns: 340px minmax(0, 1fr); }
+.cv-dialog { width: 1240px; height: min(960px, calc(100dvh - 32px)); overflow: hidden; }
+.cv-dialog[open] { display: flex; flex-direction: column; }
+.cv-dialog > .dialog-header { flex-shrink: 0; }
+#cv-form { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.cv-workspace { display: grid; grid-template-columns: 340px minmax(0, 1fr); flex: 1; min-height: 0; overflow: hidden; }
+.cv-settings, .cv-preview-panel { min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.cv-panel-label { margin: 0 0 1rem; color: var(--muted); font-size: 0.75rem; }
 .cv-settings { padding: 1.5rem; border-right: 1px solid var(--line); }
 .cv-settings fieldset { min-width: 0; margin: 0 0 1.5rem; padding: 0; border: 0; }
 .cv-settings legend { margin-bottom: 0.8rem; font-size: 0.9rem; font-weight: 600; color: var(--heading); }
@@ -49,6 +53,7 @@ dialog::backdrop { background: #13252fe0; }
 .cv-preview .cv-headline { margin-bottom: 0.5rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 0.78rem; }
 .cv-preview .cv-contact-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.25rem 1rem; margin-bottom: 0.25rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 0.72rem; }
 .cv-contact-row > * { min-width: 0; overflow-wrap: anywhere; }
+.cv-contact-row > a { min-height: 24px; }
 .cv-preview h4 { margin: 1.2rem 0 0.65rem; padding-bottom: 0.3rem; border-bottom: 1px solid #aab0b5; color: #202428; font-family: inherit; font-size: 0.76rem; letter-spacing: 0.04em; text-transform: uppercase; }
 .cv-preview h5 { margin: 0 0 0.2rem; color: #202428; font-size: 0.82rem; line-height: 1.5; }
 .cv-preview p { margin-bottom: 0.4rem; }
@@ -63,7 +68,7 @@ dialog::backdrop { background: #13252fe0; }
 .cv-preview .cv-item-meta { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 0.72rem; color: #596269; }
 .cv-preview .cv-entry-link { color: inherit; font: inherit; text-decoration: none; }
 .cv-preview .cv-entry-link:hover { text-decoration: underline; }
-.cv-download-bar { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem 1.5rem; padding: 1rem 1.5rem; border-top: 1px solid var(--line); background: var(--paper); }
+.cv-download-bar { flex-shrink: 0; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem 1.5rem; padding: 1rem 1.5rem; border-top: 1px solid var(--line); background: var(--paper); }
 .cv-download-bar p { margin: 0; font-size: 0.8rem; }
 .cv-download-bar .cv-help { margin-top: 0.2rem; font-size: 0.7rem; }
 .cv-download-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
@@ -79,8 +84,9 @@ dialog::backdrop { background: #13252fe0; }
   .dialog-header { padding: 1rem; }
   .dialog-header h2 { font-size: 1.35rem; }
   .dialog-header .eyebrow { font-size: 0.6rem; }
-  .cv-workspace { grid-template-columns: 1fr; }
-  .cv-settings { border-right: 0; }
+  .cv-dialog { height: calc(100dvh - 16px); }
+  .cv-workspace { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
+  .cv-settings { border-right: 0; border-bottom: 1px solid var(--line); }
   .cv-preview { padding: 1.2rem; }
   .cv-download-bar { padding: 0.75rem 1rem; }
   .cv-download-bar .cv-help { display: none; }

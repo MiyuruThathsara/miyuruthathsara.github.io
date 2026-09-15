@@ -1,0 +1,10 @@
+{% for record in include.records %}
+<div class="record">
+  <p class="record-date">{{ record.date | escape }}</p>
+  <div>
+    <{{ include.heading | default: 'h2' }}>{{ record.title | escape }}</{{ include.heading | default: 'h2' }}>
+    {% if record.organization != '' %}<p class="record-organization">{{ record.organization | escape }}{% if record.institution %}<br>{{ record.institution | escape }}{% endif %}</p>{% endif %}
+    {% for paragraph in record.paragraphs %}<p>{{ paragraph | escape }}</p>{% endfor %}
+  </div>
+</div>
+{% endfor %}

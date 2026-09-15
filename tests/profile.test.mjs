@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { readFile, writeFile, mkdtemp } from 'node:fs/promises';
+import { readFile, writeFile, mkdtemp, stat } from 'node:fs/promises';
 import { resolve, extname, sep, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { chromium, webkit } from 'playwright';
@@ -17,7 +17,7 @@ const server = createServer(async (req, res) => {
   const path = resolve(root, `.${decodeURIComponent(new URL(req.url, 'http://localhost').pathname)}`);
   if (path !== root && !path.startsWith(root + sep)) { res.writeHead(403).end(); return; }
   try {
-    const file = path === root ? join(root, 'index.html') : path;
+    const file = (await stat(path)).isDirectory() ? join(path, 'index.html') : path;
     res.writeHead(200, { 'Content-Type': mime[extname(file)] || 'application/octet-stream' });
     res.end(await readFile(file));
   } catch { res.writeHead(404).end(); }
@@ -90,32 +90,24 @@ try {
   await page.goto(base);
   await page.locator('[data-open-cv]').waitFor({ state: 'visible' });
   assert.equal(await page.title(), 'Miyuru Thathsara | Personal Profile');
+  const sharedData = JSON.parse(await page.locator('#cv-data').textContent());
+  const homepage = await page.locator('main').innerText();
+  assert.equal((homepage.match(/Ph\.D\. Candidate/g) || []).length, 1, 'Show the role only once on the homepage');
+  assert.equal((homepage.match(/Nanyang Technological University/g) || []).length, 1, 'Show the university only once on the homepage');
+  assert.equal(await page.locator('main #news, main #research, main #publications, main #experience, main #education, main #review, main #contact').count(), 0, 'Homepage must not contain the other full pages');
   assert.equal(await page.locator('.profile-photo').getAttribute('src'), '/me.jpeg');
-  assert.match(await page.locator('#review').innerText(), /External Reviewer[\s\S]*ICCAD 2026/);
-  assert(!/\bSCSE\b/.test(await page.locator('main').innerText()));
-  assert.match(await page.locator('#experience').innerText(), /HESL, CCDS/);
-  assert.equal(await page.locator('h1').count(), 1, 'Keep a single profile name for all screen sizes');
-  assert.equal(await page.locator('.news-list li').count(), 3);
-  newsHeadlines = await page.locator('.news-list h3').allTextContents();
-  assert(await page.locator('nav a[href="#news"]').isVisible());
-  websiteSummaries = await page.locator('.publication > p:not(.publication-venue), .publication > div > p:not(.publication-venue)').allTextContents();
-  assert.equal(websiteSummaries.length, 5);
-  assert(websiteSummaries.every(summary => summary.trim().split(/\s+/).length <= 40), 'Website paper summaries should be brief');
-  for (const link of await page.locator('.news-list a').all()) {
-    assert.equal(await page.locator(await link.getAttribute('href')).count(), 1, 'News links should target existing sections');
-  }
+  assert(await page.locator('.profile-photo').evaluate(img => !img.closest('a, button, [data-image-viewer]')), 'The profile photo should be static');
+  assert(!homepage.includes('View full photograph'));
+
   for (const width of [1440, 1024, 800, 768, 540, 390, 320]) {
     await page.setViewportSize({ width, height: 1100 });
-    for (const img of await page.locator('main img').all()) {
-      await img.scrollIntoViewIfNeeded();
-      await img.evaluate(image => image.decode());
-    }
+    await page.locator('.profile-photo').evaluate(image => image.decode());
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Page overflow at ${width}`);
     const frame = await page.locator('.profile-photo-frame').boundingBox();
     const photo = await page.locator('.profile-photo').boundingBox();
     assert(frame.width >= 220);
-    assert(Math.abs(photo.width / photo.height - 1) < 0.01, 'The full square photograph must retain its proportions');
-    assert(photo.x >= frame.x - 1 && photo.y >= frame.y - 1 && photo.x + photo.width <= frame.x + frame.width + 1 && photo.y + photo.height <= frame.y + frame.height + 1, 'The photograph must fit completely inside its frame');
+    assert(Math.abs(photo.width / photo.height - 1) < 0.01, 'Preserve the full square photograph');
+    assert(photo.x >= frame.x - 1 && photo.y >= frame.y - 1 && photo.x + photo.width <= frame.x + frame.width + 1 && photo.y + photo.height <= frame.y + frame.height + 1);
     if (width <= 800) {
       const heading = await page.locator('.profile-heading').boundingBox();
       assert(heading.y + heading.height <= photo.y + 1, 'Mobile name and headline must precede the photograph');
@@ -129,23 +121,89 @@ try {
       for (const boxes of rows.values()) {
         const left = Math.min(...boxes.map(box => box.x));
         const right = Math.max(...boxes.map(box => box.x + box.width));
-        assert(Math.abs((left + right) / 2 - nav.x - nav.width / 2) < 2, `Every mobile navigation row should be centered at ${width}`);
+        assert(Math.abs((left + right) / 2 - nav.x - nav.width / 2) < 2, `Center every mobile navigation row at ${width}`);
       }
     }
-    for (const figure of await page.locator('.publication-media').all()) {
-      const bounds = await figure.boundingBox();
-      assert(bounds.width <= 240 && bounds.height <= 215, 'Publication previews should remain compact');
-    }
     if ([1440, 390].includes(width)) {
-      await page.evaluate(() => scrollTo(0, 0));
       await audit();
       await page.screenshot({ path: join(artifacts, `profile-${width}.png`) });
-      await page.locator('.publication').nth(2).screenshot({ path: join(artifacts, `diagram-${width}.png`) });
-      await page.locator('#news').screenshot({ path: join(artifacts, `news-${width}.png`) });
     }
-    console.log(`PASS: ${width}px image sizing and page layout`);
   }
 
+  const routes = ['/', '/news/', '/research/', '/publications/', '/experience/', '/education/', '/review/', '/contact/'];
+  assert.deepEqual(await page.locator('nav a').evaluateAll(links => links.map(link => new URL(link.href).pathname)), routes);
+  let referenceCv;
+  for (const route of routes) {
+    await page.locator(`nav a[href="${route}"]`).click();
+    assert.equal(new URL(page.url()).pathname, route, 'Navigation must change pages');
+    assert((await page.reload()).ok(), 'Direct page reload should work');
+    await page.locator('[data-open-cv]').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('h1').count(), 1);
+    assert.equal(await page.title(), `${await page.locator('h1').innerText()} | ${route === '/' ? 'Personal Profile' : 'Miyuru Thathsara'}`);
+    assert.equal(await page.locator('nav [aria-current="page"]').count(), 1);
+    assert.equal(await page.locator('nav [aria-current="page"]').getAttribute('href'), route);
+    assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'), `https://miyuruthathsara.github.io${route}`);
+    assert.deepEqual(JSON.parse(await page.locator('#cv-data').textContent()), sharedData, 'Every page needs the same complete CV data');
+    const content = await page.locator('main').innerText();
+    assert(!/\bSCSE\b/.test(content));
+    if (route === '/news/') {
+      assert.equal(await page.locator('.news-list li').count(), 3);
+      newsHeadlines = await page.locator('.news-list h2').allTextContents();
+      for (const href of await page.locator('.news-list a').evaluateAll(links => links.map(link => link.href))) {
+        assert((await context.request.get(href)).ok(), 'News destination should exist');
+        const hash = new URL(href).hash;
+        if (hash) assert(await page.evaluate(async ({ href, hash }) => new DOMParser().parseFromString(await (await fetch(href)).text(), 'text/html').querySelector(hash) !== null, { href, hash }));
+      }
+    }
+    if (route === '/publications/') {
+      websiteSummaries = await page.locator('.publication > div > p:not(.publication-venue)').allTextContents();
+      assert.equal(websiteSummaries.length, 5);
+      assert(websiteSummaries.every(summary => summary.trim().split(/\s+/).length <= 40));
+    }
+    if (route === '/review/') assert.match(content, /External Reviewer[\s\S]*ICCAD 2026/);
+    if (route === '/experience/') assert.match(content, /HESL, CCDS/);
+    if (route === '/education/') assert(content.includes('Honours & awards') && content.includes('NTU Research Scholarship'));
+    for (const width of [1440, 390, 320]) {
+      await page.setViewportSize({ width, height: 1100 });
+      for (const img of await page.locator('main img').all()) {
+        await img.scrollIntoViewIfNeeded();
+        await img.evaluate(image => image.decode());
+      }
+      assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${route} overflow at ${width}`);
+      for (const figure of await page.locator('.publication-media').all()) {
+        const bounds = await figure.boundingBox();
+        assert(bounds.width <= 240 && bounds.height <= 215, 'Keep diagrams compact');
+      }
+      if (width !== 320) {
+        await page.evaluate(() => scrollTo(0, 0));
+        if (width === 390) await audit();
+        await page.screenshot({ path: join(artifacts, `${route.split('/')[1] || 'home'}-${width}.png`) });
+      }
+    }
+    await page.setViewportSize({ width: 1440, height: 1100 });
+    await page.locator('[data-open-cv]').click();
+    assert.equal(await page.locator('#cv-title').innerText(), 'Generate CV PDF');
+    assert.equal(await page.locator('#cv-dialog .eyebrow').textContent(), "Miyuru's Profile");
+    const text = await downloadPdf(`route-${route.split('/')[1] || 'home'}`);
+    if (referenceCv) assert.equal(text, referenceCv, 'CV content must not depend on the page used to generate it');
+    else referenceCv = text;
+    await page.locator('[data-close-cv]').click();
+    console.log(`PASS: ${route} navigation, reload, accessibility, responsive layout, and full CV download`);
+  }
+
+  await page.goto(`${base}/#research`);
+  await page.waitForURL('**/research/');
+  await page.goto(`${base}/#awards`);
+  await page.waitForURL('**/education/#awards');
+  const noJsContext = await browser.newContext({ javaScriptEnabled: false });
+  const noJsPage = await noJsContext.newPage();
+  await noJsPage.goto(`${base}/news/`);
+  await noJsPage.locator('nav a[href="/research/"]').click();
+  assert.equal(new URL(noJsPage.url()).pathname, '/research/');
+  assert(await noJsPage.locator('.research-focus').isVisible(), 'Pages should work without JavaScript');
+  await noJsContext.close();
+
+  await page.goto(`${base}/publications/`);
   await page.locator('[data-vector-url]').click();
   await page.locator('#image-full').evaluate(image => image.decode());
   await page.waitForFunction(() => document.querySelector('#image-zoom-out').disabled);
@@ -157,33 +215,41 @@ try {
   await audit();
   await page.keyboard.press('Escape');
   assert(await page.locator('[data-vector-url]').evaluate(el => document.activeElement === el));
-  await page.locator('.profile-photo-link').click();
+  await page.locator('.publication-media').first().click();
   assert(!await page.locator('#image-vector').isVisible());
-  assert.equal(await page.locator('#image-original').getAttribute('href'), `${base}/me.jpeg`);
   await page.locator('[data-close-image]').click();
+  await page.goto(base);
 
-  for (const width of [1440, 390, 320]) {
-    await page.setViewportSize({ width, height: 1100 });
+  for (const [width, height] of [[1440, 1100], [390, 844], [320, 568], [844, 390]]) {
+    await page.setViewportSize({ width, height });
     await page.locator('[data-open-cv]').click();
     await page.locator('input[data-group="contacts"][data-key="personal"]').check();
     assert(await page.locator('#cv-dialog').evaluate(el => el.scrollWidth <= el.clientWidth + 1), `CV overflow at ${width}`);
-    assert(await page.locator('#cv-preview').evaluate(el => el.scrollWidth <= el.clientWidth + 1), `CV preview overflow at ${width}`);
+    assert(await page.locator('#cv-preview').evaluate(el => el.scrollWidth <= el.clientWidth + 1), `Preview overflow at ${width}`);
     assert.equal(await page.locator('.cv-preview-header').evaluate(el => getComputedStyle(el).textAlign), 'center');
-    const links = page.locator('.cv-contact-row').last().locator('a');
-    assert.deepEqual(await links.allTextContents(), ['Website', 'Google Scholar', 'LinkedIn', 'GitHub']);
-    if (width === 1440) {
-      const boxes = await Promise.all((await links.all()).map(link => link.boundingBox()));
-      assert(boxes.every(box => Math.abs(box.y - boxes[0].y) < 1), 'Desktop profile links should share a horizontal row');
-    }
+    assert.deepEqual(await page.locator('.cv-contact-row').last().locator('a').allTextContents(), ['Website', 'Google Scholar', 'LinkedIn', 'GitHub']);
     const downloadBounds = await page.locator('#cv-download').boundingBox();
-    assert(downloadBounds.y + downloadBounds.height <= 1100, `Download button not reachable at ${width}`);
+    assert(downloadBounds.y + downloadBounds.height <= height, 'Keep download controls in the viewport');
+    const settings = page.locator('.cv-settings'), previewPanel = page.locator('.cv-preview-panel');
+    await settings.evaluate(el => { el.scrollTop = 0; });
+    await previewPanel.evaluate(el => { el.scrollTop = 0; });
+    await page.screenshot({ path: join(artifacts, `builder-initial-${width}-${height}.png`) });
+    const previewBounds = await previewPanel.boundingBox();
+    await settings.evaluate(el => { el.scrollTop = 350; });
+    assert(await settings.evaluate(el => el.scrollTop > 0), 'Selections need their own scroll area');
+    assert.equal(await previewPanel.evaluate(el => el.scrollTop), 0, 'Scrolling selections must not scroll the preview');
+    assert.deepEqual(await previewPanel.boundingBox(), previewBounds, 'Scrolling selections must not move the preview pane');
+    const settingsScroll = await settings.evaluate(el => el.scrollTop);
+    await previewPanel.focus();
+    await page.keyboard.press('PageDown');
+    await page.waitForFunction(() => document.querySelector('.cv-preview-panel').scrollTop > 0);
+    assert.equal(await settings.evaluate(el => el.scrollTop), settingsScroll, 'Preview keyboard scrolling must not move selections');
+    assert.deepEqual(await page.locator('#cv-download').boundingBox(), downloadBounds, 'Download controls must remain fixed while either pane scrolls');
+    assert.equal(await page.locator('#cv-dialog').evaluate(el => el.scrollTop), 0);
+    await settings.evaluate(el => { el.scrollTop = 0; });
+    await previewPanel.evaluate(el => { el.scrollTop = 0; });
     await audit();
-    await page.screenshot({ path: join(artifacts, `builder-${width}.png`) });
-    await page.locator('.cv-preview-header').evaluate(el => el.scrollIntoView({ block: 'center' }));
-    const headerBounds = await page.locator('.cv-preview-header').boundingBox();
-    const barBounds = await page.locator('.cv-download-bar').boundingBox();
-    assert(headerBounds.y + headerBounds.height <= barBounds.y, `CV header should be viewable above the download bar at ${width}`);
-    await page.locator('.cv-preview-header').screenshot({ path: join(artifacts, `cv-header-${width}.png`) });
+    await page.screenshot({ path: join(artifacts, `builder-${width}-${height}.png`) });
     await page.locator('input[data-group="contacts"][data-key="personal"]').uncheck();
     await page.locator('[data-close-cv]').click();
   }
@@ -278,9 +344,10 @@ try {
     delete saved.hyperlinks;
     localStorage.setItem(key, JSON.stringify(saved));
   });
-  await page.reload();
+  await page.goto(`${base}/education/`);
   await page.locator('[data-open-cv]').click();
   assert(!await page.locator('input[data-group="contacts"][data-key="university"]').isChecked());
+  assert(!await page.locator('input[data-group="entries"][data-key*="Hardware Accelerator for Feature Matching"]').isChecked(), 'Entry selections should persist across pages');
   assert(await page.locator('#cv-hyperlinks').isChecked());
 
   await page.locator('input[name="audience"][value="company"]').check();
@@ -349,7 +416,7 @@ try {
   const [retryDownload] = await Promise.all([retryPage.waitForEvent('download'), retryPage.locator('#cv-download').click()]);
   assert(retryDownload.suggestedFilename().endsWith('.pdf'));
   await retryContext.close();
-  console.log('PASS: centered mobile navigation, name before photo, News exclusion, separate paper descriptions, PDF typography and dates, image zoom, keyboard focus, CV presets, selection, persistence, centered headers, horizontal links, print option, empty state, PDF downloads, retry, and accessibility');
+  console.log('PASS: separate pages, direct reloads, active navigation, legacy links, static portrait, unique affiliation, independent CV scrolling, complete CV data on every page, cross-page preferences, PDF formatting, News exclusion, image zoom, retry, and accessibility');
   console.log(`Artifacts: ${artifacts}`);
 } finally {
   await browser.close();

@@ -7,55 +7,34 @@ const download = document.querySelector('#cv-download');
 const status = document.querySelector('#cv-status');
 const savedKey = 'miyuru-cv-options-v1';
 const wording = JSON.parse(document.querySelector('#cv-wording').textContent);
-const text = node => {
-  if (!node) return '';
-  const copy = node.cloneNode(true);
-  copy.querySelectorAll('br').forEach(br => br.replaceWith(' '));
-  return copy.textContent.replace(/\s+/g, ' ').trim();
-};
-const paragraphs = node => [...node.querySelectorAll(':scope > p')].map(text).filter(Boolean);
+const source = JSON.parse(document.querySelector('#cv-data').textContent);
 const entry = (title = '', meta = '', values = [], url = '') => ({ title, meta, paragraphs: values, url });
-const records = selector => [...document.querySelectorAll(selector)].map(record => {
-  const body = record.querySelector('div');
-  const date = text(record.querySelector('.record-date'));
-  const sourceOrganization = body.querySelector('.record-organization');
-  const formattedOrganization = sourceOrganization?.cloneNode(true);
-  formattedOrganization?.querySelectorAll('br').forEach(br => br.replaceWith(' · '));
-  return { ...entry(text(body.querySelector('h3')), [date, text(sourceOrganization)].filter(Boolean).join(' | '), [...body.querySelectorAll(':scope > p:not(.record-organization)')].map(text)), date, organization: text(formattedOrganization) };
-});
-const publications = selector => [...document.querySelectorAll(selector)].map(record => {
-  const venue = record.querySelector('.publication-venue');
-  const conference = venue.cloneNode(true);
-  conference.querySelector('span')?.remove();
-  return {
-    ...entry(text(record.querySelector('h3')), text(venue), [text(record.querySelector(':scope > p:not(.publication-venue), :scope > div > p:not(.publication-venue)'))].filter(Boolean), record.querySelector('h3 a')?.href || ''),
-    cvId: record.dataset.cvId,
-    citationMeta: [text(conference), text(venue.querySelector('span'))].filter(Boolean).join(' | ')
-  };
-});
+const records = values => values.map(record => ({
+  // Preserve existing selection IDs while displaying institution lines with a separator.
+  ...entry(record.title, [record.date, [record.organization, record.institution].filter(Boolean).join(' ')].filter(Boolean).join(' | '), record.paragraphs),
+  date: record.date, organization: [record.organization, record.institution].filter(Boolean).join(' · ')
+}));
+const publications = values => values.map(paper => ({
+  ...entry(paper.title, [paper.venue, paper.credit].filter(Boolean).join(' '), [paper.summary], paper.url),
+  cvId: paper.id, citationMeta: [paper.venue, paper.credit].filter(Boolean).join(' | ')
+}));
 
-// Deliberate allowlist: website News updates are never offered or exported as CV content.
+// Shared build-time data keeps every page's CV complete. News is deliberately excluded.
 const sections = [
-  { id: 'summary', title: 'Profile', items: [entry('', '', [...document.querySelectorAll('.introduction > p:not([class])')].map(text))] },
+  { id: 'summary', title: 'Profile', items: [entry('', '', source.profile.summary)] },
   { id: 'expertise', title: 'Technical expertise', items: wording.expertise.map(value => entry('', '', [value])) },
-  { id: 'research', title: 'Research focus', items: [entry('', '', paragraphs(document.querySelector('.research-focus')))] },
-  { id: 'experience', title: 'Professional experience', items: records('#experience .record') },
-  { id: 'education', title: 'Education', items: records('#education > .record') },
-  { id: 'publications', title: 'Selected publications', items: publications('#publications .publication:not(.publication-contribution)') },
-  { id: 'review', title: 'Review Experience', items: records('#review .record') },
-  { id: 'awards', title: 'Honours and awards', items: [...document.querySelectorAll('.award-list li')].map(item => entry(text(item.querySelector('strong')), '', [text(item.querySelector('span'))])) },
-  { id: 'earlier', title: 'Earlier education', items: records('.education-details .record') },
-  { id: 'contributions', title: 'Additional research contributions', items: publications('.publication-contribution') },
-  { id: 'interests', title: 'Personal interests', items: [entry('', '', [text(document.querySelector('.personal-note'))])] }
+  { id: 'research', title: 'Research focus', items: [entry('', '', source.profile.research)] },
+  { id: 'experience', title: 'Professional experience', items: records(source.profile.experience) },
+  { id: 'education', title: 'Education', items: records(source.profile.education) },
+  { id: 'publications', title: 'Selected publications', items: publications(source.publications.filter(paper => !paper.contribution)) },
+  { id: 'review', title: 'Review Experience', items: records(source.profile.review) },
+  { id: 'awards', title: 'Honours and awards', items: source.profile.awards.map(award => entry(award.title, '', award.paragraphs)) },
+  { id: 'earlier', title: 'Earlier education', items: records(source.profile.earlier) },
+  { id: 'contributions', title: 'Additional research contributions', items: publications(source.publications.filter(paper => paper.contribution)) },
+  { id: 'interests', title: 'Personal interests', items: [entry('', '', [source.profile.interests])] }
 ];
 sections.forEach(section => section.items.forEach(item => { item.id = `${section.id}:${item.title || item.paragraphs[0]}:${item.meta}`; }));
-const contacts = [...document.querySelectorAll('.contact-list > div')].map(row => {
-  const link = row.querySelector('a');
-  return { id: text(row.querySelector('dt')).toLowerCase(), label: text(row.querySelector('dt')), text: text(link).replace('↗', '').trim(), url: link.href };
-}).concat([...document.querySelectorAll('.profile-sidebar .profile-links a')].map(link => {
-  const label = text(link).replace('↗', '').trim();
-  return { id: label.toLowerCase().replace(/\s/g, '-'), label, text: label, url: link.href };
-})).map(contact => ({ ...contact, kind: contact.url.startsWith('mailto:') ? 'email' : 'web' }));
+const contacts = source.contacts.map(contact => ({ ...contact, url: new URL(contact.url, document.baseURI).href, kind: contact.url.startsWith('mailto:') ? 'email' : 'web' }));
 
 const orders = {
   company: ['summary', 'expertise', 'experience', 'education', 'publications', 'review', 'research', 'awards', 'contributions', 'earlier', 'interests'],
@@ -138,8 +117,8 @@ function renderOptions() {
 
 function model() {
   return {
-    name: text(document.querySelector('#profile-title')),
-    headline: state.audience === 'company' ? 'Embedded Intelligence | Hardware Acceleration' : text(document.querySelector('.intro-subtitle')),
+    name: source.name,
+    headline: state.audience === 'company' ? 'Embedded Intelligence | Hardware Acceleration' : source.profile.headline,
     audience: state.audience,
     contacts: contacts.filter(contact => state.contacts[contact.id] && (state.hyperlinks || contact.kind === 'email')).map(contact => ({
       ...contact,

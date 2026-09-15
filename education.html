@@ -1,0 +1,18 @@
+---
+layout: section
+title: Education
+section: education
+permalink: /education/
+description: Academic training, qualifications, and honours.
+---
+{% include records.html records=site.data.profile.education %}
+<details class="education-details">
+  <summary>Earlier education</summary>
+  {% include records.html records=site.data.profile.earlier heading='h3' %}
+</details>
+<section class="content-section" id="awards" aria-labelledby="awards-title">
+  <div class="section-heading"><h2 id="awards-title">Honours &amp; awards</h2></div>
+  <ul class="award-list">
+    {% for award in site.data.profile.awards %}<li><strong>{{ award.title | escape }}</strong><span>{{ award.paragraphs | join: ' ' | escape }}</span></li>{% endfor %}
+  </ul>
+</section>

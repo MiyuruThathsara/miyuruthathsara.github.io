@@ -1,0 +1,15 @@
+<script id="cv-data" type="application/json">
+{
+  "name": {{ site.title | jsonify }},
+  "profile": {{ site.data.profile | jsonify }},
+  "publications": {{ site.data.publications | jsonify }},
+  "contacts": [
+    { "id": "university", "label": "University", "text": {{ site.university_email | jsonify }}, "url": {{ site.university_email | prepend: 'mailto:' | jsonify }} },
+    { "id": "personal", "label": "Personal", "text": {{ site.personal_email | jsonify }}, "url": {{ site.personal_email | prepend: 'mailto:' | jsonify }} },
+    { "id": "website", "label": "Website", "text": "Website", "url": {{ site.personal_website | jsonify }} },
+    { "id": "google-scholar", "label": "Google Scholar", "text": "Google Scholar", "url": {{ site.scholar_url | jsonify }} },
+    { "id": "linkedin", "label": "LinkedIn", "text": "LinkedIn", "url": {{ site.linkedin_url | jsonify }} },
+    { "id": "github", "label": "GitHub", "text": "GitHub", "url": {{ site.github_url | jsonify }} }
+  ]
+}
+</script>

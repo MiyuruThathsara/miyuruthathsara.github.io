@@ -1,0 +1,11 @@
+---
+layout: section
+title: Selected publications
+section: publications
+permalink: /publications/
+description: Research in reconfigurable computing and embedded systems.
+---
+<p class="section-note"><a href="{{ site.scholar_url | escape }}">View Google Scholar <span aria-hidden="true">↗</span></a></p>
+{% for paper in site.data.publications %}{% unless paper.contribution %}{% include publication.html paper=paper %}{% endunless %}{% endfor %}
+<h2 class="subheading contribution-heading">Additional research contribution</h2>
+{% for paper in site.data.publications %}{% if paper.contribution %}{% include publication.html paper=paper %}{% endif %}{% endfor %}

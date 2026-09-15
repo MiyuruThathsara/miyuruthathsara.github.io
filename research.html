@@ -1,0 +1,15 @@
+---
+layout: section
+title: Research
+section: research
+permalink: /research/
+description: Embedded intelligence and hardware acceleration for autonomous robots.
+---
+<div class="research-focus">
+  <h2>Current focus</h2>
+  {% for paragraph in site.data.profile.research %}<p>{{ paragraph | escape }}</p>{% endfor %}
+</div>
+<div class="research-themes">
+  {% for theme in site.data.profile.themes %}<div class="research-theme"><h2>{{ theme.title | escape }}</h2><p>{{ theme.summary | escape }}</p></div>{% endfor %}
+</div>
+<p class="page-related"><a href="{{ '/publications/' | relative_url }}">Explore the publications <span aria-hidden="true">↗</span></a></p>

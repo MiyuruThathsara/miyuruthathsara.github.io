@@ -1,0 +1,22 @@
+{% assign paper = include.paper %}
+<article id="{{ paper.id }}" class="publication{% if paper.featured %} publication-featured{% endif %}{% if paper.contribution %} publication-contribution{% endif %}" data-cv-id="{{ paper.id }}">
+  {% if paper.image %}
+  <a class="publication-media" href="{{ paper.image | relative_url }}" data-image-viewer data-image-title="{{ paper.image_title | escape }}"{% if paper.vector %} data-vector-url="{{ paper.vector | relative_url }}"{% endif %} aria-label="{{ paper.image_label | escape }}">
+    <picture><source srcset="{{ paper.webp | relative_url }}" type="image/webp"><img src="{{ paper.image | relative_url }}" alt="{{ paper.image_alt | escape }}" width="{{ paper.image_width }}" height="{{ paper.image_height }}" loading="lazy" decoding="async"></picture>
+    <span class="image-caption">View full-size figure <span aria-hidden="true">↗</span></span>
+  </a>
+  {% endif %}
+  <div>
+    <p class="publication-venue">{{ paper.venue | escape }} <span>{{ paper.credit | escape }}</span></p>
+    <h2>{% if paper.url != '' %}<a href="{{ paper.url | escape }}">{{ paper.title | escape }}</a>{% else %}{{ paper.title | escape }}{% endif %}</h2>
+    <p>{{ paper.summary | escape }}</p>
+    {% if paper.url != '' %}<a class="publication-link" href="{{ paper.url | escape }}" aria-label="Read {{ paper.title | escape }} on IEEE Xplore">Paper <span aria-hidden="true">↗</span></a>{% endif %}
+    {% if paper.video_id %}
+    <details class="demo-disclosure">
+      <summary>View research demonstration</summary>
+      <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/{{ paper.video_id }}?rel=0" title="FPGA stereo visual SLAM research demonstration" loading="lazy" allow="encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+      <p class="video-fallback"><a href="https://www.youtube.com/watch?v={{ paper.video_id }}">Watch on YouTube <span aria-hidden="true">↗</span></a></p>
+    </details>
+    {% endif %}
+  </div>
+</article>
