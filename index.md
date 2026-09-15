@@ -29,7 +29,6 @@ permalink: /
     <section class="introduction" aria-labelledby="profile-title">
       {% for paragraph in site.data.profile.summary %}<p>{{ paragraph | escape }}</p>{% endfor %}
       <div class="profile-actions">
-        {% include cv-button.html %}
         <a class="text-link" href="{{ '/contact/' | relative_url }}">Contact me <span aria-hidden="true">↗</span></a>
       </div>
       <div class="profile-explore">

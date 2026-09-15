@@ -4,5 +4,6 @@ if (location.pathname === home.pathname && location.hash) {
   const section = location.hash.slice(1);
   const link = [...document.querySelectorAll('nav [data-section]')].find(link => link.dataset.section === section);
   if (link && section !== 'profile') location.replace(link.href);
+  else if (section === 'review') location.replace(new URL('publications/#review', home).href);
   else if (section === 'awards') location.replace(new URL('education/#awards', home).href);
 }

@@ -7,6 +7,43 @@
   --line: #dedfd9;
   --accent: #806134;
   --wash: #f2f3ef;
+  --button-bg: #183b4e;
+  --button-ink: #fff;
+  --button-hover: #285369;
+  --selection: #dbe5e8;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #151c22;
+  --ink: #dce3e8;
+  --heading: #add1e2;
+  --muted: #adb9c1;
+  --line: #35434c;
+  --accent: #d2b482;
+  --wash: #1e2932;
+  --button-bg: #add1e2;
+  --button-ink: #13252f;
+  --button-hover: #c5e1ed;
+  --selection: #334d5d;
+}
+
+/* Follow the device preference even when JavaScript is unavailable. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --paper: #151c22;
+    --ink: #dce3e8;
+    --heading: #add1e2;
+    --muted: #adb9c1;
+    --line: #35434c;
+    --accent: #d2b482;
+    --wash: #1e2932;
+    --button-bg: #add1e2;
+    --button-ink: #13252f;
+    --button-hover: #c5e1ed;
+    --selection: #334d5d;
+  }
 }
 
 * { box-sizing: border-box; }
@@ -24,10 +61,10 @@ body {
   line-height: 1.75;
   -webkit-font-smoothing: antialiased;
 }
-::selection { background: #dbe5e8; color: var(--heading); }
+::selection { background: var(--selection); color: var(--heading); }
 a { color: var(--heading); text-underline-offset: 4px; text-decoration-thickness: 1px; }
 a:hover { text-decoration-color: var(--accent); }
-a:focus-visible, summary:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
+a:focus-visible, summary:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
   outline: 2px solid var(--heading);
   outline-offset: 5px;
   border-radius: 1px;
@@ -44,7 +81,12 @@ h3 { margin: 0 0 0.5rem; font-size: 1rem; font-weight: 600; line-height: 1.5; }
 .skip-link:focus { top: 0.75rem; }
 .header-inner, .page-shell, .footer-inner { width: min(1160px, calc(100% - 96px)); margin: 0 auto; }
 .site-header { border-bottom: 1px solid var(--line); }
-.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 2rem; min-height: 88px; }
+.header-inner { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 1.25rem; min-height: 88px; }
+.header-actions { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; max-width: 180px; padding: 0.6rem 0; }
+.header-actions .button { padding: 0.6rem 0.85rem; font-size: 0.78rem; white-space: nowrap; }
+.theme-control { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--muted); font-size: 0.75rem; }
+.theme-control select { min-height: 44px; padding: 0.35rem 0.5rem; border: 1px solid var(--line); border-radius: 2px; background: var(--paper); color: var(--heading); font: inherit; cursor: pointer; }
+.site-header nav { justify-content: center; }
 .site-brand { display: flex; align-items: center; gap: 0.85rem; text-decoration: none; }
 .brand-initials { font-family: Georgia, "Times New Roman", serif; font-size: 1.65rem; letter-spacing: -0.08em; }
 .site-brand > span:last-child { border-left: 1px solid var(--line); padding-left: 0.85rem; color: var(--muted); font-size: 0.75rem; letter-spacing: 0.09em; text-transform: uppercase; }
@@ -109,8 +151,8 @@ nav a[aria-current="page"] { color: var(--heading); font-weight: 600; text-decor
 .publication p:not(.publication-venue) { margin-bottom: 0.6rem; font-size: 0.85rem; line-height: 1.75; }
 .publication-venue { display: flex; flex-wrap: wrap; gap: 0.2rem 0.8rem; align-items: baseline; margin: 0 0 0.6rem; color: var(--heading); font-size: 0.72rem; font-weight: 650; letter-spacing: 0.025em; }
 .publication-venue span { color: var(--muted); font-size: 0.7rem; font-weight: 400; letter-spacing: 0; }
-.publication-media { display: block; width: 100%; max-width: 240px; margin: 0 auto; padding: 10px 10px 0; border: 1px solid var(--line); background: #fff; text-decoration: none; cursor: zoom-in; }
-.publication-media picture { display: flex; align-items: center; justify-content: center; height: 164px; }
+.publication-media { display: block; width: 100%; max-width: 240px; margin: 0 auto; padding: 10px 10px 0; border: 1px solid var(--line); background: var(--wash); text-decoration: none; cursor: zoom-in; }
+.publication-media picture { display: flex; align-items: center; justify-content: center; height: 164px; background: #fff; }
 .publication-media img { width: auto; max-width: 100%; height: auto; max-height: 100%; object-fit: contain; margin: 0 auto; }
 .publication-media .image-caption { padding: 0.5rem 0; font-size: 0.72rem; }
 .publication-link { font-size: 0.78rem; font-weight: 600; }
@@ -160,7 +202,8 @@ summary::marker { color: var(--accent); }
 }
 
 @media (max-width: 800px) {
-  .header-inner { flex-wrap: wrap; justify-content: center; gap: 0.35rem; padding: 0.7rem 0; }
+  .header-inner { grid-template-columns: 1fr; justify-items: center; gap: 0.45rem; padding: 0.7rem 0; }
+  .header-actions { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1rem; max-width: 100%; padding: 0.25rem 0 0; text-align: center; }
   .site-brand { width: 100%; justify-content: center; }
   .site-header nav { width: 100%; justify-content: center; text-align: center; }
   .site-brand > span:last-child { display: none; }
@@ -179,7 +222,7 @@ summary::marker { color: var(--accent); }
 
 @media (max-width: 540px) {
   .header-inner, .page-shell, .footer-inner { width: calc(100% - 40px); }
-  .header-inner { flex-wrap: wrap; gap: 0; padding: 0.7rem 0; }
+  .header-inner { gap: 0.4rem; padding: 0.7rem 0; }
   .site-brand { width: 100%; }
   .site-brand > span:last-child { display: inline; }
   .brand-initials { font-size: 1.45rem; }
@@ -212,6 +255,7 @@ summary::marker { color: var(--accent); }
 }
 
 @media print {
+  :root { color-scheme: light !important; --paper: #fff !important; --ink: #000 !important; --heading: #183b4e !important; --muted: #606b70 !important; --line: #dedfd9 !important; --accent: #806134 !important; --wash: #f2f3ef !important; }
   body { border: 0; background: #fff; color: #000; font-size: 10pt; }
   .site-header, .site-footer, .skip-link, .demo-disclosure, .profile-actions, dialog { display: none !important; }
   .page-shell { width: 100%; padding: 0; }

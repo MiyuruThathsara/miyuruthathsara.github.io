@@ -71,9 +71,9 @@
       "date": "2016 – 2021",
       "organization": "University of Moratuwa, Sri Lanka",
       "paragraphs": [
-        "First Class Honours · GPA: 3.74/4.2",
-        "Selected coursework: Digital IC Design (A+), Advanced Digital Systems (A+)."
-      ]
+        "First Class Honours · GPA: 3.74/4.2"
+      ],
+      "hidden_coursework": "Selected coursework: Digital IC Design (A+), Advanced Digital Systems (A+)."
     }
   ],
   "earlier": [
@@ -122,10 +122,11 @@
     },
     {
       "title": "Chess",
+      "hidden": true,
       "paragraphs": [
         "School team captain, 2005–2010. Individual: 25th nationally and 5th provincially. Team: 3rd nationally on two occasions."
       ]
     }
   ],
-  "interests": "Outside research, I enjoy badminton, cricket, and chess, as well as sharing knowledge with the research community."
+  "interests": "Outside research, I enjoy badminton and cricket, as well as sharing knowledge with the research community."
 }

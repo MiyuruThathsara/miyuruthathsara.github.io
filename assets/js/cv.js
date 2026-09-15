@@ -28,7 +28,7 @@ const sections = [
   { id: 'education', title: 'Education', items: records(source.profile.education) },
   { id: 'publications', title: 'Selected publications', items: publications(source.publications.filter(paper => !paper.contribution)) },
   { id: 'review', title: 'Review Experience', items: records(source.profile.review) },
-  { id: 'awards', title: 'Honours and awards', items: source.profile.awards.map(award => entry(award.title, '', award.paragraphs)) },
+  { id: 'awards', title: 'Honours and awards', items: source.profile.awards.filter(award => !award.hidden).map(award => entry(award.title, '', award.paragraphs)) },
   { id: 'earlier', title: 'Earlier education', items: records(source.profile.earlier) },
   { id: 'contributions', title: 'Additional research contributions', items: publications(source.publications.filter(paper => paper.contribution)) },
   { id: 'interests', title: 'Personal interests', items: [entry('', '', [source.profile.interests])] }
@@ -52,7 +52,7 @@ function preset(audience) {
   return {
     audience,
     sections: Object.fromEntries(sections.map(section => [section.id, selected.includes(section.id)])),
-    entries: Object.fromEntries(sections.flatMap(section => section.items.map(item => [item.id, item.title !== 'Chess']))),
+    entries: Object.fromEntries(sections.flatMap(section => section.items.map(item => [item.id, true]))),
     contacts: Object.fromEntries(contacts.map(contact => [contact.id, ['website', 'github', 'linkedin', audience === 'company' ? 'personal' : 'university', ...(audience === 'academia' ? ['google-scholar'] : [])].includes(contact.id)])),
     hyperlinks: true,
     descriptions: true,
@@ -133,7 +133,7 @@ function model() {
         if (id === 'research') values = [wording.research_focus];
         if (item.cvId && wording.publications[item.cvId]) values = [wording.publications[item.cvId]];
         if (!state.descriptions && ['experience', 'publications', 'contributions'].includes(id)) values = [];
-        if (!state.grades && ['education', 'earlier'].includes(id)) values = values.filter(value => !/coursework|A\/L:|O\/L:/.test(value)).map(value => value.replace(/ · GPA:.*/, ''));
+        if (!state.grades && ['education', 'earlier'].includes(id)) values = values.filter(value => !/A\/L:|O\/L:/.test(value)).map(value => value.replace(/ · GPA:.*/, ''));
         if (id === 'awards') return entry('', '', [[item.title, ...values].join(' — ')]);
         return {
           title: item.title, meta: item.citationMeta ?? item.organization ?? item.meta,

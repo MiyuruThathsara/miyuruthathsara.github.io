@@ -13,6 +13,6 @@ description: Academic training, qualifications, and honours.
 <section class="content-section" id="awards" aria-labelledby="awards-title">
   <div class="section-heading"><h2 id="awards-title">Honours &amp; awards</h2></div>
   <ul class="award-list">
-    {% for award in site.data.profile.awards %}<li><strong>{{ award.title | escape }}</strong><span>{{ award.paragraphs | join: ' ' | escape }}</span></li>{% endfor %}
+    {% for award in site.data.profile.awards %}{% unless award.hidden %}<li><strong>{{ award.title | escape }}</strong><span>{{ award.paragraphs | join: ' ' | escape }}</span></li>{% endunless %}{% endfor %}
   </ul>
 </section>

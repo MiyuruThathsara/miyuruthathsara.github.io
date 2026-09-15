@@ -9,3 +9,7 @@ description: Research in reconfigurable computing and embedded systems.
 {% for paper in site.data.publications %}{% unless paper.contribution %}{% include publication.html paper=paper %}{% endunless %}{% endfor %}
 <h2 class="subheading contribution-heading">Additional research contribution</h2>
 {% for paper in site.data.publications %}{% if paper.contribution %}{% include publication.html paper=paper %}{% endif %}{% endfor %}
+<section class="content-section" id="review" aria-labelledby="review-title">
+  <div class="section-heading"><h2 id="review-title">Review experience</h2></div>
+  {% include records.html records=site.data.profile.review heading='h3' %}
+</section>

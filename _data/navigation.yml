@@ -16,9 +16,6 @@
 - label: Education
   url: /education/
   section: education
-- label: Review
-  url: /review/
-  section: review
 - label: Contact
   url: /contact/
   section: contact

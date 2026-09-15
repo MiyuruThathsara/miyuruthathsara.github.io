@@ -1,12 +1,12 @@
 [hidden] { display: none !important; }
-button, input { font: inherit; }
+button, input, select { font: inherit; }
 button { cursor: pointer; }
 button:disabled { cursor: wait; opacity: 0.55; }
-.button { display: inline-flex; justify-content: center; align-items: center; gap: 0.65rem; min-height: 44px; padding: 0.65rem 1.1rem; border: 1px solid var(--heading); border-radius: 2px; background: var(--heading); color: #fff; font-size: 0.85rem; font-weight: 600; line-height: 1.4; text-decoration: none; }
-.button:hover { background: #285369; color: #fff; }
+.button { display: inline-flex; justify-content: center; align-items: center; gap: 0.65rem; min-height: 44px; padding: 0.65rem 1.1rem; border: 1px solid var(--button-bg); border-radius: 2px; background: var(--button-bg); color: var(--button-ink); font-size: 0.85rem; font-weight: 600; line-height: 1.4; text-decoration: none; }
+.button:hover { background: var(--button-hover); color: var(--button-ink); }
 .button-secondary { background: var(--paper); color: var(--heading); border-color: var(--line); }
 .button-secondary:hover { background: var(--wash); color: var(--heading); }
-.button-format { padding-left: 0.65rem; border-left: 1px solid #ffffff60; font-size: 0.68rem; letter-spacing: 0.04em; }
+.button-format { padding-left: 0.65rem; border-left: 1px solid currentColor; font-size: 0.68rem; letter-spacing: 0.04em; }
 .profile-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem 1.5rem; margin-top: 1.4rem; }
 body:has(dialog[open]) { overflow: hidden; }
 dialog { max-width: calc(100% - 32px); max-height: calc(100dvh - 32px); padding: 0; border: 1px solid var(--line); border-radius: 4px; background: var(--paper); color: var(--ink); box-shadow: 0 20px 80px #14252e40; }
@@ -48,6 +48,7 @@ dialog::backdrop { background: #13252fe0; }
 .cv-preview-panel { min-width: 0; padding: 1.5rem; background: var(--wash); }
 .cv-preview-label { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; color: var(--muted); font-size: 0.75rem; }
 .cv-preview { min-height: 440px; padding: 2.5rem; border: 1px solid var(--line); background: #fff; color: #24272b; font-family: Arial, Helvetica, sans-serif; font-size: 0.81rem; line-height: 1.5; }
+.cv-preview { color-scheme: light; --heading: #183b4e; --accent: #806134; --selection: #dbe5e8; }
 .cv-preview h3 { margin: 0 0 0.4rem; color: #202428; font-family: inherit; font-size: 1.65rem; font-weight: 700; letter-spacing: 0; }
 .cv-preview-header { margin-bottom: 1.3rem; text-align: center; }
 .cv-preview .cv-headline { margin-bottom: 0.5rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 0.78rem; }

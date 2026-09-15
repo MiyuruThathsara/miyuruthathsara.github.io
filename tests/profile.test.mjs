@@ -25,7 +25,7 @@ const server = createServer(async (req, res) => {
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const base = `http://127.0.0.1:${server.address().port}`;
 const browser = process.env.BROWSER === 'webkit' ? await webkit.launch() : await chromium.launch({ channel: 'chrome' });
-const context = await browser.newContext({ viewport: { width: 1440, height: 1100 }, reducedMotion: 'reduce', acceptDownloads: true });
+const context = await browser.newContext({ viewport: { width: 1440, height: 1100 }, colorScheme: 'light', reducedMotion: 'reduce', acceptDownloads: true });
 const page = await context.newPage();
 const pageErrors = [];
 const pdfInspections = new Map();
@@ -68,6 +68,7 @@ async function readPdf(bytes, name, render = false) {
   }
   console.log(`PDF ${name}: ${pdf.numPages} pages; selectable text and margins verified`);
   assert(!/\bNEWS\b/.test(text), `News must never appear in ${name}`);
+  assert(!/\bchess\b|selected coursework|Digital IC Design|Advanced Digital Systems/i.test(text), `Hidden details leaked into ${name}`);
   assert(newsHeadlines.every(headline => !text.includes(headline)), `Website news leaked into ${name}`);
   assert(websiteSummaries.every(summary => !text.includes(summary)), `Use formal CV paper descriptions, not website copy, in ${name}`);
   pdfInspections.set(name, inspection);
@@ -98,11 +99,22 @@ try {
   assert.equal(await page.locator('.profile-photo').getAttribute('src'), '/me.jpeg');
   assert(await page.locator('.profile-photo').evaluate(img => !img.closest('a, button, [data-image-viewer]')), 'The profile photo should be static');
   assert(!homepage.includes('View full photograph'));
+  assert.equal(await page.locator('[data-open-cv]').count(), 1);
+  assert.equal(await page.locator('.site-header [data-open-cv]').count(), 1, 'Use one shared header CV action');
+  assert.equal(await page.locator('main [data-open-cv]').count(), 0);
+  assert.equal(await page.locator('#theme-preference').inputValue(), 'system');
+  assert.equal(await page.locator('html').getAttribute('data-theme'), 'light');
 
   for (const width of [1440, 1024, 800, 768, 540, 390, 320]) {
     await page.setViewportSize({ width, height: 1100 });
     await page.locator('.profile-photo').evaluate(image => image.decode());
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Page overflow at ${width}`);
+    const cvButton = await page.locator('.site-header [data-open-cv]').boundingBox();
+    assert(cvButton.y + cvButton.height <= (await page.locator('main').boundingBox()).y, 'Keep the CV action in the top header');
+    assert(cvButton.width >= 44 && cvButton.height >= 44, 'The shared action should be easy to tap');
+    const themeControl = await page.locator('#theme-preference').boundingBox();
+    assert(themeControl.width >= 44 && themeControl.height >= 44, 'Theme selection should be easy to tap');
+    assert(themeControl.y + themeControl.height <= (await page.locator('main').boundingBox()).y);
     const frame = await page.locator('.profile-photo-frame').boundingBox();
     const photo = await page.locator('.profile-photo').boundingBox();
     assert(frame.width >= 220);
@@ -130,7 +142,7 @@ try {
     }
   }
 
-  const routes = ['/', '/news/', '/research/', '/publications/', '/experience/', '/education/', '/review/', '/contact/'];
+  const routes = ['/', '/news/', '/research/', '/publications/', '/experience/', '/education/', '/contact/'];
   assert.deepEqual(await page.locator('nav a').evaluateAll(links => links.map(link => new URL(link.href).pathname)), routes);
   let referenceCv;
   for (const route of routes) {
@@ -138,6 +150,9 @@ try {
     assert.equal(new URL(page.url()).pathname, route, 'Navigation must change pages');
     assert((await page.reload()).ok(), 'Direct page reload should work');
     await page.locator('[data-open-cv]').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('[data-open-cv]').count(), 1);
+    assert.equal(await page.locator('main [data-open-cv]').count(), 0, 'Remove page-level CV buttons');
+    assert.equal(await page.locator('nav a[href="/review/"]').count(), 0, 'Review is no longer a navigation page');
     assert.equal(await page.locator('h1').count(), 1);
     assert.equal(await page.title(), `${await page.locator('h1').innerText()} | ${route === '/' ? 'Personal Profile' : 'Miyuru Thathsara'}`);
     assert.equal(await page.locator('nav [aria-current="page"]').count(), 1);
@@ -145,6 +160,7 @@ try {
     assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'), `https://miyuruthathsara.github.io${route}`);
     assert.deepEqual(JSON.parse(await page.locator('#cv-data').textContent()), sharedData, 'Every page needs the same complete CV data');
     const content = await page.locator('main').innerText();
+    assert(!/\bchess\b|selected coursework|Digital IC Design|Advanced Digital Systems/i.test(content), `Hidden details must not appear on ${route}`);
     assert(!/\bSCSE\b/.test(content));
     if (route === '/news/') {
       assert.equal(await page.locator('.news-list li').count(), 3);
@@ -156,11 +172,11 @@ try {
       }
     }
     if (route === '/publications/') {
+      assert.match(await page.locator('#review').innerText(), /External Reviewer[\s\S]*ICCAD 2026/);
       websiteSummaries = await page.locator('.publication > div > p:not(.publication-venue)').allTextContents();
       assert.equal(websiteSummaries.length, 5);
       assert(websiteSummaries.every(summary => summary.trim().split(/\s+/).length <= 40));
     }
-    if (route === '/review/') assert.match(content, /External Reviewer[\s\S]*ICCAD 2026/);
     if (route === '/experience/') assert.match(content, /HESL, CCDS/);
     if (route === '/education/') assert(content.includes('Honours & awards') && content.includes('NTU Research Scholarship'));
     for (const width of [1440, 390, 320]) {
@@ -191,16 +207,89 @@ try {
     console.log(`PASS: ${route} navigation, reload, accessibility, responsive layout, and full CV download`);
   }
 
+  // System follows live device changes; explicit choices win and persist across pages.
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
+  assert.equal(await page.locator('#theme-preference').inputValue(), 'system');
+  await page.locator('#theme-preference').selectOption('light');
+  assert.equal(await page.locator('html').getAttribute('data-theme'), 'light');
+  await page.reload();
+  assert.equal(await page.locator('html').getAttribute('data-theme'), 'light', 'Manual light wins over a dark system after reload');
+  assert.equal(await page.locator('#theme-preference').inputValue(), 'light');
+  await page.locator('#theme-preference').selectOption('dark');
+  await page.emulateMedia({ colorScheme: 'light' });
+  assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark', 'Manual dark wins over a light system');
+  for (const route of routes) {
+    await page.goto(`${base}${route}`);
+    assert.equal(await page.locator('#theme-preference').inputValue(), 'dark');
+    assert.equal(await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(21, 28, 34)');
+    for (const width of [1440, 390, 320]) {
+      await page.setViewportSize({ width, height: 1100 });
+      assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Dark theme overflow at ${route} ${width}`);
+      if (width === 390) await audit();
+      if (width !== 320) await page.screenshot({ path: join(artifacts, `dark-${route.split('/')[1] || 'home'}-${width}.png`) });
+    }
+  }
+  await page.goto(`${base}/publications/`);
+  await page.locator('[data-vector-url]').click();
+  await page.locator('#image-full').evaluate(img => img.decode());
+  await audit();
+  await page.locator('[data-close-image]').click();
+  await page.setViewportSize({ width: 1440, height: 1100 });
+  await page.locator('[data-open-cv]').click();
+  assert.equal(await page.locator('#cv-preview').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(255, 255, 255)', 'Keep the preview as white paper');
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 1100 });
+    await audit();
+    await page.locator('.cv-settings, .cv-preview-panel').evaluateAll(panes => panes.forEach(pane => { pane.scrollTop = 0; }));
+    await page.screenshot({ path: join(artifacts, `dark-builder-${width}.png`) });
+  }
+  assert.equal(await downloadPdf('dark-academic', true), referenceCv, 'Site theme must not change PDF content');
+  await page.locator('[data-close-cv]').click();
+  await page.emulateMedia({ media: 'print' });
+  assert.equal(await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(255, 255, 255)');
+  assert.equal(await page.locator('h1').evaluate(el => getComputedStyle(el).color), 'rgb(24, 59, 78)', 'Printed headings must remain dark');
+  await page.emulateMedia({ media: 'screen' });
+  // An existing tab should update when another tab changes or clears the preference.
+  const sibling = await context.newPage();
+  await sibling.goto(base);
+  assert.equal(await sibling.locator('#theme-preference').inputValue(), 'dark');
+  await sibling.locator('#theme-preference').selectOption('light');
+  await page.waitForFunction(() => document.documentElement.dataset.theme === 'light');
+  assert.equal(await page.locator('#theme-preference').inputValue(), 'light');
+  await sibling.evaluate(() => localStorage.removeItem('miyuru-theme-v1'));
+  await page.waitForFunction(() => document.querySelector('#theme-preference').value === 'system');
+  await sibling.close();
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
+  await page.locator('#theme-preference').selectOption('light');
+  await page.locator('#theme-preference').selectOption('system');
+  assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark', 'Choosing System restores the live device preference');
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.waitForFunction(() => document.documentElement.dataset.theme === 'light');
+  assert.equal(await page.locator('#theme-preference').inputValue(), 'system');
+  console.log('PASS: system/light/dark themes, device changes, cross-page and cross-tab preferences, dark accessibility, white CV preview/PDF, and light print styles');
+
   await page.goto(`${base}/#research`);
   await page.waitForURL('**/research/');
   await page.goto(`${base}/#awards`);
   await page.waitForURL('**/education/#awards');
-  const noJsContext = await browser.newContext({ javaScriptEnabled: false });
+  await page.goto(`${base}/#review`);
+  await page.waitForURL('**/publications/#review');
+  await page.goto(`${base}/review/`);
+  await page.waitForURL('**/publications/#review');
+  const noJsContext = await browser.newContext({ javaScriptEnabled: false, colorScheme: 'dark' });
   const noJsPage = await noJsContext.newPage();
   await noJsPage.goto(`${base}/news/`);
   await noJsPage.locator('nav a[href="/research/"]').click();
   assert.equal(new URL(noJsPage.url()).pathname, '/research/');
   assert(await noJsPage.locator('.research-focus').isVisible(), 'Pages should work without JavaScript');
+  assert(!await noJsPage.locator('.theme-control').isVisible(), 'Do not show an inactive selector without JavaScript');
+  assert.equal(await noJsPage.locator('body').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(21, 28, 34)', 'CSS should follow system dark mode without JavaScript');
+  await noJsPage.emulateMedia({ colorScheme: 'light' });
+  assert.equal(await noJsPage.locator('body').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(252, 251, 248)');
+  await noJsPage.goto(`${base}/review/`);
+  await noJsPage.waitForURL('**/publications/#review');
   await noJsContext.close();
 
   await page.goto(`${base}/publications/`);
@@ -342,6 +431,7 @@ try {
     const key = 'miyuru-cv-options-v1';
     const saved = JSON.parse(localStorage.getItem(key));
     delete saved.hyperlinks;
+    saved.entries['awards:Chess:'] = true;
     localStorage.setItem(key, JSON.stringify(saved));
   });
   await page.goto(`${base}/education/`);
@@ -349,6 +439,8 @@ try {
   assert(!await page.locator('input[data-group="contacts"][data-key="university"]').isChecked());
   assert(!await page.locator('input[data-group="entries"][data-key*="Hardware Accelerator for Feature Matching"]').isChecked(), 'Entry selections should persist across pages');
   assert(await page.locator('#cv-hyperlinks').isChecked());
+  assert.equal(await page.locator('input[data-group="entries"][data-key*="Chess"]').count(), 0, 'Old saved preferences must not restore hidden entries');
+  assert(!/coursework|chess/i.test(await page.locator('#cv-form').innerText()));
 
   await page.locator('input[name="audience"][value="company"]').check();
   pdfText = await downloadPdf('company', true);
@@ -368,7 +460,7 @@ try {
   pdfText = await downloadPdf('all-sections');
   assert(pdfText.includes('Nalanda College'));
   assert(pdfText.includes('Acknowledged contributor'));
-  assert(pdfText.includes('Chess'));
+  assert(!/chess|coursework/i.test(pdfText));
   assert(pdfText.includes('ICCAD 2026'));
   assert(pdfText.includes('Acknowledged contribution to prototype development'));
   await page.locator('#cv-descriptions').uncheck();
@@ -399,10 +491,20 @@ try {
   });
   const mobilePage = await mobileContext.newPage();
   await mobilePage.goto(base);
+  await mobilePage.locator('#theme-preference').selectOption('dark');
+  assert.equal(await mobilePage.locator('html').getAttribute('data-theme'), 'dark', 'Manual theme selection should work with storage blocked');
   await mobilePage.locator('[data-open-cv]').tap();
   const [mobileDownload] = await Promise.all([mobilePage.waitForEvent('download'), mobilePage.locator('#cv-download').tap()]);
   assert(mobileDownload.suggestedFilename().endsWith('.pdf'));
   await mobileContext.close();
+
+  const invalidThemeContext = await browser.newContext({ colorScheme: 'dark' });
+  await invalidThemeContext.addInitScript(() => localStorage.setItem('miyuru-theme-v1', 'invalid'));
+  const invalidThemePage = await invalidThemeContext.newPage();
+  await invalidThemePage.goto(base);
+  assert.equal(await invalidThemePage.locator('#theme-preference').inputValue(), 'system');
+  assert.equal(await invalidThemePage.locator('html').getAttribute('data-theme'), 'dark', 'Invalid saved settings must fall back to System');
+  await invalidThemeContext.close();
 
   // A failed first library request must be recoverable without reloading the page.
   const retryContext = await browser.newContext();
