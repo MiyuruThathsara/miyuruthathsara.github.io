@@ -54,8 +54,11 @@
         toggle.focus();
       }
     });
-    control.addEventListener('focusout', event => {
-      if (!control.contains(event.relatedTarget)) control.open = false;
+    // Safari may blur the summary with relatedTarget === null before activating
+    // a tapped label/radio. Closing on that blur cancels the pending selection.
+    // Only dismiss when focus actually arrives at a control outside this menu.
+    document.addEventListener('focusin', event => {
+      if (!control.contains(event.target)) control.open = false;
     });
     control.hidden = false;
   }, { once: true });

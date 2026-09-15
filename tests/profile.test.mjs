@@ -61,6 +61,40 @@ async function checkDisclosures(target = page) {
   }
 }
 
+async function checkThemeTaps() {
+  for (const blurBeforeClick of [false, true]) {
+    console.log(`Checking touch theme selection (null focus destination: ${blurBeforeClick})`);
+    const touchContext = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, colorScheme: 'light' });
+    const touchPage = await touchContext.newPage();
+    try {
+      await touchPage.goto(base);
+      if (blurBeforeClick) {
+        // Safari can blur the previous control without focusing a tapped radio.
+        // Reproduce that event ordering without pretending Chromium is Safari.
+        await touchPage.evaluate(() => document.addEventListener('mousedown', event => {
+          if (!event.target.closest('.theme-menu label')) return;
+          event.preventDefault();
+          document.activeElement.blur();
+        }, true));
+      }
+      await touchPage.locator('#theme-toggle').tap();
+      for (const [value, target] of [['dark', 'span'], ['light', 'input'], ['system', null]]) {
+        await touchPage.locator('#theme-toggle').focus();
+        const label = touchPage.locator('.theme-menu label').filter({ has: touchPage.locator(`input[value="${value}"]`) });
+        await (target ? label.locator(target) : label).tap();
+        assert.equal(await currentTheme(touchPage), value, `A ${target || 'label'} tap must apply ${value}, even with a null focus destination (${blurBeforeClick})`);
+        assert.equal(await touchPage.locator('html').getAttribute('data-theme'), value === 'system' ? 'light' : value);
+        assert(await touchPage.locator('.theme-control').evaluate(el => el.open), 'Focus loss must not dismiss the menu during a tap');
+      }
+      await touchPage.touchscreen.tap(5, 100);
+      assert(!await touchPage.locator('.theme-control').evaluate(el => el.open));
+      await touchPage.reload();
+      assert.equal(await currentTheme(touchPage), 'system');
+    } finally { await touchContext.close(); }
+  }
+  console.log('PASS: real touch taps on theme labels, text, and radios, including Safari-style null-focus event ordering');
+}
+
 async function readPdf(bytes, name, render = false) {
   const task = getDocument({ data: new Uint8Array(bytes), standardFontDataUrl: resolve('node_modules/pdfjs-dist/standard_fonts') + sep });
   const pdf = await task.promise;
@@ -129,6 +163,7 @@ try {
   assert.equal(await page.locator('main [data-open-cv]').count(), 0);
   assert.equal(await currentTheme(), 'system');
   assert.equal(await page.locator('html').getAttribute('data-theme'), 'light');
+  await checkThemeTaps();
 
   for (const width of [1440, 1100, 1024, 901, 900, 800, 768, 540, 390, 320]) {
     await page.setViewportSize({ width, height: 1100 });
