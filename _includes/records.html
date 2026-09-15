@@ -5,6 +5,10 @@
     <{{ include.heading | default: 'h2' }}>{{ record.title | escape }}</{{ include.heading | default: 'h2' }}>
     {% if record.organization != '' %}<p class="record-organization">{{ record.organization | escape }}{% if record.institution %}<br>{{ record.institution | escape }}{% endif %}</p>{% endif %}
     {% for paragraph in record.paragraphs %}<p>{{ paragraph | escape }}</p>{% endfor %}
+    {% if record.coursework %}<details class="record-details" data-coursework>
+      <summary>Selected coursework</summary>
+      <p>{{ record.coursework | escape }}</p>
+    </details>{% endif %}
   </div>
 </div>
 {% endfor %}

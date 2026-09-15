@@ -38,6 +38,29 @@ async function audit() {
   assert.deepEqual(result.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => n.target) })), []);
 }
 
+const currentTheme = (target = page) => target.locator('input[name="theme-preference"]:checked').inputValue();
+async function chooseTheme(value, target = page) {
+  const control = target.locator('.theme-control');
+  if (!await control.evaluate(el => el.open)) await target.locator('#theme-toggle').click();
+  await target.locator(`input[name="theme-preference"][value="${value}"]`).check();
+  assert.equal(await control.locator('[data-theme-icon]:not([hidden])').getAttribute('data-theme-icon'), value);
+  await target.locator('#theme-toggle').click();
+}
+
+async function checkDisclosures(target = page) {
+  for (const [selector, expected] of [['[data-coursework]', 'Digital IC Design (A+)'], ['.award-details', 'School team captain']]) {
+    const detail = target.locator(selector);
+    assert(!await detail.evaluate(el => el.open), 'Extra details start collapsed');
+    assert(!await detail.locator('p').isVisible(), 'Keep the detail hidden until requested');
+    await detail.locator('summary').focus();
+    await target.keyboard.press('Enter');
+    assert(await detail.locator('p').isVisible());
+    assert((await detail.locator('p').innerText()).includes(expected));
+    await detail.locator('summary').click();
+    assert(!await detail.locator('p').isVisible(), 'Visitors can collapse the detail again');
+  }
+}
+
 async function readPdf(bytes, name, render = false) {
   const task = getDocument({ data: new Uint8Array(bytes), standardFontDataUrl: resolve('node_modules/pdfjs-dist/standard_fonts') + sep });
   const pdf = await task.promise;
@@ -68,7 +91,9 @@ async function readPdf(bytes, name, render = false) {
   }
   console.log(`PDF ${name}: ${pdf.numPages} pages; selectable text and margins verified`);
   assert(!/\bNEWS\b/.test(text), `News must never appear in ${name}`);
-  assert(!/\bchess\b|selected coursework|Digital IC Design|Advanced Digital Systems/i.test(text), `Hidden details leaked into ${name}`);
+  if (!['all-sections', 'all-sections-no-descriptions', 'optional-no-grades', 'restored-options'].includes(name)) {
+    assert(!/\bchess\b|selected coursework|Digital IC Design|Advanced Digital Systems/i.test(text), `Optional details should stay out of the preset: ${name}`);
+  }
   assert(newsHeadlines.every(headline => !text.includes(headline)), `Website news leaked into ${name}`);
   assert(websiteSummaries.every(summary => !text.includes(summary)), `Use formal CV paper descriptions, not website copy, in ${name}`);
   pdfInspections.set(name, inspection);
@@ -102,19 +127,34 @@ try {
   assert.equal(await page.locator('[data-open-cv]').count(), 1);
   assert.equal(await page.locator('.site-header [data-open-cv]').count(), 1, 'Use one shared header CV action');
   assert.equal(await page.locator('main [data-open-cv]').count(), 0);
-  assert.equal(await page.locator('#theme-preference').inputValue(), 'system');
+  assert.equal(await currentTheme(), 'system');
   assert.equal(await page.locator('html').getAttribute('data-theme'), 'light');
 
-  for (const width of [1440, 1024, 800, 768, 540, 390, 320]) {
+  for (const width of [1440, 1100, 1024, 901, 900, 800, 768, 540, 390, 320]) {
     await page.setViewportSize({ width, height: 1100 });
     await page.locator('.profile-photo').evaluate(image => image.decode());
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Page overflow at ${width}`);
     const cvButton = await page.locator('.site-header [data-open-cv]').boundingBox();
     assert(cvButton.y + cvButton.height <= (await page.locator('main').boundingBox()).y, 'Keep the CV action in the top header');
     assert(cvButton.width >= 44 && cvButton.height >= 44, 'The shared action should be easy to tap');
-    const themeControl = await page.locator('#theme-preference').boundingBox();
+    const themeControl = await page.locator('#theme-toggle').boundingBox();
     assert(themeControl.width >= 44 && themeControl.height >= 44, 'Theme selection should be easy to tap');
     assert(themeControl.y + themeControl.height <= (await page.locator('main').boundingBox()).y);
+    assert.equal(themeControl.y, cvButton.y, 'Keep CV and theme controls on one row');
+    const brand = await page.locator('.site-brand').boundingBox();
+    assert(Math.abs(brand.y + brand.height / 2 - cvButton.y - cvButton.height / 2) < 1, 'Align the toolbar with the branding');
+    assert.equal(await page.locator('.cv-trigger-label').isVisible(), width > 1100, 'Use the CV icon when the label would crowd the header');
+    assert.equal(await page.locator('[data-open-cv]').getAttribute('aria-label'), 'Generate CV PDF');
+    await page.locator('#theme-toggle').click();
+    const menu = await page.locator('.theme-menu').boundingBox();
+    assert(menu.x >= 0 && menu.x + menu.width <= width, 'Keep the theme menu within the viewport');
+    if ([1440, 390].includes(width)) {
+      await audit();
+      await page.screenshot({ path: join(artifacts, `theme-menu-${width}.png`) });
+    }
+    await page.keyboard.press('Escape');
+    assert(!await page.locator('.theme-control').evaluate(el => el.open));
+    assert(await page.locator('#theme-toggle').evaluate(el => document.activeElement === el));
     const frame = await page.locator('.profile-photo-frame').boundingBox();
     const photo = await page.locator('.profile-photo').boundingBox();
     assert(frame.width >= 220);
@@ -160,7 +200,7 @@ try {
     assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'), `https://miyuruthathsara.github.io${route}`);
     assert.deepEqual(JSON.parse(await page.locator('#cv-data').textContent()), sharedData, 'Every page needs the same complete CV data');
     const content = await page.locator('main').innerText();
-    assert(!/\bchess\b|selected coursework|Digital IC Design|Advanced Digital Systems/i.test(content), `Hidden details must not appear on ${route}`);
+    assert(!/School team captain|Digital IC Design|Advanced Digital Systems/i.test(content), `Extra details should be collapsed on ${route}`);
     assert(!/\bSCSE\b/.test(content));
     if (route === '/news/') {
       assert.equal(await page.locator('.news-list li').count(), 3);
@@ -178,7 +218,10 @@ try {
       assert(websiteSummaries.every(summary => summary.trim().split(/\s+/).length <= 40));
     }
     if (route === '/experience/') assert.match(content, /HESL, CCDS/);
-    if (route === '/education/') assert(content.includes('Honours & awards') && content.includes('NTU Research Scholarship'));
+    if (route === '/education/') {
+      assert(content.includes('Honours & awards') && content.includes('NTU Research Scholarship'));
+      assert(content.includes('Chess') && content.includes('Selected coursework'), 'Show discoverable disclosure labels');
+    }
     for (const width of [1440, 390, 320]) {
       await page.setViewportSize({ width, height: 1100 });
       for (const img of await page.locator('main img').all()) {
@@ -186,6 +229,7 @@ try {
         await img.evaluate(image => image.decode());
       }
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${route} overflow at ${width}`);
+      if (route === '/education/') await checkDisclosures();
       for (const figure of await page.locator('.publication-media').all()) {
         const bounds = await figure.boundingBox();
         assert(bounds.width <= 240 && bounds.height <= 215, 'Keep diagrams compact');
@@ -210,18 +254,18 @@ try {
   // System follows live device changes; explicit choices win and persist across pages.
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
-  assert.equal(await page.locator('#theme-preference').inputValue(), 'system');
-  await page.locator('#theme-preference').selectOption('light');
+  assert.equal(await currentTheme(), 'system');
+  await chooseTheme('light');
   assert.equal(await page.locator('html').getAttribute('data-theme'), 'light');
   await page.reload();
   assert.equal(await page.locator('html').getAttribute('data-theme'), 'light', 'Manual light wins over a dark system after reload');
-  assert.equal(await page.locator('#theme-preference').inputValue(), 'light');
-  await page.locator('#theme-preference').selectOption('dark');
+  assert.equal(await currentTheme(), 'light');
+  await chooseTheme('dark');
   await page.emulateMedia({ colorScheme: 'light' });
   assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark', 'Manual dark wins over a light system');
   for (const route of routes) {
     await page.goto(`${base}${route}`);
-    assert.equal(await page.locator('#theme-preference').inputValue(), 'dark');
+    assert.equal(await currentTheme(), 'dark');
     assert.equal(await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(21, 28, 34)');
     for (const width of [1440, 390, 320]) {
       await page.setViewportSize({ width, height: 1100 });
@@ -253,21 +297,50 @@ try {
   // An existing tab should update when another tab changes or clears the preference.
   const sibling = await context.newPage();
   await sibling.goto(base);
-  assert.equal(await sibling.locator('#theme-preference').inputValue(), 'dark');
-  await sibling.locator('#theme-preference').selectOption('light');
+  assert.equal(await currentTheme(sibling), 'dark');
+  await chooseTheme('light', sibling);
   await page.waitForFunction(() => document.documentElement.dataset.theme === 'light');
-  assert.equal(await page.locator('#theme-preference').inputValue(), 'light');
+  assert.equal(await currentTheme(), 'light');
   await sibling.evaluate(() => localStorage.removeItem('miyuru-theme-v1'));
-  await page.waitForFunction(() => document.querySelector('#theme-preference').value === 'system');
+  await page.waitForFunction(() => document.documentElement.dataset.themePreference === 'system');
   await sibling.close();
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
-  await page.locator('#theme-preference').selectOption('light');
-  await page.locator('#theme-preference').selectOption('system');
+  await chooseTheme('light');
+  await chooseTheme('system');
   assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark', 'Choosing System restores the live device preference');
   await page.emulateMedia({ colorScheme: 'light' });
   await page.waitForFunction(() => document.documentElement.dataset.theme === 'light');
-  assert.equal(await page.locator('#theme-preference').inputValue(), 'system');
+  assert.equal(await currentTheme(), 'system');
+  await page.locator('#theme-toggle').focus();
+  await page.keyboard.press('Enter');
+  await page.locator('input[name="theme-preference"]:checked').focus();
+  await page.keyboard.press('ArrowDown');
+  assert.equal(await currentTheme(), 'light', 'Native arrow keys change the theme');
+  await page.keyboard.press('ArrowDown');
+  assert.equal(await currentTheme(), 'dark');
+  assert.equal(await page.locator('[data-theme-icon]:not([hidden])').getAttribute('data-theme-icon'), 'dark');
+  await page.keyboard.press('Escape');
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.locator('#theme-toggle').click();
+    await audit();
+    const menu = await page.locator('.theme-menu').boundingBox();
+    assert(menu.x >= 0 && menu.x + menu.width <= width);
+    await page.screenshot({ path: join(artifacts, `dark-theme-menu-${width}.png`) });
+    await page.mouse.click(5, 100); // The page margin remains outside the menu at every width.
+    assert(!await page.locator('.theme-control').evaluate(el => el.open), 'Outside clicks close the theme menu');
+  }
+  await page.locator('#theme-toggle').click();
+  await page.locator('input[name="theme-preference"]:checked').focus();
+  await page.keyboard.press('Tab');
+  assert(!await page.locator('.theme-control').evaluate(el => el.open), 'Tabbing out closes the theme menu');
+  await chooseTheme('system');
+  await page.locator('#theme-toggle').click();
+  await page.locator('[data-open-cv]').click();
+  assert(!await page.locator('.theme-control').evaluate(el => el.open), 'Opening the CV should dismiss the theme menu');
+  assert(await page.locator('#cv-dialog').isVisible());
+  await page.locator('[data-close-cv]').click();
   console.log('PASS: system/light/dark themes, device changes, cross-page and cross-tab preferences, dark accessibility, white CV preview/PDF, and light print styles');
 
   await page.goto(`${base}/#research`);
@@ -290,6 +363,8 @@ try {
   assert.equal(await noJsPage.locator('body').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(252, 251, 248)');
   await noJsPage.goto(`${base}/review/`);
   await noJsPage.waitForURL('**/publications/#review');
+  await noJsPage.goto(`${base}/education/`);
+  await checkDisclosures(noJsPage);
   await noJsContext.close();
 
   await page.goto(`${base}/publications/`);
@@ -439,8 +514,8 @@ try {
   assert(!await page.locator('input[data-group="contacts"][data-key="university"]').isChecked());
   assert(!await page.locator('input[data-group="entries"][data-key*="Hardware Accelerator for Feature Matching"]').isChecked(), 'Entry selections should persist across pages');
   assert(await page.locator('#cv-hyperlinks').isChecked());
-  assert.equal(await page.locator('input[data-group="entries"][data-key*="Chess"]').count(), 0, 'Old saved preferences must not restore hidden entries');
-  assert(!/coursework|chess/i.test(await page.locator('#cv-form').innerText()));
+  assert(await page.locator('input[data-group="entries"][data-key*="Chess"]').isChecked(), 'Preserve existing selections for the restored Chess option');
+  assert(!await page.locator('#cv-coursework').isChecked(), 'Coursework starts optional for old saved presets');
 
   await page.locator('input[name="audience"][value="company"]').check();
   pdfText = await downloadPdf('company', true);
@@ -457,12 +532,24 @@ try {
   await page.locator('#cv-selections details').evaluateAll(details => details.forEach(el => { el.open = true; }));
   for (const checkbox of await page.locator('input[data-group="entries"]').all()) await checkbox.check();
   await page.locator('#cv-grades').check();
+  await page.locator('#cv-coursework').check();
   pdfText = await downloadPdf('all-sections');
   assert(pdfText.includes('Nalanda College'));
   assert(pdfText.includes('Acknowledged contributor'));
-  assert(!/chess|coursework/i.test(pdfText));
+  assert(pdfText.includes('Chess') && pdfText.includes('School team captain'));
+  assert(pdfText.includes('Selected coursework: Digital IC Design (A+), Advanced Digital Systems (A+).'));
   assert(pdfText.includes('ICCAD 2026'));
   assert(pdfText.includes('Acknowledged contribution to prototype development'));
+  await page.locator('#cv-grades').uncheck();
+  const optionalNoGrades = await downloadPdf('optional-no-grades');
+  assert(optionalNoGrades.includes('Digital IC Design, Advanced Digital Systems.'));
+  assert(!optionalNoGrades.includes('A+') && !optionalNoGrades.includes('GPA:'));
+  await page.locator('#cv-grades').check();
+  await page.goto(`${base}/contact/`);
+  await page.locator('[data-open-cv]').click();
+  assert(await page.locator('#cv-coursework').isChecked(), 'Remember the independent coursework choice across pages');
+  assert(await page.locator('input[data-group="entries"][data-key*="Chess"]').isChecked());
+  assert.equal(await downloadPdf('restored-options'), pdfText);
   await page.locator('#cv-descriptions').uncheck();
   const withoutDescriptions = await downloadPdf('all-sections-no-descriptions');
   assert(withoutDescriptions.includes('Hardware Accelerator for Feature Matching'));
@@ -491,7 +578,7 @@ try {
   });
   const mobilePage = await mobileContext.newPage();
   await mobilePage.goto(base);
-  await mobilePage.locator('#theme-preference').selectOption('dark');
+  await chooseTheme('dark', mobilePage);
   assert.equal(await mobilePage.locator('html').getAttribute('data-theme'), 'dark', 'Manual theme selection should work with storage blocked');
   await mobilePage.locator('[data-open-cv]').tap();
   const [mobileDownload] = await Promise.all([mobilePage.waitForEvent('download'), mobilePage.locator('#cv-download').tap()]);
@@ -502,7 +589,7 @@ try {
   await invalidThemeContext.addInitScript(() => localStorage.setItem('miyuru-theme-v1', 'invalid'));
   const invalidThemePage = await invalidThemeContext.newPage();
   await invalidThemePage.goto(base);
-  assert.equal(await invalidThemePage.locator('#theme-preference').inputValue(), 'system');
+  assert.equal(await currentTheme(invalidThemePage), 'system');
   assert.equal(await invalidThemePage.locator('html').getAttribute('data-theme'), 'dark', 'Invalid saved settings must fall back to System');
   await invalidThemeContext.close();
 

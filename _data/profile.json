@@ -73,7 +73,7 @@
       "paragraphs": [
         "First Class Honours · GPA: 3.74/4.2"
       ],
-      "hidden_coursework": "Selected coursework: Digital IC Design (A+), Advanced Digital Systems (A+)."
+      "coursework": "Digital IC Design (A+), Advanced Digital Systems (A+)."
     }
   ],
   "earlier": [
@@ -122,7 +122,7 @@
     },
     {
       "title": "Chess",
-      "hidden": true,
+      "collapsed": true,
       "paragraphs": [
         "School team captain, 2005–2010. Individual: 25th nationally and 5th provincially. Team: 3rd nationally on two occasions."
       ]

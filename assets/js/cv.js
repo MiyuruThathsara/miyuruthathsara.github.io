@@ -12,7 +12,7 @@ const entry = (title = '', meta = '', values = [], url = '') => ({ title, meta, 
 const records = values => values.map(record => ({
   // Preserve existing selection IDs while displaying institution lines with a separator.
   ...entry(record.title, [record.date, [record.organization, record.institution].filter(Boolean).join(' ')].filter(Boolean).join(' | '), record.paragraphs),
-  date: record.date, organization: [record.organization, record.institution].filter(Boolean).join(' · ')
+  date: record.date, organization: [record.organization, record.institution].filter(Boolean).join(' · '), coursework: record.coursework
 }));
 const publications = values => values.map(paper => ({
   ...entry(paper.title, [paper.venue, paper.credit].filter(Boolean).join(' '), [paper.summary], paper.url),
@@ -28,7 +28,7 @@ const sections = [
   { id: 'education', title: 'Education', items: records(source.profile.education) },
   { id: 'publications', title: 'Selected publications', items: publications(source.publications.filter(paper => !paper.contribution)) },
   { id: 'review', title: 'Review Experience', items: records(source.profile.review) },
-  { id: 'awards', title: 'Honours and awards', items: source.profile.awards.filter(award => !award.hidden).map(award => entry(award.title, '', award.paragraphs)) },
+  { id: 'awards', title: 'Honours and awards', items: source.profile.awards.map(award => ({ ...entry(award.title, '', award.paragraphs), optional: award.collapsed })) },
   { id: 'earlier', title: 'Earlier education', items: records(source.profile.earlier) },
   { id: 'contributions', title: 'Additional research contributions', items: publications(source.publications.filter(paper => paper.contribution)) },
   { id: 'interests', title: 'Personal interests', items: [entry('', '', [source.profile.interests])] }
@@ -52,11 +52,12 @@ function preset(audience) {
   return {
     audience,
     sections: Object.fromEntries(sections.map(section => [section.id, selected.includes(section.id)])),
-    entries: Object.fromEntries(sections.flatMap(section => section.items.map(item => [item.id, true]))),
+    entries: Object.fromEntries(sections.flatMap(section => section.items.map(item => [item.id, !item.optional]))),
     contacts: Object.fromEntries(contacts.map(contact => [contact.id, ['website', 'github', 'linkedin', audience === 'company' ? 'personal' : 'university', ...(audience === 'academia' ? ['google-scholar'] : [])].includes(contact.id)])),
     hyperlinks: true,
     descriptions: true,
-    grades: audience === 'academia'
+    grades: audience === 'academia',
+    coursework: false
   };
 }
 
@@ -69,7 +70,7 @@ function restore() {
       if (typeof saved?.[group]?.[key] === 'boolean') state[group][key] = saved[group][key];
     }
   }
-  for (const key of ['hyperlinks', 'descriptions', 'grades']) if (typeof saved?.[key] === 'boolean') state[key] = saved[key];
+  for (const key of ['hyperlinks', 'descriptions', 'grades', 'coursework']) if (typeof saved?.[key] === 'boolean') state[key] = saved[key];
 }
 
 function element(tag, className, value) {
@@ -111,6 +112,7 @@ function renderOptions() {
   document.querySelector('#cv-hyperlinks').checked = state.hyperlinks;
   document.querySelector('#cv-descriptions').checked = state.descriptions;
   document.querySelector('#cv-grades').checked = state.grades;
+  document.querySelector('#cv-coursework').checked = state.coursework;
   document.querySelector('#cv-preset-description').textContent = state.audience === 'company' ? 'Emphasizes engineering expertise and professional experience.' : 'Emphasizes research, publications, and academic service.';
   update();
 }
@@ -129,6 +131,7 @@ function model() {
       const section = sections.find(value => value.id === id);
       const items = section.items.filter(item => state.entries[item.id]).map((item, index) => {
         let values = [...item.paragraphs];
+        if (state.coursework && item.coursework) values.push(`Selected coursework: ${state.grades ? item.coursework : item.coursework.replace(/ \(A\+\)/g, '')}`);
         if (id === 'summary') values = [state.audience === 'company' ? wording.company_summary : wording.academic_summary];
         if (id === 'research') values = [wording.research_focus];
         if (item.cvId && wording.publications[item.cvId]) values = [wording.publications[item.cvId]];
@@ -245,6 +248,7 @@ form.addEventListener('change', event => {
   if (input.id === 'cv-hyperlinks') state.hyperlinks = input.checked;
   if (input.id === 'cv-descriptions') state.descriptions = input.checked;
   if (input.id === 'cv-grades') state.grades = input.checked;
+  if (input.id === 'cv-coursework') state.coursework = input.checked;
   update();
 });
 form.addEventListener('submit', async event => {

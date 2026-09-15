@@ -54,14 +54,7 @@
         </nav>
         <div class="header-actions">
           {% include cv-button.html %}
-          <label class="theme-control" hidden>
-            <span>Theme</span>
-            <select id="theme-preference" aria-label="Colour theme">
-              <option value="system">System</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
-          </label>
+          {% include theme-control.html %}
         </div>
       </div>
     </header>
