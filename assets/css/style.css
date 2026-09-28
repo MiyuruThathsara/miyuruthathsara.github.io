@@ -198,7 +198,6 @@ summary::marker { color: var(--accent); }
 .contact-list > div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 1rem; margin: 0.5rem 0; }
 .contact-list dt { color: var(--muted); }
 .contact-list dd { margin: 0; overflow-wrap: anywhere; }
-.contact-section .personal-note { max-width: 40rem; margin: 1.75rem 0 0; padding-top: 1.25rem; border-top: 1px solid var(--line); font-size: 0.8rem; color: var(--muted); }
 .site-footer { border-top: 1px solid var(--line); }
 .footer-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 2rem; padding: 1.6rem 0; font-size: 0.74rem; color: var(--muted); }
 .footer-inner p { margin: 0; }

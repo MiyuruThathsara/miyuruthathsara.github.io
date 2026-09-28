@@ -259,6 +259,7 @@ try {
       assert(websiteSummaries.every(summary => summary.trim().split(/\s+/).length <= 40));
     }
     if (route === '/experience/') assert.match(content, /HESL, CCDS/);
+    if (route === '/contact/') assert(!content.includes(sharedData.profile.interests), 'Keep the personal-interest note off the Contact page');
     if (route === '/education/') {
       assert(content.includes('Honours & awards') && content.includes('NTU Research Scholarship'));
       assert(content.includes('Chess') && content.includes('Selected coursework'), 'Show discoverable disclosure labels');
