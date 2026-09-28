@@ -1,9 +1,9 @@
 ---
 layout: section
-title: Research
+title: Research & Publications
 section: research
 permalink: /research/
-description: Embedded intelligence and hardware acceleration for autonomous robots.
+description: Research and publications in embedded intelligence, visual SLAM, and hardware acceleration for autonomous robots.
 ---
 <div class="research-focus">
   <h2>Current focus</h2>
@@ -12,4 +12,12 @@ description: Embedded intelligence and hardware acceleration for autonomous robo
 <div class="research-themes">
   {% for theme in site.data.profile.themes %}<div class="research-theme"><h2>{{ theme.title | escape }}</h2><p>{{ theme.summary | escape }}</p></div>{% endfor %}
 </div>
-<p class="page-related"><a href="{{ '/publications/' | relative_url }}">Explore the publications <span aria-hidden="true">↗</span></a></p>
+<section class="content-section" id="publications" aria-labelledby="publications-title">
+  <div class="section-heading"><h2 id="publications-title">Selected publications</h2></div>
+  <p class="section-note"><a href="{{ site.scholar_url | escape }}">View Google Scholar <span aria-hidden="true">↗</span></a></p>
+  {% for paper in site.data.publications %}{% unless paper.contribution %}{% include publication.html paper=paper heading='h3' %}{% endunless %}{% endfor %}
+</section>
+<section class="content-section" aria-labelledby="contributions-title">
+  <div class="section-heading"><h2 id="contributions-title">Additional research contribution</h2></div>
+  {% for paper in site.data.publications %}{% if paper.contribution %}{% include publication.html paper=paper heading='h3' %}{% endif %}{% endfor %}
+</section>

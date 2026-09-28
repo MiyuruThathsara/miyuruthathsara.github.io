@@ -2,12 +2,12 @@
 - date: "2026"
   title: ICCAD external review
   summary: External Reviewer for ICCAD 2026.
-  link: /publications/#review
+  link: /experience/#review
   link_label: Review experience
 - date: "2025"
   title: FPL paper acceptance
   summary: First-author paper on FPGA-based stereo visual SLAM accepted at FPL 2025.
-  link: /publications/#fpl2025
+  link: /research/#fpl2025
   link_label: Research and publications
 - date: "2025"
   title: Ph.D. candidacy

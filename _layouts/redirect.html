@@ -5,7 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ page.title | escape }} | {{ site.title | escape }}</title>
     <link rel="canonical" href="{{ page.redirect_to | absolute_url }}">
+    <script>
+      const destination = new URL({{ page.redirect_to | relative_url | jsonify }}, location.href);
+      {% if page.redirect_review_to %}
+      if (location.hash === '#review') location.replace({{ page.redirect_review_to | relative_url | jsonify }});
+      else {
+        if (location.hash) destination.hash = location.hash;
+        location.replace(destination.href);
+      }
+      {% else %}
+      location.replace(destination.href);
+      {% endif %}
+    </script>
     <meta http-equiv="refresh" content="0; url={{ page.redirect_to | relative_url }}">
   </head>
-  <body><p>Review experience is now on the <a href="{{ page.redirect_to | relative_url }}">Publications page</a>.</p></body>
+  <body><p>This page has moved to <a href="{{ page.redirect_to | relative_url }}">{{ page.redirect_label | default: page.title | escape }}</a>.</p></body>
 </html>

@@ -223,7 +223,7 @@ try {
     }
   }
 
-  const routes = ['/', '/news/', '/research/', '/publications/', '/experience/', '/education/', '/contact/'];
+  const routes = ['/', '/news/', '/research/', '/experience/', '/education/', '/contact/'];
   assert.deepEqual(await page.locator('nav a').evaluateAll(links => links.map(link => new URL(link.href).pathname)), routes);
   let referenceCv;
   for (const route of routes) {
@@ -234,6 +234,9 @@ try {
     assert.equal(await page.locator('[data-open-cv]').count(), 1);
     assert.equal(await page.locator('main [data-open-cv]').count(), 0, 'Remove page-level CV buttons');
     assert.equal(await page.locator('nav a[href="/review/"]').count(), 0, 'Review is no longer a navigation page');
+    assert.equal(await page.locator('nav a[href="/publications/"]').count(), 0, 'Research and publications share one navigation tab');
+    assert.equal(await page.locator('nav a[href="/research/"]').innerText(), 'Research & Publications');
+    assert.equal(await page.locator('.page-description').count(), 0, 'Remove the redundant descriptions below page titles');
     assert.equal(await page.locator('h1').count(), 1);
     assert.equal(await page.title(), `${await page.locator('h1').innerText()} | ${route === '/' ? 'Personal Profile' : 'Miyuru Thathsara'}`);
     assert.equal(await page.locator('nav [aria-current="page"]').count(), 1);
@@ -252,17 +255,27 @@ try {
         if (hash) assert(await page.evaluate(async ({ href, hash }) => new DOMParser().parseFromString(await (await fetch(href)).text(), 'text/html').querySelector(hash) !== null, { href, hash }));
       }
     }
-    if (route === '/publications/') {
-      assert.match(await page.locator('#review').innerText(), /External Reviewer[\s\S]*ICCAD 2026/);
+    if (route === '/research/') {
+      assert(await page.locator('.research-focus').isVisible());
+      assert.equal(await page.locator('#publications .publication').count(), 4);
+      assert.equal(await page.locator('.publication h3').count(), 5);
+      assert.equal(await page.locator('main #review').count(), 0, 'Review experience belongs on Experience');
       websiteSummaries = await page.locator('.publication > div > p:not(.publication-venue)').allTextContents();
       assert.equal(websiteSummaries.length, 5);
       assert(websiteSummaries.every(summary => summary.trim().split(/\s+/).length <= 40));
     }
-    if (route === '/experience/') assert.match(content, /HESL, CCDS/);
+    if (route === '/experience/') {
+      assert.match(content, /HESL, CCDS/);
+      assert.match(await page.locator('#review').innerText(), /External Reviewer[\s\S]*ICCAD 2026/);
+    }
     if (route === '/contact/') assert(!content.includes(sharedData.profile.interests), 'Keep the personal-interest note off the Contact page');
     if (route === '/education/') {
       assert(content.includes('Honours & awards') && content.includes('NTU Research Scholarship'));
       assert(content.includes('Chess') && content.includes('Selected coursework'), 'Show discoverable disclosure labels');
+      assert.equal(await page.locator('.section-page > .record').count(), 3);
+      assert.match(await page.locator('.section-page > .record').last().innerText(), /Certificate Level in Management \(CIMA\)[\s\S]*Achievers Lanka/);
+      assert.equal(await page.locator('.education-details .record').count(), 1);
+      assert.match(await page.locator('.education-details .record').textContent(), /Nalanda College/);
     }
     for (const width of [1440, 390, 320]) {
       await page.setViewportSize({ width, height: 1100 });
@@ -316,7 +329,7 @@ try {
       if (width !== 320) await page.screenshot({ path: join(artifacts, `dark-${route.split('/')[1] || 'home'}-${width}.png`) });
     }
   }
-  await page.goto(`${base}/publications/`);
+  await page.goto(`${base}/research/`);
   await page.locator('[data-vector-url]').click();
   await page.locator('#image-full').evaluate(img => img.decode());
   await audit();
@@ -390,9 +403,17 @@ try {
   await page.goto(`${base}/#awards`);
   await page.waitForURL('**/education/#awards');
   await page.goto(`${base}/#review`);
-  await page.waitForURL('**/publications/#review');
+  await page.waitForURL('**/experience/#review');
   await page.goto(`${base}/review/`);
-  await page.waitForURL('**/publications/#review');
+  await page.waitForURL('**/experience/#review');
+  await page.goto(`${base}/#publications`);
+  await page.waitForURL('**/research/#publications');
+  await page.goto(`${base}/publications/`);
+  await page.waitForURL('**/research/#publications');
+  await page.goto(`${base}/publications/#fpl2025`);
+  await page.waitForURL('**/research/#fpl2025');
+  await page.goto(`${base}/publications/#review`);
+  await page.waitForURL('**/experience/#review');
   const noJsContext = await browser.newContext({ javaScriptEnabled: false, colorScheme: 'dark' });
   const noJsPage = await noJsContext.newPage();
   await noJsPage.goto(`${base}/news/`);
@@ -404,12 +425,14 @@ try {
   await noJsPage.emulateMedia({ colorScheme: 'light' });
   assert.equal(await noJsPage.locator('body').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(252, 251, 248)');
   await noJsPage.goto(`${base}/review/`);
-  await noJsPage.waitForURL('**/publications/#review');
+  await noJsPage.waitForURL('**/experience/#review');
+  await noJsPage.goto(`${base}/publications/`);
+  await noJsPage.waitForURL('**/research/#publications');
   await noJsPage.goto(`${base}/education/`);
   await checkDisclosures(noJsPage);
   await noJsContext.close();
 
-  await page.goto(`${base}/publications/`);
+  await page.goto(`${base}/research/`);
   await page.locator('[data-vector-url]').click();
   await page.locator('#image-full').evaluate(image => image.decode());
   await page.waitForFunction(() => document.querySelector('#image-zoom-out').disabled);
@@ -469,6 +492,8 @@ try {
   assert(pdfText.includes('HESL, CCDS') && !pdfText.includes('SCSE'));
   assert.match(pdfText, /Hardware Accelerator for Feature Matching/);
   assert(!pdfText.includes('Nalanda College'));
+  assert(pdfText.includes('Certificate Level in Management (CIMA)'));
+  assert(pdfText.indexOf('REVIEW EXPERIENCE') < pdfText.indexOf('PROFESSIONAL EXPERIENCE'), 'Prioritize academic review service in the academic CV');
   assert(!pdfText.includes('Cross Assembled Multi-quadrotor'));
   assert(pdfText.indexOf('RESEARCH FOCUS') < pdfText.indexOf('PROFESSIONAL EXPERIENCE'));
   assert(!pdfText.includes('scholar.google.com'));
@@ -549,6 +574,10 @@ try {
     const saved = JSON.parse(localStorage.getItem(key));
     delete saved.hyperlinks;
     saved.entries['awards:Chess:'] = true;
+    // A previously excluded certificate must remain excluded after moving sections.
+    const certificate = Object.keys(saved.entries).find(key => key.startsWith('education:Certificate Level in Management (CIMA):'));
+    saved.entries[certificate.replace('education:Certificate Level in Management (CIMA):', 'earlier:Certificate Level in Management:')] = false;
+    delete saved.entries[certificate];
     localStorage.setItem(key, JSON.stringify(saved));
   });
   await page.goto(`${base}/education/`);
@@ -558,6 +587,7 @@ try {
   assert(await page.locator('#cv-hyperlinks').isChecked());
   assert(await page.locator('input[data-group="entries"][data-key*="Chess"]').isChecked(), 'Preserve existing selections for the restored Chess option');
   assert(!await page.locator('#cv-coursework').isChecked(), 'Coursework starts optional for old saved presets');
+  assert(!await page.locator('input[data-group="entries"][data-key*="Certificate Level in Management (CIMA)"]').isChecked(), 'Preserve the old explicit certificate selection');
 
   await page.locator('input[name="audience"][value="company"]').check();
   pdfText = await downloadPdf('company', true);
@@ -568,6 +598,8 @@ try {
   assert(!pdfText.includes('SELECTED PUBLICATIONS'));
   assert(!pdfText.includes('GPA:'));
   assert(pdfText.includes('First Class Honours'));
+  assert(pdfText.includes('Certificate Level in Management (CIMA)'));
+  assert(!pdfText.includes('Nalanda College'));
   assert(pdfText.includes('mthathsara@outlook.com'));
 
   for (const checkbox of await page.locator('input[data-group="sections"]').all()) await checkbox.check();

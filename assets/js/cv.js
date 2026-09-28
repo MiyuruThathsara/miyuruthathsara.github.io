@@ -1,4 +1,4 @@
-import { createCvPdf } from './cv-pdf.js';
+import { createCvPdf } from './cv-pdf.js?v=20260929-sections';
 
 const dialog = document.querySelector('#cv-dialog');
 const form = document.querySelector('#cv-form');
@@ -38,7 +38,7 @@ const contacts = source.contacts.map(contact => ({ ...contact, url: new URL(cont
 
 const orders = {
   company: ['summary', 'expertise', 'experience', 'education', 'publications', 'review', 'research', 'awards', 'contributions', 'earlier', 'interests'],
-  academia: ['summary', 'research', 'education', 'publications', 'experience', 'review', 'expertise', 'awards', 'contributions', 'earlier', 'interests']
+  academia: ['summary', 'research', 'education', 'publications', 'review', 'experience', 'expertise', 'awards', 'contributions', 'earlier', 'interests']
 };
 let state;
 let opener;
@@ -69,6 +69,12 @@ function restore() {
     for (const key of Object.keys(state[group])) {
       if (typeof saved?.[group]?.[key] === 'boolean') state[group][key] = saved[group][key];
     }
+  }
+  // Retain explicit certificate choices saved before it moved out of Earlier education.
+  const certificate = sections.find(section => section.id === 'education').items.find(item => item.title === 'Certificate Level in Management (CIMA)');
+  if (certificate && typeof saved?.entries?.[certificate.id] !== 'boolean') {
+    const previousId = `earlier:Certificate Level in Management:${certificate.meta}`;
+    if (typeof saved?.entries?.[previousId] === 'boolean') state.entries[certificate.id] = saved.entries[previousId];
   }
   for (const key of ['hyperlinks', 'descriptions', 'grades', 'coursework']) if (typeof saved?.[key] === 'boolean') state[key] = saved[key];
 }

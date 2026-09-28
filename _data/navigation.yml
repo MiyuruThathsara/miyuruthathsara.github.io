@@ -4,12 +4,9 @@
 - label: News
   url: /news/
   section: news
-- label: Research
+- label: Research & Publications
   url: /research/
   section: research
-- label: Publications
-  url: /publications/
-  section: publications
 - label: Experience
   url: /experience/
   section: experience

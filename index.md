@@ -31,8 +31,7 @@ permalink: /
         <a class="text-link" href="{{ '/contact/' | relative_url }}">Contact me <span aria-hidden="true">↗</span></a>
       </div>
       <div class="profile-explore">
-        <a href="{{ '/research/' | relative_url }}">Explore my research <span aria-hidden="true">↗</span></a>
-        <a href="{{ '/publications/' | relative_url }}">Browse publications <span aria-hidden="true">↗</span></a>
+        <a href="{{ '/research/' | relative_url }}">Explore research &amp; publications <span aria-hidden="true">↗</span></a>
         <a href="{{ '/news/' | relative_url }}">Read the latest news <span aria-hidden="true">↗</span></a>
       </div>
     </section>

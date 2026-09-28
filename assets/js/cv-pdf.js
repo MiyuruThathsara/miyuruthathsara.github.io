@@ -9,6 +9,7 @@ export function createCvPdf(jsPDF, model) {
   const ink = [36, 39, 43];
   const navy = [24, 59, 78];
   const muted = [80, 86, 92];
+  const entryGap = model.audience === 'company' ? 5 : 7;
   let y = margin;
   const clean = value => String(value).normalize('NFC').replace(/[\u2010-\u2015]/g, '-').replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"').replace(/\u00a0/g, ' ').replace(/\u2197/g, '').replace(/\u00d7/g, 'x');
 
@@ -60,7 +61,7 @@ export function createCvPdf(jsPDF, model) {
     const titleHeight = item.title ? textHeight(item.title, 10.5, 'bold', titleWidth) + 2 : 0;
     const metaHeight = item.meta ? textHeight(item.meta, 9, 'normal', width - indent) + 3 : 0;
     const bodyHeight = item.paragraphs.reduce((height, value) => height + textHeight(value, 10, 'normal', width - indent - (item.bullets ? 10 : 0)) + 3, 0);
-    return { indent, titleWidth, height: titleHeight + metaHeight + bodyHeight + (item.title ? 7 : 0), startHeight: titleHeight + metaHeight + (bodyHeight ? 26 : 0) };
+    return { indent, titleWidth, height: titleHeight + metaHeight + bodyHeight + (item.title ? entryGap : 0), startHeight: titleHeight + metaHeight + (bodyHeight ? 26 : 0) };
   }
 
   function reserveEntry(item) {
@@ -132,7 +133,7 @@ export function createCvPdf(jsPDF, model) {
       if (item.title) paragraph(item.title, { style: 'bold', size: 10.5, after: 2, url: item.url, indent, maxWidth: titleWidth });
       if (item.meta) paragraph(item.meta, { size: 9, color: muted, indent });
       item.paragraphs.forEach(value => paragraph(value, { indent: indent + (item.bullets ? 10 : 0), bullet: item.bullets }));
-      y += item.title ? 7 : 0;
+      y += item.title ? entryGap : 0;
     }
   }
 

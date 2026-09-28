@@ -8,7 +8,7 @@
   {% endif %}
   <div>
     <p class="publication-venue">{{ paper.venue | escape }} <span>{{ paper.credit | escape }}</span></p>
-    <h2>{% if paper.url != '' %}<a href="{{ paper.url | escape }}">{{ paper.title | escape }}</a>{% else %}{{ paper.title | escape }}{% endif %}</h2>
+    <{{ include.heading | default: 'h2' }}>{% if paper.url != '' %}<a href="{{ paper.url | escape }}">{{ paper.title | escape }}</a>{% else %}{{ paper.title | escape }}{% endif %}</{{ include.heading | default: 'h2' }}>
     <p>{{ paper.summary | escape }}</p>
     {% if paper.url != '' %}<a class="publication-link" href="{{ paper.url | escape }}" aria-label="Read {{ paper.title | escape }} on IEEE Xplore">Paper <span aria-hidden="true">↗</span></a>{% endif %}
     {% if paper.video_id %}
