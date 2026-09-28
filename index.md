@@ -21,7 +21,7 @@ interests:
     {% include profile-links.html %}
     <section class="profile-interests" aria-labelledby="interests-title">
       <h2 id="interests-title">Interests</h2>
-      <ul>{% for interest in page.interests %}<li>{{ interest | escape }}</li>{% endfor %}</ul>
+      <ul role="list">{% for interest in page.interests %}<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v15M12 5C9 3 6 3 3 4v14c3-1 6-1 9 2 3-3 6-3 9-2V4c-3-1-6-1-9 1Z"/></svg><span>{{ interest | escape }}</span></li>{% endfor %}</ul>
     </section>
   </aside>
   <div class="profile-content">
@@ -31,7 +31,7 @@ interests:
         <a class="text-link" href="{{ '/contact/' | relative_url }}">Contact me <span aria-hidden="true">↗</span></a>
       </div>
       <div class="profile-explore">
-        <a href="{{ '/research/' | relative_url }}">Explore research &amp; publications <span aria-hidden="true">↗</span></a>
+        <a href="{{ '/research/' | relative_url }}">Explore research <span aria-hidden="true">↗</span></a>
         <a href="{{ '/news/' | relative_url }}">Read the latest news <span aria-hidden="true">↗</span></a>
       </div>
     </section>

@@ -1,4 +1,4 @@
-import { createCvPdf } from './cv-pdf.js?v=20260929-sections';
+import { createCvPdf } from './cv-pdf.js?v=20260929-engineering';
 
 const dialog = document.querySelector('#cv-dialog');
 const form = document.querySelector('#cv-form');
@@ -119,7 +119,7 @@ function renderOptions() {
   document.querySelector('#cv-descriptions').checked = state.descriptions;
   document.querySelector('#cv-grades').checked = state.grades;
   document.querySelector('#cv-coursework').checked = state.coursework;
-  document.querySelector('#cv-preset-description').textContent = state.audience === 'company' ? 'Emphasizes engineering expertise and professional experience.' : 'Emphasizes research, publications, and academic service.';
+  document.querySelector('#cv-preset-description').textContent = state.audience === 'company' ? 'Engineering template: coding-style typography and digital-logic accents, emphasizing technical expertise and professional experience.' : 'Formal academic template emphasizing research, publications, and academic service.';
   update();
 }
 
@@ -159,7 +159,21 @@ function model() {
 }
 
 function renderPreview(data) {
+  preview.dataset.audience = data.audience;
   const header = element('header', 'cv-preview-header');
+  if (data.audience === 'company') {
+    const masthead = element('div', 'cv-engineering-masthead');
+    masthead.setAttribute('aria-hidden', 'true');
+    masthead.append(element('span', '', '// ENGINEERING CV'));
+    const trace = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    trace.setAttribute('viewBox', '0 0 88 12');
+    trace.setAttribute('focusable', 'false');
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M2 10h12V3h12v7h12V3h12v7h12V3h12v7h12');
+    trace.append(path);
+    masthead.append(trace);
+    header.append(masthead);
+  }
   header.append(element('h3', '', data.name), element('p', 'cv-headline', data.headline));
   for (const kind of ['email', 'web']) {
     const contacts = data.contacts.filter(contact => contact.kind === kind);
@@ -176,8 +190,14 @@ function renderPreview(data) {
     header.append(row);
   }
   preview.replaceChildren(header);
-  data.sections.forEach(section => {
-    preview.append(element('h4', '', section.title));
+  data.sections.forEach((section, index) => {
+    const heading = element('h4', '', section.title);
+    if (data.audience === 'company') {
+      const number = element('span', 'cv-section-code', `${String(index + 1).padStart(2, '0')} // `);
+      number.setAttribute('aria-hidden', 'true');
+      heading.prepend(number);
+    }
+    preview.append(heading);
     section.items.forEach(item => {
       const block = element('div', 'cv-preview-item');
       if (item.number) {

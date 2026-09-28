@@ -98,7 +98,8 @@ async function checkThemeTaps() {
 async function readPdf(bytes, name, render = false) {
   const task = getDocument({ data: new Uint8Array(bytes), standardFontDataUrl: resolve('node_modules/pdfjs-dist/standard_fonts') + sep });
   const pdf = await task.promise;
-  const inspection = { links: [], firstPage: null, pages: [], pageCount: pdf.numPages };
+  const companyTemplate = (await pdf.getMetadata()).info.Title.endsWith('Professional CV');
+  const inspection = { links: [], firstPage: null, pages: [], pageCount: pdf.numPages, fonts: new Set() };
   let text = '';
   for (let number = 1; number <= pdf.numPages; number++) {
     const pdfPage = await pdf.getPage(number);
@@ -106,9 +107,10 @@ async function readPdf(bytes, name, render = false) {
     const content = await pdfPage.getTextContent();
     const items = content.items.filter(item => item.str?.trim());
     inspection.links.push(...(await pdfPage.getAnnotations()).filter(annotation => annotation.subtype === 'Link'));
-    if (number === 1) inspection.firstPage = { items, width: viewport.width };
+    if (number === 1) inspection.firstPage = { items, width: viewport.width, styles: content.styles };
     inspection.pages.push(items);
-    assert(Object.values(content.styles).every(style => style.fontFamily === 'sans-serif'), `Use consistent sans-serif typography in ${name}`);
+    Object.values(content.styles).forEach(style => inspection.fonts.add(style.fontFamily));
+    assert(Object.values(content.styles).every(style => (companyTemplate ? ['sans-serif', 'monospace'] : ['sans-serif']).includes(style.fontFamily)), `Use the intended template typography in ${name}`);
     assert(items.length > 5, `Unexpected empty page in ${name}`);
     for (const item of items) {
       const x = item.transform[4], y = item.transform[5];
@@ -124,6 +126,7 @@ async function readPdf(bytes, name, render = false) {
     }
   }
   console.log(`PDF ${name}: ${pdf.numPages} pages; selectable text and margins verified`);
+  if (companyTemplate) assert(inspection.fonts.has('monospace'), `Use coding typography in ${name}`);
   assert(!/\bNEWS\b/.test(text), `News must never appear in ${name}`);
   if (!['all-sections', 'all-sections-no-descriptions', 'optional-no-grades', 'restored-options'].includes(name)) {
     assert(!/\bchess\b|selected coursework|Digital IC Design|Advanced Digital Systems/i.test(text), `Optional details should stay out of the preset: ${name}`);
@@ -179,6 +182,10 @@ try {
   assert.deepEqual(await page.locator('.profile-interests li').allTextContents(), [
     'Embedded Intelligence', 'Computer Architecture', 'Hardware Acceleration', 'Hardware–Software Co-design'
   ]);
+  assert.equal(await page.locator('.profile-interests ul').evaluate(el => getComputedStyle(el).listStyleType), 'none');
+  assert(await page.locator('.profile-interests ul').evaluate(el => parseFloat(getComputedStyle(el).fontSize) >= 14.5));
+  assert.equal(await page.locator('.profile-interests li svg[aria-hidden="true"]').count(), 4, 'Use book icons in four stacked interest cards');
+  assert(await page.locator('.profile-interests li').first().evaluate(el => parseFloat(getComputedStyle(el).borderTopWidth) >= 1));
   assert.equal(await page.locator('.intro-subtitle').innerText(), `${sharedData.profile.headline}, Singapore`);
   assert(!profileHeading.includes('College of Computing and Data Science'));
   assert.equal(await page.locator('.profile-college').count(), 0, 'Keep the homepage affiliation on a single line');
@@ -220,7 +227,9 @@ try {
     assert(brandType.size >= (width > 540 ? 24 : 19.2), 'Make the header name larger on desktop and mobile');
     assert(brand.x + brand.width <= cvButton.x, 'The larger name must not overlap the header controls');
     assert.equal(await page.locator('.cv-trigger-label').isVisible(), width > 1100, 'Use the CV icon when the label would crowd the header');
-    assert.equal(await page.locator('[data-open-cv]').getAttribute('aria-label'), 'Generate CV PDF');
+    assert.equal(await page.locator('[data-open-cv]').getAttribute('aria-label'), 'CV: Generate PDF');
+    assert.equal(await page.locator('[data-open-cv]').getAttribute('title'), 'Generate PDF');
+    assert.equal(await page.locator('.cv-trigger-label').textContent(), 'CV');
     await page.locator('#theme-toggle').click();
     const menu = await page.locator('.theme-menu').boundingBox();
     assert(menu.x >= 0 && menu.x + menu.width <= width, 'Keep the theme menu within the viewport');
@@ -281,7 +290,7 @@ try {
     assert.equal(await page.locator('main [data-open-cv]').count(), 0, 'Remove page-level CV buttons');
     assert.equal(await page.locator('nav a[href="/review/"]').count(), 0, 'Review is no longer a navigation page');
     assert.equal(await page.locator('nav a[href="/publications/"]').count(), 0, 'Research and publications share one navigation tab');
-    assert.equal(await page.locator('nav a[href="/research/"]').innerText(), 'Research & Publications');
+    assert.equal(await page.locator('nav a[href="/research/"]').innerText(), 'Research');
     assert.equal(await page.locator('nav a[href="/"]').innerText(), 'About');
     assert.equal(await page.locator('.site-brand').innerText(), 'Miyuru Thathsara');
     assert.equal(await page.locator('.brand-initials').count(), 0);
@@ -307,6 +316,7 @@ try {
       }
     }
     if (route === '/research/') {
+      assert.equal(await page.locator('h1').innerText(), 'Research');
       assert(await page.locator('.research-focus').isVisible());
       assert.equal(await page.locator('#publications .publication').count(), 4);
       assert.equal(await page.locator('.publication h3').count(), 5);
@@ -348,8 +358,8 @@ try {
     }
     await page.setViewportSize({ width: 1440, height: 1100 });
     await page.locator('[data-open-cv]').click();
-    assert.equal(await page.locator('#cv-title').innerText(), 'Generate CV PDF');
-    assert.equal(await page.locator('#cv-dialog .eyebrow').textContent(), "Miyuru's Profile");
+    assert.equal(await page.locator('#cv-title').innerText(), 'Generate PDF');
+    assert.equal(await page.locator('#cv-dialog .eyebrow').textContent(), 'Miyuru Thathsara');
     const text = await downloadPdf(`route-${route.split('/')[1] || 'home'}`);
     if (referenceCv) assert.equal(text, referenceCv, 'CV content must not depend on the page used to generate it');
     else referenceCv = text;
@@ -651,6 +661,19 @@ try {
   assert(!await page.locator('input[data-group="entries"][data-key*="Certificate Level in Management (CIMA)"]').isChecked(), 'Preserve the old explicit certificate selection');
 
   await page.locator('input[name="audience"][value="company"]').check();
+  assert.equal(await page.locator('#cv-preview').getAttribute('data-audience'), 'company');
+  assert.equal(await page.locator('.cv-engineering-masthead svg').count(), 1);
+  assert.equal(await page.locator('.cv-section-code').count(), 5);
+  assert.match(await page.locator('.cv-preview h3').evaluate(el => getComputedStyle(el).fontFamily), /Courier/);
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: 1100 });
+    assert(await page.locator('#cv-preview').evaluate(el => el.scrollWidth <= el.clientWidth + 1), `Company preview overflow at ${width}`);
+    await page.locator('.cv-preview-panel').evaluate(el => { el.scrollTop = 0; });
+    await page.locator('.cv-settings').evaluate(el => { el.scrollTop = 0; });
+    await audit();
+    await page.screenshot({ path: join(artifacts, `company-preview-${width}.png`) });
+  }
+  await page.setViewportSize({ width: 1440, height: 1100 });
   pdfText = await downloadPdf('company', true);
   assert.equal(pdfInspections.get('company').pageCount, 1, 'The default company CV should fit one page without a sparse continuation');
   assert(pdfText.includes('AXI DMA'));
@@ -662,6 +685,42 @@ try {
   assert(pdfText.includes('Certificate Level in Management (CIMA)'));
   assert(!pdfText.includes('Nalanda College'));
   assert(pdfText.includes('mthathsara@outlook.com'));
+  assert(pdfText.includes('// ENGINEERING CV') && pdfText.includes('01 // PROFESSIONAL PROFILE'));
+  const company = pdfInspections.get('company');
+  // PDF.js may split a bold Courier name into separate word items.
+  const companyName = company.firstPage.items.filter(item => item.height >= 22);
+  assert.equal(companyName.map(item => item.str).join(' '), 'Miyuru Thathsara');
+  assert(companyName.every(item => company.firstPage.styles[item.fontName].fontFamily === 'monospace'));
+  const nameLeft = companyName[0].transform[4], nameRight = companyName.at(-1).transform[4] + companyName.at(-1).width;
+  assert(Math.abs((nameLeft + nameRight) / 2 - company.firstPage.width / 2) < 2, 'Keep the company CV name centered');
+  assert(company.fonts.has('sans-serif'), 'Keep long descriptions in a readable body font');
+  const dateLines = new Map();
+  for (const item of company.firstPage.items.filter(item => item.height === 8.5 && item.transform[4] > 420)) {
+    const key = item.transform[5];
+    dateLines.set(key, [...(dateLines.get(key) || []), item]);
+  }
+  for (const date of await page.locator('.cv-entry-date').allTextContents()) {
+    const parts = [...dateLines.values()].find(items => items.map(item => item.str).join(' ') === date.replace(/[\u2010-\u2015]/g, '-'));
+    assert(parts, `Missing company date: ${date}`);
+    const first = parts[0], last = parts.at(-1);
+    assert(Math.abs(last.transform[4] + last.width - company.firstPage.width + 48) < 2);
+    const title = company.firstPage.items.filter(item => item.transform[4] < first.transform[4] && Math.abs(item.transform[5] - first.transform[5]) < 0.1);
+    assert(title.length && Math.max(...title.map(item => item.transform[4] + item.width)) + 8 < first.transform[4], `Company title/date collision: ${date}`);
+  }
+  for (const contact of await page.locator('.cv-contact-row a').evaluateAll(links => links.map(link => ({ label: link.textContent, url: link.href })))) {
+    const item = company.firstPage.items.find(item => item.str === contact.label);
+    const annotation = company.links.find(link => (link.url || link.unsafeUrl) === contact.url);
+    assert(annotation, `Missing company hyperlink: ${contact.label}`);
+    assert(Math.abs(annotation.rect[0] - item.transform[4]) < 1 && Math.abs(annotation.rect[2] - item.transform[4] - item.width) < 2);
+  }
+  await page.locator('#cv-hyperlinks').uncheck();
+  const printedCompany = await downloadPdf('print-company', true);
+  assert.deepEqual(pdfInspections.get('print-company').links, []);
+  assert(printedCompany.includes('mthathsara@outlook.com') && !printedCompany.includes('LinkedIn'));
+  await page.locator('input[name="audience"][value="academia"]').check();
+  assert.equal(await page.locator('#cv-preview').getAttribute('data-audience'), 'academia');
+  assert.equal(await page.locator('.cv-engineering-masthead, .cv-section-code').count(), 0, 'Keep the academic template formal when switching back');
+  await page.locator('input[name="audience"][value="company"]').check();
 
   for (const checkbox of await page.locator('input[data-group="sections"]').all()) await checkbox.check();
   await page.locator('#cv-selections details').evaluateAll(details => details.forEach(el => { el.open = true; }));
