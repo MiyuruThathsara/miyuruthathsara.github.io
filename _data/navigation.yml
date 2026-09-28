@@ -1,6 +1,6 @@
-- label: Profile
+- label: About
   url: /
-  section: profile
+  section: about
 - label: News
   url: /news/
   section: news

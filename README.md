@@ -1,4 +1,4 @@
-# Miyuru Thathsara — Personal Profile
+# Miyuru Thathsara — Personal Website
 
 A responsive profile and research website built with Jekyll and hosted on GitHub Pages.
 
@@ -15,7 +15,7 @@ Open `http://localhost:4000`. To build without starting a server, run `bundle ex
 
 ## Editing
 
-- `index.md`: homepage, with a single affiliation beneath the name and a static, uncropped portrait.
+- `index.md`: About homepage, with a single affiliation beneath the name and a static, uncropped portrait. The About tab stays at `/`; `/#about` and old `/#profile` bookmarks also work.
 - `news.html`, `research.html`, `experience.html`, `education.html`, `contact.html`: separate pages for the navigation tabs. Research and publications share `/research/`; review experience is on Experience. `publications.html` redirects to `/research/#publications`, preserving paper anchors and sending the former review anchor to Experience. `review.html` redirects to `/experience/#review`. Honours and awards are on Education.
 - `_data/navigation.yml`: page labels, URLs, and active-navigation identifiers.
 - `_data/profile.json`: shared profile, research, employment, education, review, awards, and personal-interest content used by both pages and CV generation.
@@ -29,6 +29,8 @@ Open `http://localhost:4000`. To build without starting a server, run `bundle ex
 - `_data/news.yml`: website-only news, newest first, with confirmed years/dates and links to the relevant sections. News is deliberately excluded from CV options and PDF generation.
 - `_includes/profile-tools.html`: CV options and the image viewer.
 - `_includes/theme-control.html`: compact theme disclosure with native radio options.
+- `_includes/profile-links.html`: centered LinkedIn, Google Scholar, GitHub, university email, and personal website icon links beneath the homepage portrait. Destinations come from `_config.yml`.
+- `_includes/social-icon.html`: inline SVG icons from [Font Awesome Free 6.7.2](https://github.com/FortAwesome/Font-Awesome/tree/6.7.2), © 2024 Fonticons, Inc., licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Original paths and attribution are retained; wrappers add theme-aware styling and accessibility attributes. No external icon font or script is required.
 - `_includes/cv-data.html`: embeds the full shared CV data into every page, without fetching or scraping other pages. News is not included.
 - `assets/js/cv.js`: presets, individual entry selection, preview, and saved preferences.
 - `assets/js/cv-pdf.js`: formal A4 PDF layout and pagination.
@@ -41,7 +43,7 @@ The GitHub Pages address is the canonical URL. The separate personal website, [m
 
 ## Colour theme
 
-The header has an aligned CV/document control and a theme icon. The CV label is shown on wide screens; compact screens use the labelled icon with a tooltip. On smaller screens, branding and controls share the first row and centered navigation sits below. Both controls have at least 44-pixel touch targets.
+The header uses the name **Miyuru Thathsara** with aligned CV/document and theme controls. Individual section pages show their title without repeating the name above it. The CV label is shown on wide screens; compact screens use the labelled icon with a tooltip. On smaller screens, branding and controls share the first row and centered navigation sits below. Both controls and the homepage contact icons have at least 44-pixel touch targets. The five contact icons stay centered beneath the portrait on desktop and mobile, with accessible names, hover titles, and keyboard focus indicators; they inherit the active colour theme.
 
 The theme icon opens **System**, **Light**, and **Dark** options, with the selected setting represented by a monitor, sun, or moon. The menu supports keyboard navigation, Escape, and dismissal by clicking outside. System is the default and follows the browser/device colour preference, including changes while the site is open. Manual choices are saved locally as `miyuru-theme-v1`, persist across pages and visits, and synchronize between open tabs. With storage blocked, theme selection still works on the current page. With JavaScript disabled, the site follows the device setting without showing an inactive selector. Diagrams keep their original colours, and CV previews, downloaded PDFs, and printed pages remain light and print-friendly.
 

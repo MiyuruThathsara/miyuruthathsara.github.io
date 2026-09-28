@@ -149,8 +149,28 @@ async function downloadPdf(name, render = false) {
 try {
   await page.goto(base);
   await page.locator('[data-open-cv]').waitFor({ state: 'visible' });
-  assert.equal(await page.title(), 'Miyuru Thathsara | Personal Profile');
+  assert.equal(await page.title(), 'About | Miyuru Thathsara');
   const sharedData = JSON.parse(await page.locator('#cv-data').textContent());
+  const socialContacts = [
+    ['LinkedIn', 'linkedin'], ['Google Scholar', 'google-scholar'], ['GitHub', 'github'],
+    ['Email Miyuru Thathsara', 'university'], ['Personal website: miyuruthathsara.com', 'website']
+  ];
+  assert.equal(await page.locator('.profile-links a').count(), socialContacts.length);
+  assert.equal(await page.locator('.sidebar-website').count(), 0, 'The website belongs in the same icon row');
+  for (const [label, id] of socialContacts) {
+    const link = page.locator('.profile-links').getByRole('link', { name: label, exact: true });
+    assert.equal(await link.getAttribute('href'), sharedData.contacts.find(contact => contact.id === id).url);
+    assert(await link.getAttribute('title'), 'Each icon has a readable hover title');
+    assert.equal(await link.locator('svg[aria-hidden="true"][focusable="false"]').count(), 1);
+    assert(await link.locator('svg path').evaluate(path => path.getBBox().width > 0), 'Render the inline icon without an external font');
+  }
+  const socialLinks = await page.locator('.profile-links a').all();
+  await socialLinks[0].focus();
+  for (const [index, link] of socialLinks.entries()) {
+    if (index) await page.keyboard.press('Tab');
+    assert(await link.evaluate(el => document.activeElement === el), 'Contact icons are in keyboard order');
+    assert(await link.evaluate(el => getComputedStyle(el).outlineStyle !== 'none'), 'Show a visible focus indicator');
+  }
   const homepage = await page.locator('main').innerText();
   const profileHeading = await page.locator('.profile-heading').innerText();
   assert.equal(await page.locator('.intro-subtitle').innerText(), `${sharedData.profile.headline}, Singapore`);
@@ -201,6 +221,12 @@ try {
     assert(frame.width >= 220);
     assert(Math.abs(photo.width / photo.height - 1) < 0.01, 'Preserve the full square photograph');
     assert(photo.x >= frame.x - 1 && photo.y >= frame.y - 1 && photo.x + photo.width <= frame.x + frame.width + 1 && photo.y + photo.height <= frame.y + frame.height + 1);
+    const contactBounds = await Promise.all(socialLinks.map(link => link.boundingBox()));
+    assert(contactBounds.every(box => box.width >= 44 && box.height >= 44), 'Contact links have mobile-friendly tap targets');
+    assert(contactBounds.every(box => box.y === contactBounds[0].y), 'Keep all five icons in one row');
+    assert(contactBounds[0].y >= photo.y + photo.height, 'Place icons beneath the portrait at every width');
+    const contactLeft = contactBounds[0].x, contactRight = contactBounds.at(-1).x + contactBounds.at(-1).width;
+    assert(Math.abs((contactLeft + contactRight) / 2 - photo.x - photo.width / 2) < 1, 'Center the contact icons beneath the portrait');
     if (width <= 800) {
       const heading = await page.locator('.profile-heading').boundingBox();
       assert(heading.y + heading.height <= photo.y + 1, 'Mobile name and headline must precede the photograph');
@@ -236,9 +262,14 @@ try {
     assert.equal(await page.locator('nav a[href="/review/"]').count(), 0, 'Review is no longer a navigation page');
     assert.equal(await page.locator('nav a[href="/publications/"]').count(), 0, 'Research and publications share one navigation tab');
     assert.equal(await page.locator('nav a[href="/research/"]').innerText(), 'Research & Publications');
+    assert.equal(await page.locator('nav a[href="/"]').innerText(), 'About');
+    assert.equal(await page.locator('.site-brand').innerText(), 'Miyuru Thathsara');
+    assert.equal(await page.locator('.brand-initials').count(), 0);
+    assert.equal(await page.locator('.page-heading .eyebrow').count(), 0, 'Do not repeat the name above section titles');
     assert.equal(await page.locator('.page-description').count(), 0, 'Remove the redundant descriptions below page titles');
     assert.equal(await page.locator('h1').count(), 1);
-    assert.equal(await page.title(), `${await page.locator('h1').innerText()} | ${route === '/' ? 'Personal Profile' : 'Miyuru Thathsara'}`);
+    assert.equal(await page.title(), `${route === '/' ? 'About' : await page.locator('h1').innerText()} | Miyuru Thathsara`);
+    assert.equal(await page.locator('meta[property="og:title"]').getAttribute('content'), await page.title());
     assert.equal(await page.locator('nav [aria-current="page"]').count(), 1);
     assert.equal(await page.locator('nav [aria-current="page"]').getAttribute('href'), route);
     assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'), `https://miyuruthathsara.github.io${route}`);
@@ -400,6 +431,13 @@ try {
 
   await page.goto(`${base}/#research`);
   await page.waitForURL('**/research/');
+  await page.goto(`${base}/contact/`);
+  await page.goto(`${base}/#profile`);
+  await page.waitForURL(`${base}/#about`);
+  assert(await page.locator('#about').isVisible());
+  await page.reload();
+  assert.equal(page.url(), `${base}/#about`, 'The About anchor must not redirect or reload in a loop');
+  await page.goto(`${base}/education/`);
   await page.goto(`${base}/#awards`);
   await page.waitForURL('**/education/#awards');
   await page.goto(`${base}/#review`);
@@ -430,6 +468,9 @@ try {
   await noJsPage.waitForURL('**/research/#publications');
   await noJsPage.goto(`${base}/education/`);
   await checkDisclosures(noJsPage);
+  await noJsPage.goto(`${base}/#about`);
+  assert.equal(await noJsPage.locator('.profile-links a').count(), 5, 'Contact links work without JavaScript');
+  assert.equal(await noJsPage.locator('.profile-links svg:visible').count(), 5);
   await noJsContext.close();
 
   await page.goto(`${base}/research/`);

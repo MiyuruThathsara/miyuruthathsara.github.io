@@ -1,10 +1,10 @@
 ---
-title: Miyuru Thathsara
+title: About
 layout: default
 permalink: /
 ---
 
-<div class="profile-layout">
+<div class="profile-layout" id="about">
   <header class="profile-heading">
     <p class="eyebrow">Embedded Intelligence <span aria-hidden="true">|</span> Hardware Acceleration</p>
     <h1 id="profile-title">Miyuru Thathsara</h1>
@@ -14,15 +14,7 @@ permalink: /
     <div class="profile-portrait">
       <div class="profile-photo-frame"><img class="profile-photo" src="{{ '/me.jpeg' | relative_url }}" alt="Miyuru Thathsara beside the Google sign" width="800" height="800" fetchpriority="high"></div>
     </div>
-    <div class="profile-links">
-      <a href="{{ site.scholar_url | escape }}">Google Scholar <span aria-hidden="true">↗</span></a>
-      <a href="{{ site.linkedin_url }}">LinkedIn <span aria-hidden="true">↗</span></a>
-      <a href="{{ site.github_url }}">GitHub <span aria-hidden="true">↗</span></a>
-    </div>
-    <div class="sidebar-website">
-      <p class="sidebar-label">Personal website</p>
-      <a href="{{ site.personal_website }}">miyuruthathsara.com <span aria-hidden="true">↗</span></a>
-    </div>
+    {% include profile-links.html %}
   </aside>
   <div class="profile-content">
     <section class="introduction" aria-labelledby="profile-title">
