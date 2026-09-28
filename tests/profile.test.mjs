@@ -153,6 +153,9 @@ try {
   const sharedData = JSON.parse(await page.locator('#cv-data').textContent());
   const homepage = await page.locator('main').innerText();
   const profileHeading = await page.locator('.profile-heading').innerText();
+  assert.equal(await page.locator('.intro-subtitle').innerText(), `${sharedData.profile.headline}, Singapore`);
+  assert(!profileHeading.includes('College of Computing and Data Science'));
+  assert.equal(await page.locator('.profile-college').count(), 0, 'Keep the homepage affiliation on a single line');
   assert.equal((profileHeading.match(/Ph\.D\. Candidate/g) || []).length, 1, 'Keep a single role in the profile heading');
   assert.equal((profileHeading.match(/Nanyang Technological University/g) || []).length, 1, 'Keep a single university in the profile heading');
   assert(!/Ph\.D\. Candidate|Nanyang Technological University/.test(await page.locator('.profile-sidebar').innerText()), 'Do not duplicate the affiliation in the sidebar');

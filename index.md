@@ -8,8 +8,7 @@ permalink: /
   <header class="profile-heading">
     <p class="eyebrow">Embedded Intelligence <span aria-hidden="true">|</span> Hardware Acceleration</p>
     <h1 id="profile-title">Miyuru Thathsara</h1>
-    <p class="intro-subtitle">{{ site.data.profile.headline | escape }}</p>
-    <p class="profile-college">College of Computing and Data Science (CCDS) <span aria-hidden="true">·</span> Singapore</p>
+    <p class="intro-subtitle">{{ site.data.profile.headline | escape }}, Singapore</p>
   </header>
   <aside class="profile-sidebar" aria-label="Photograph and profile links">
     <div class="profile-portrait">
