@@ -152,8 +152,11 @@ try {
   assert.equal(await page.title(), 'Miyuru Thathsara | Personal Profile');
   const sharedData = JSON.parse(await page.locator('#cv-data').textContent());
   const homepage = await page.locator('main').innerText();
-  assert.equal((homepage.match(/Ph\.D\. Candidate/g) || []).length, 1, 'Show the role only once on the homepage');
-  assert.equal((homepage.match(/Nanyang Technological University/g) || []).length, 1, 'Show the university only once on the homepage');
+  const profileHeading = await page.locator('.profile-heading').innerText();
+  assert.equal((profileHeading.match(/Ph\.D\. Candidate/g) || []).length, 1, 'Keep a single role in the profile heading');
+  assert.equal((profileHeading.match(/Nanyang Technological University/g) || []).length, 1, 'Keep a single university in the profile heading');
+  assert(!/Ph\.D\. Candidate|Nanyang Technological University/.test(await page.locator('.profile-sidebar').innerText()), 'Do not duplicate the affiliation in the sidebar');
+  assert.deepEqual(await page.locator('.introduction > p').allTextContents(), sharedData.profile.summary, 'Render the complete supplied bio as separate paragraphs');
   assert.equal(await page.locator('main #news, main #research, main #publications, main #experience, main #education, main #review, main #contact').count(), 0, 'Homepage must not contain the other full pages');
   assert.equal(await page.locator('.profile-photo').getAttribute('src'), '/me.jpeg');
   assert(await page.locator('.profile-photo').evaluate(img => !img.closest('a, button, [data-image-viewer]')), 'The profile photo should be static');
