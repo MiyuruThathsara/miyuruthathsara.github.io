@@ -83,6 +83,7 @@ h3 { margin: 0 0 0.5rem; font-size: 1rem; font-weight: 600; line-height: 1.5; }
 .header-inner, .page-shell, .footer-inner { width: min(1160px, calc(100% - 96px)); margin: 0 auto; }
 .site-header { border-bottom: 1px solid var(--line); }
 .header-inner { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "brand nav actions"; align-items: center; gap: 1.25rem; min-height: 88px; }
+.header-inner--about { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "nav actions"; }
 .header-actions { grid-area: actions; display: flex; align-items: center; gap: 0.5rem; padding-left: 1rem; border-left: 1px solid var(--line); }
 .header-tool { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: 44px; height: 44px; padding: 0; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--heading); font-size: 0.76rem; font-weight: 600; line-height: 1; white-space: nowrap; text-decoration: none; cursor: pointer; }
 .header-tool:hover, .theme-control[open] > summary { background: var(--wash); border-color: var(--line); text-decoration: none; }
@@ -219,14 +220,25 @@ summary::marker { color: var(--accent); }
 
 @media (max-width: 900px) {
   .header-inner { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "brand actions" "nav nav"; gap: 0.35rem 1rem; padding: 0.75rem 0 0.4rem; }
-  .site-header nav { width: 100%; justify-content: center; text-align: center; }
+  .header-inner--about { grid-template-areas: ". actions" "nav nav"; }
+  .site-header nav { width: 100%; min-width: 0; flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; padding: 6px; text-align: center; overscroll-behavior-x: contain; scroll-padding-inline: 6px; }
+  .site-header nav a { flex-shrink: 0; white-space: nowrap; }
+  .site-header nav a:first-child { margin-left: auto; }
+  .site-header nav a:last-child { margin-right: auto; }
 }
 
 @media (max-width: 800px) {
-  .profile-layout { grid-template-columns: 1fr; grid-template-areas: "heading" "sidebar" "content"; column-gap: 0; }
+  .profile-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "heading" "portrait" "links" "content" "interests"; column-gap: 0; }
   .profile-heading { text-align: center; }
-  .profile-sidebar { display: flex; flex-direction: column; align-items: center; margin-bottom: 2.25rem; }
-  .profile-portrait { width: 224px; max-width: 100%; }
+  .profile-sidebar { display: contents; }
+  .profile-portrait { grid-area: portrait; justify-self: center; width: min(100%, 360px); margin-bottom: 1rem; }
+  .profile-links { grid-area: links; justify-self: center; margin-bottom: 2rem; }
+  .profile-interests { grid-area: interests; max-width: none; margin-top: 2rem; padding-top: 1.5rem; }
+  .profile-interests h2 { font-size: 1.6rem; }
+  .profile-interests ul { gap: 0.75rem; font-size: 1.08rem; }
+  .profile-interests li { min-height: 56px; gap: 0.75rem; padding: 0.9rem 1rem; }
+  .profile-interests li span { min-width: 0; overflow-wrap: anywhere; }
+  .profile-interests svg { width: 22px; height: 22px; }
   .page-shell { padding-top: 36px; padding-bottom: 48px; }
   h1 { font-size: 2.8rem; }
   .record { grid-template-columns: 145px minmax(0, 1fr); }
@@ -237,8 +249,8 @@ summary::marker { color: var(--accent); }
   .header-inner { column-gap: 0.5rem; }
   .header-actions { gap: 0.25rem; padding-left: 0; border-left: 0; }
   .site-brand { font-size: clamp(1.2rem, 5.6vw, 1.4rem); }
-  .site-header nav { display: flex; flex-wrap: wrap; gap: 0.1rem 1rem; }
-  .site-header nav a { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; font-size: 0.73rem; }
+  .site-header nav { gap: 0.6rem; }
+  .site-header nav a { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; font-size: 0.75rem; }
   h1 { font-size: clamp(2rem, 8.5vw, 2.8rem); }
   h2 { font-size: 1.65rem; }
   .eyebrow { font-size: 0.6rem; letter-spacing: 0.07em; }

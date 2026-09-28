@@ -1,23 +1,25 @@
-// Text-based A4 output; this module has no DOM dependencies.
-export function createCvPdf(jsPDF, model) {
+import { createCompanyPdf } from './cv-company-pdf.js?v=20260929-circuit';
+
+// Text-based A4 output; these modules have no DOM dependencies.
+export function createCvPdf(jsPDF, model, fonts) {
+  if (model.audience === 'company') return createCompanyPdf(jsPDF, model, fonts);
   const pdf = new jsPDF({ unit: 'pt', format: 'a4', compress: true });
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   const margin = 48;
   const width = pageWidth - margin * 2;
   const bottom = pageHeight - 50;
-  const company = model.audience === 'company';
-  const headingFont = company ? 'courier' : 'helvetica';
-  const detailFont = company ? 'courier' : 'helvetica';
-  const dateSize = company ? 8.5 : 9;
+  const headingFont = 'helvetica';
+  const detailFont = 'helvetica';
+  const dateSize = 9;
   const ink = [36, 39, 43];
-  const navy = company ? [20, 96, 87] : [24, 59, 78];
+  const navy = [24, 59, 78];
   const muted = [80, 86, 92];
-  const entryGap = company ? 5 : 7;
+  const entryGap = 7;
   let y = margin;
   const clean = value => String(value).normalize('NFC').replace(/[\u2010-\u2015]/g, '-').replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"').replace(/\u00a0/g, ' ').replace(/\u2197/g, '').replace(/\u00d7/g, 'x');
 
-  pdf.setProperties({ title: `${model.name} - ${company ? 'Professional' : 'Academic'} CV`, author: model.name, subject: 'Curriculum Vitae', creator: 'Miyuru Thathsara CV Generator' });
+  pdf.setProperties({ title: `${model.name} - Academic CV`, author: model.name, subject: 'Curriculum Vitae', creator: 'Miyuru Thathsara CV Generator' });
   pdf.setLanguage('en');
 
   function newPage() {
@@ -43,10 +45,7 @@ export function createCvPdf(jsPDF, model) {
       pdf.setFont(font, style).setFontSize(size).setTextColor(...color);
       const textWidth = Math.min(maxWidth, pdf.getTextWidth(line));
       const x = align === 'center' ? (pageWidth - textWidth) / 2 : margin + indent;
-      if (bullet && index === 0) {
-        if (company) pdf.setDrawColor(...navy).setLineWidth(0.7).rect(x - 9, y + size - 5, 3, 3);
-        else pdf.text('•', x - 10, y + size);
-      }
+      if (bullet && index === 0) pdf.text('•', x - 10, y + size);
       pdf.text(line, x, y + size);
       if (url) pdf.link(x, y, textWidth, lineHeight, { url });
       y += lineHeight;
@@ -113,35 +112,18 @@ export function createCvPdf(jsPDF, model) {
     }
   }
 
-  if (company) {
-    // A small clock trace hints at digital logic without turning content into an image.
-    pdf.setFont('courier', 'normal').setFontSize(7.5).setTextColor(...navy);
-    pdf.text('// ENGINEERING CV', margin, 29);
-    pdf.setDrawColor(...navy).setLineWidth(0.8);
-    const traceX = pageWidth - margin - 84;
-    pdf.lines([[12, 0], [0, -7], [12, 0], [0, 7], [12, 0], [0, -7], [12, 0], [0, 7], [12, 0], [0, -7], [12, 0], [0, 7], [12, 0]], traceX, 29);
-  }
   paragraph(model.name, { font: headingFont, size: 23, style: 'bold', after: 3, align: 'center' });
-  paragraph(model.headline, { font: detailFont, size: 9.5, after: 7, align: 'center', color: company ? navy : ink });
+  paragraph(model.headline, { font: detailFont, size: 9.5, after: 7, align: 'center', color: ink });
   contactRows(model.contacts.filter(contact => contact.kind === 'email'));
   contactRows(model.contacts.filter(contact => contact.kind === 'web'));
   y += 6;
 
-  let sectionNumber = 0;
   for (const section of model.sections) {
     if (!section.items.length) continue;
     ensure(32 + reserveEntry(section.items[0]));
     y += 8;
-    sectionNumber += 1;
-    if (company) {
-      pdf.setFillColor(238, 245, 243).rect(margin, y - 3, width, 21, 'F');
-      pdf.setFillColor(...navy).rect(margin, y - 3, 2, 21, 'F');
-      const label = `${String(sectionNumber).padStart(2, '0')} // ${section.title.toUpperCase()}`;
-      paragraph(label, { font: headingFont, style: 'bold', size: 9.5, color: navy, indent: 9, after: 4 });
-    } else {
-      paragraph(section.title.toUpperCase(), { style: 'bold', size: 9.5, after: 4 });
-      pdf.setDrawColor(170, 176, 181).setLineWidth(0.5).line(margin, y, pageWidth - margin, y);
-    }
+    paragraph(section.title.toUpperCase(), { style: 'bold', size: 9.5, after: 4 });
+    pdf.setDrawColor(170, 176, 181).setLineWidth(0.5).line(margin, y, pageWidth - margin, y);
     y += 6;
     for (const item of section.items) {
       ensure(reserveEntry(item));
@@ -165,7 +147,6 @@ export function createCvPdf(jsPDF, model) {
   for (let page = 1; page <= pages; page++) {
     pdf.setPage(page);
     pdf.setDrawColor(205, 211, 214).setLineWidth(0.5).line(margin, pageHeight - 36, pageWidth - margin, pageHeight - 36);
-    if (company) pdf.setFillColor(...navy).rect(margin, pageHeight - 37.5, 3, 3, 'F');
     pdf.setFont(detailFont, 'normal').setFontSize(8).setTextColor(...muted);
     pdf.text(clean(model.name), margin, pageHeight - 22);
     pdf.text(`${page} / ${pages}`, pageWidth - margin, pageHeight - 22, { align: 'right' });

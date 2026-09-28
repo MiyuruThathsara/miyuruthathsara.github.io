@@ -12,7 +12,7 @@ const root = resolve(process.env.SITE_DIR || '_site');
 await readFile(join(root, 'index.html'));
 const artifacts = await mkdtemp(join(tmpdir(), 'miyuru-profile-test-'));
 console.log(`Artifacts: ${artifacts}`);
-const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.webp': 'image/webp', '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml', '.pdf': 'application/pdf' };
+const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.webp': 'image/webp', '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml', '.pdf': 'application/pdf', '.ttf': 'font/ttf' };
 const server = createServer(async (req, res) => {
   const path = resolve(root, `.${decodeURIComponent(new URL(req.url, 'http://localhost').pathname)}`);
   if (path !== root && !path.startsWith(root + sep)) { res.writeHead(403).end(); return; }
@@ -36,6 +36,24 @@ page.on('pageerror', error => pageErrors.push(error.message));
 async function audit() {
   const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
   assert.deepEqual(result.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => n.target) })), []);
+}
+
+async function checkMobileNavigation(target = page) {
+  const width = target.viewportSize().width;
+  if (width > 900) return;
+  const nav = target.locator('.site-header nav');
+  const bounds = await nav.boundingBox();
+  const boxes = await Promise.all((await nav.locator('a').all()).map(link => link.boundingBox()));
+  assert(boxes.every(box => Math.abs(box.y - boxes[0].y) < 1), `Keep mobile navigation on one line at ${width}`);
+  const overflows = await nav.evaluate(el => el.scrollWidth > el.clientWidth);
+  if (!overflows) {
+    assert(Math.abs((boxes[0].x + boxes.at(-1).x + boxes.at(-1).width) / 2 - bounds.x - bounds.width / 2) < 2, 'Center the mobile tabs when they fit');
+  }
+  await target.waitForFunction(() => {
+    const strip = document.querySelector('.site-header nav').getBoundingClientRect();
+    const tab = document.querySelector('nav [aria-current="page"]').getBoundingClientRect();
+    return tab.left >= strip.left - 1 && tab.right <= strip.right + 1;
+  });
 }
 
 const currentTheme = (target = page) => target.locator('input[name="theme-preference"]:checked').inputValue();
@@ -126,7 +144,13 @@ async function readPdf(bytes, name, render = false) {
     }
   }
   console.log(`PDF ${name}: ${pdf.numPages} pages; selectable text and margins verified`);
-  if (companyTemplate) assert(inspection.fonts.has('monospace'), `Use coding typography in ${name}`);
+  // PDF.js classifies this embedded coding font as sans-serif. Check the actual
+  // embedded font name and descriptor instead of its generic fallback family.
+  if (companyTemplate) {
+    const raw = Buffer.from(bytes).toString('latin1');
+    assert(raw.includes('/BaseFont /JetBrainsMono') && raw.includes('/FontFile2'), `Embed JetBrains Mono in ${name}`);
+    assert(!raw.includes('/BaseFont /Courier'), `Do not fall back to the old Courier template in ${name}`);
+  }
   assert(!/\bNEWS\b/.test(text), `News must never appear in ${name}`);
   if (!['all-sections', 'all-sections-no-descriptions', 'optional-no-grades', 'restored-options'].includes(name)) {
     assert(!/\bchess\b|selected coursework|Digital IC Design|Advanced Digital Systems/i.test(text), `Optional details should stay out of the preset: ${name}`);
@@ -135,7 +159,7 @@ async function readPdf(bytes, name, render = false) {
   assert(websiteSummaries.every(summary => !text.includes(summary)), `Use formal CV paper descriptions, not website copy, in ${name}`);
   pdfInspections.set(name, inspection);
   await task.destroy();
-  return text;
+  return text.replace(/ +/g, ' ');
 }
 
 async function downloadPdf(name, render = false) {
@@ -215,17 +239,8 @@ try {
     assert(themeControl.width >= 44 && themeControl.height >= 44, 'Theme selection should be easy to tap');
     assert(themeControl.y + themeControl.height <= (await page.locator('main').boundingBox()).y);
     assert.equal(themeControl.y, cvButton.y, 'Keep CV and theme controls on one row');
-    const brand = await page.locator('.site-brand').boundingBox();
-    assert(Math.abs(brand.y + brand.height / 2 - cvButton.y - cvButton.height / 2) < 1, 'Align the toolbar with the branding');
-    const brandType = await page.locator('.site-brand').evaluate(el => {
-      const style = getComputedStyle(el);
-      return { font: style.fontFamily, weight: style.fontWeight, size: parseFloat(style.fontSize) };
-    });
-    const nameType = await page.locator('#profile-title').evaluate(el => ({ font: getComputedStyle(el).fontFamily, weight: getComputedStyle(el).fontWeight }));
-    assert.equal(brandType.font, nameType.font, 'Use the same serif font for the header and About-page name');
-    assert.equal(brandType.weight, nameType.weight, 'Match the About-page name weight');
-    assert(brandType.size >= (width > 540 ? 24 : 19.2), 'Make the header name larger on desktop and mobile');
-    assert(brand.x + brand.width <= cvButton.x, 'The larger name must not overlap the header controls');
+    assert.equal(await page.locator('.site-brand').count(), 0, 'Do not show the corner name on About');
+    await checkMobileNavigation();
     assert.equal(await page.locator('.cv-trigger-label').isVisible(), width > 1100, 'Use the CV icon when the label would crowd the header');
     assert.equal(await page.locator('[data-open-cv]').getAttribute('aria-label'), 'CV: Generate PDF');
     assert.equal(await page.locator('[data-open-cv]').getAttribute('title'), 'Generate PDF');
@@ -253,29 +268,34 @@ try {
     assert(Math.abs((contactLeft + contactRight) / 2 - photo.x - photo.width / 2) < 1, 'Center the contact icons beneath the portrait');
     const interests = await page.locator('.profile-interests').boundingBox();
     assert(interests.y >= contactBounds[0].y + contactBounds[0].height, 'Place Interests beneath the contact icons');
-    assert(interests.width <= 264 && interests.x >= 0 && interests.x + interests.width <= width, 'Keep Interests compact and within the viewport');
+    assert(interests.x >= 0 && interests.x + interests.width <= width, 'Keep Interests within the viewport');
     if (width <= 800) {
-      assert(Math.abs(interests.x + interests.width / 2 - photo.x - photo.width / 2) < 1, 'Center the Interests block beneath the photo on mobile');
+      const content = await page.locator('.profile-content').boundingBox();
+      assert(interests.y >= content.y + content.height, 'Move Interests below all About content on mobile');
+      assert(Math.abs(interests.width - content.width) < 1 && Math.abs(interests.x - content.x) < 1, 'Fill the mobile content width with the interest cards');
+      assert(await page.locator('.profile-interests ul').evaluate(el => parseFloat(getComputedStyle(el).fontSize) >= 17));
+      assert(Math.abs(photo.width - Math.min(content.width, 360)) < 1, 'Enlarge the uncropped mobile photo to the available width, up to 360px');
       const heading = await page.locator('.profile-heading').boundingBox();
       assert(heading.y + heading.height <= photo.y + 1, 'Mobile name and headline must precede the photograph');
-      const nav = await page.locator('.site-header nav').boundingBox();
-      const rows = new Map();
-      for (const link of await page.locator('.site-header nav a').all()) {
-        const box = await link.boundingBox();
-        const key = Math.round(box.y);
-        rows.set(key, [...(rows.get(key) || []), box]);
-      }
-      for (const boxes of rows.values()) {
-        const left = Math.min(...boxes.map(box => box.x));
-        const right = Math.max(...boxes.map(box => box.x + box.width));
-        assert(Math.abs((left + right) / 2 - nav.x - nav.width / 2) < 2, `Center every mobile navigation row at ${width}`);
-      }
     }
-    else assert(Math.abs(interests.x - photo.x) < 1, 'Align Interests with the left sidebar on desktop');
+    else {
+      assert(interests.width <= 264);
+      assert(Math.abs(interests.x - photo.x) < 1, 'Keep Interests in the desktop sidebar');
+    }
     if ([1440, 390].includes(width)) {
       await audit();
       await page.screenshot({ path: join(artifacts, `profile-${width}.png`) });
+      if (width === 390) await page.locator('.profile-interests').screenshot({ path: join(artifacts, 'mobile-interests.png') });
     }
+  }
+
+  // Keyboard users can reach each tab, even when the narrowest strip scrolls.
+  await page.locator('nav a').first().focus();
+  for (const [index, link] of (await page.locator('nav a').all()).entries()) {
+    if (index) await page.keyboard.press('Tab');
+    assert(await link.evaluate(el => document.activeElement === el));
+    const tab = await link.boundingBox(), strip = await page.locator('nav').boundingBox();
+    assert(tab.x >= strip.x - 1 && tab.x + tab.width <= strip.x + strip.width + 1);
   }
 
   const routes = ['/', '/news/', '/research/', '/experience/', '/education/', '/contact/'];
@@ -292,7 +312,8 @@ try {
     assert.equal(await page.locator('nav a[href="/publications/"]').count(), 0, 'Research and publications share one navigation tab');
     assert.equal(await page.locator('nav a[href="/research/"]').innerText(), 'Research');
     assert.equal(await page.locator('nav a[href="/"]').innerText(), 'About');
-    assert.equal(await page.locator('.site-brand').innerText(), 'Miyuru Thathsara');
+    if (route === '/') assert.equal(await page.locator('.site-brand').count(), 0);
+    else assert.equal(await page.locator('.site-brand').innerText(), 'Miyuru Thathsara');
     assert.equal(await page.locator('.brand-initials').count(), 0);
     assert.equal(await page.locator('.page-heading .eyebrow').count(), 0, 'Do not repeat the name above section titles');
     assert.equal(await page.locator('.page-description').count(), 0, 'Remove the redundant descriptions below page titles');
@@ -340,6 +361,15 @@ try {
     }
     for (const width of [1440, 390, 320]) {
       await page.setViewportSize({ width, height: 1100 });
+      await checkMobileNavigation();
+      if (route !== '/') {
+        const brand = await page.locator('.site-brand').boundingBox();
+        const cvButton = await page.locator('[data-open-cv]').boundingBox();
+        assert(Math.abs(brand.y + brand.height / 2 - cvButton.y - cvButton.height / 2) < 1);
+        assert(brand.x + brand.width <= cvButton.x);
+        assert.match(await page.locator('.site-brand').evaluate(el => getComputedStyle(el).fontFamily), /Georgia/);
+        assert(await page.locator('.site-brand').evaluate(el => parseFloat(getComputedStyle(el).fontSize)) >= (width > 540 ? 24 : 19.2));
+      }
       for (const img of await page.locator('main img').all()) {
         await img.scrollIntoViewIfNeeded();
         await img.evaluate(image => image.decode());
@@ -501,6 +531,14 @@ try {
   await noJsPage.goto(`${base}/#about`);
   assert.equal(await noJsPage.locator('.profile-links a').count(), 5, 'Contact links work without JavaScript');
   assert.equal(await noJsPage.locator('.profile-links svg:visible').count(), 5);
+  await noJsPage.setViewportSize({ width: 390, height: 844 });
+  // Measure in a single frame: a #about anchor can adjust viewport scroll after resize.
+  const noJsLayout = await noJsPage.evaluate(() => {
+    const content = document.querySelector('.profile-content').getBoundingClientRect();
+    const interests = document.querySelector('.profile-interests').getBoundingClientRect();
+    return { contentBottom: content.bottom, interestsTop: interests.top };
+  });
+  assert(noJsLayout.interestsTop >= noJsLayout.contentBottom - 1, `Mobile layout must not depend on JavaScript: ${JSON.stringify(noJsLayout)}`);
   await noJsContext.close();
 
   await page.goto(`${base}/research/`);
@@ -662,9 +700,14 @@ try {
 
   await page.locator('input[name="audience"][value="company"]').check();
   assert.equal(await page.locator('#cv-preview').getAttribute('data-audience'), 'company');
-  assert.equal(await page.locator('.cv-engineering-masthead svg').count(), 1);
+  assert.equal(await page.locator('.cv-circuit').count(), 1);
   assert.equal(await page.locator('.cv-section-code').count(), 5);
-  assert.match(await page.locator('.cv-preview h3').evaluate(el => getComputedStyle(el).fontFamily), /Courier/);
+  assert.match(await page.locator('.cv-preview h3').evaluate(el => getComputedStyle(el).fontFamily), /JetBrains Mono/);
+  await page.evaluate(() => document.fonts.ready);
+  assert(await page.evaluate(() => document.fonts.check('700 24px "JetBrains Mono"')), 'Load the real font for the preview');
+  assert.equal(await page.locator('.cv-result-card').count(), 3);
+  assert.equal(await page.locator('.cv-engineering-main .cv-section-experience').count(), 1);
+  assert.equal(await page.locator('.cv-engineering-rail .cv-section-education').count(), 1);
   for (const width of [1440, 390, 320]) {
     await page.setViewportSize({ width, height: 1100 });
     assert(await page.locator('#cv-preview').evaluate(el => el.scrollWidth <= el.clientWidth + 1), `Company preview overflow at ${width}`);
@@ -685,30 +728,31 @@ try {
   assert(pdfText.includes('Certificate Level in Management (CIMA)'));
   assert(!pdfText.includes('Nalanda College'));
   assert(pdfText.includes('mthathsara@outlook.com'));
-  assert(pdfText.includes('// ENGINEERING CV') && pdfText.includes('01 // PROFESSIONAL PROFILE'));
+  assert(pdfText.includes('miyuru_thathsara.cpp') && pdfText.includes('namespace miyuru {'));
+  assert(pdfText.includes('~20 FPS') && pdfText.includes('~5 W') && pdfText.includes('ENGINEERING RESULTS'));
   const company = pdfInspections.get('company');
-  // PDF.js may split a bold Courier name into separate word items.
+  // The name remains centered; the circuit drawing never replaces live text.
   const companyName = company.firstPage.items.filter(item => item.height >= 22);
   assert.equal(companyName.map(item => item.str).join(' '), 'Miyuru Thathsara');
-  assert(companyName.every(item => company.firstPage.styles[item.fontName].fontFamily === 'monospace'));
   const nameLeft = companyName[0].transform[4], nameRight = companyName.at(-1).transform[4] + companyName.at(-1).width;
   assert(Math.abs((nameLeft + nameRight) / 2 - company.firstPage.width / 2) < 2, 'Keep the company CV name centered');
   assert(company.fonts.has('sans-serif'), 'Keep long descriptions in a readable body font');
   const dateLines = new Map();
-  for (const item of company.firstPage.items.filter(item => item.height === 8.5 && item.transform[4] > 420)) {
+  for (const item of company.firstPage.items.filter(item => Math.abs(item.height - 7.7) < 0.01)) {
     const key = item.transform[5];
     dateLines.set(key, [...(dateLines.get(key) || []), item]);
   }
   for (const date of await page.locator('.cv-entry-date').allTextContents()) {
-    const parts = [...dateLines.values()].find(items => items.map(item => item.str).join(' ') === date.replace(/[\u2010-\u2015]/g, '-'));
+    const parts = [...dateLines.values()].find(items => items.map(item => item.str).join(' ').replace(/ +/g, ' ') === date.replace(/[\u2010-\u2015]/g, '-'));
     assert(parts, `Missing company date: ${date}`);
-    const first = parts[0], last = parts.at(-1);
-    assert(Math.abs(last.transform[4] + last.width - company.firstPage.width + 48) < 2);
-    const title = company.firstPage.items.filter(item => item.transform[4] < first.transform[4] && Math.abs(item.transform[5] - first.transform[5]) < 0.1);
-    assert(title.length && Math.max(...title.map(item => item.transform[4] + item.width)) + 8 < first.transform[4], `Company title/date collision: ${date}`);
+    const first = parts[0];
+    assert(Math.min(Math.abs(first.transform[4] - 42), Math.abs(first.transform[4] - (company.firstPage.width - 42 - 182))) < 2, 'Align dates with their column');
+    const title = company.firstPage.items.find(item => Math.abs(item.height - 9.4) < 0.01 && Math.abs(item.transform[4] - first.transform[4]) < 1 && first.transform[5] - item.transform[5] > 10 && first.transform[5] - item.transform[5] < 18);
+    assert(title, `Put the role or degree on a separate line below its date: ${date}`);
   }
   for (const contact of await page.locator('.cv-contact-row a').evaluateAll(links => links.map(link => ({ label: link.textContent, url: link.href })))) {
-    const item = company.firstPage.items.find(item => item.str === contact.label);
+    const parts = company.firstPage.items.filter(item => Math.abs(item.height - 8) < 0.01);
+    const item = parts.find(item => item.str === contact.label);
     const annotation = company.links.find(link => (link.url || link.unsafeUrl) === contact.url);
     assert(annotation, `Missing company hyperlink: ${contact.label}`);
     assert(Math.abs(annotation.rect[0] - item.transform[4]) < 1 && Math.abs(annotation.rect[2] - item.transform[4] - item.width) < 2);
@@ -717,9 +761,32 @@ try {
   const printedCompany = await downloadPdf('print-company', true);
   assert.deepEqual(pdfInspections.get('print-company').links, []);
   assert(printedCompany.includes('mthathsara@outlook.com') && !printedCompany.includes('LinkedIn'));
+
+  // Results and structural columns must honor explicit choices, not be baked into artwork.
+  await page.locator('#cv-hyperlinks').check();
+  await page.locator('[data-section="highlights"] details').evaluate(el => { el.open = true; });
+  await page.locator('input[data-group="entries"][data-key^="highlights:~20 FPS"]').uncheck();
+  assert.equal(await page.locator('.cv-result-card').count(), 2);
+  const twoResults = await downloadPdf('two-results');
+  assert(!twoResults.includes('~20 FPS') && twoResults.includes('~5 W') && twoResults.includes('AXI DMA'));
+  for (const checkbox of await page.locator('input[data-group="sections"]').all()) await checkbox.uncheck();
+  await page.locator('input[data-group="sections"][data-key="highlights"]').check();
+  await page.locator('input[data-group="entries"][data-key^="highlights:AXI DMA"]').uncheck();
+  const resultOnly = await downloadPdf('result-only');
+  assert(resultOnly.includes('~5 W') && !resultOnly.includes('AXI DMA') && !resultOnly.includes('PROFESSIONAL EXPERIENCE'));
+  await page.locator('input[data-group="sections"][data-key="highlights"]').uncheck();
+  for (const id of ['experience', 'education']) {
+    await page.locator(`input[data-group="sections"][data-key="${id}"]`).check();
+    assert.equal(await page.locator('.cv-single-column').count(), 1);
+    const singleColumn = await downloadPdf(`${id}-only`);
+    assert(singleColumn.includes(id === 'experience' ? 'Project Officer' : 'Certificate Level in Management (CIMA)'));
+    const inspection = pdfInspections.get(`${id}-only`);
+    assert(inspection.firstPage.items.some(item => item.transform[4] < 43 && item.str.includes(id === 'experience' ? 'PROFESSIONAL' : 'EDUCATION')), 'Use the full page for a lone structural column');
+    await page.locator(`input[data-group="sections"][data-key="${id}"]`).uncheck();
+  }
   await page.locator('input[name="audience"][value="academia"]').check();
   assert.equal(await page.locator('#cv-preview').getAttribute('data-audience'), 'academia');
-  assert.equal(await page.locator('.cv-engineering-masthead, .cv-section-code').count(), 0, 'Keep the academic template formal when switching back');
+  assert.equal(await page.locator('.cv-circuit, .cv-section-code, .cv-result-card').count(), 0, 'Keep the academic template formal when switching back');
   await page.locator('input[name="audience"][value="company"]').check();
 
   for (const checkbox of await page.locator('input[data-group="sections"]').all()) await checkbox.check();
@@ -777,6 +844,9 @@ try {
   await mobilePage.locator('[data-open-cv]').tap();
   const [mobileDownload] = await Promise.all([mobilePage.waitForEvent('download'), mobilePage.locator('#cv-download').tap()]);
   assert(mobileDownload.suggestedFilename().endsWith('.pdf'));
+  await mobilePage.locator('input[name="audience"][value="company"]').check();
+  const [mobileCompany] = await Promise.all([mobilePage.waitForEvent('download'), mobilePage.locator('#cv-download').tap()]);
+  assert(mobileCompany.suggestedFilename().includes('Company'));
   await mobileContext.close();
 
   const invalidThemeContext = await browser.newContext({ colorScheme: 'dark' });
@@ -798,6 +868,17 @@ try {
   await retryPage.unroute('**/assets/vendor/jspdf.umd.min.js');
   const [retryDownload] = await Promise.all([retryPage.waitForEvent('download'), retryPage.locator('#cv-download').click()]);
   assert(retryDownload.suggestedFilename().endsWith('.pdf'));
+
+  // Embedded font requests also recover without a reload or broken controls.
+  await retryPage.route('**/assets/fonts/jetbrains-mono/*.ttf', route => route.abort());
+  await retryPage.locator('input[name="audience"][value="company"]').check();
+  await retryPage.locator('#cv-download').click();
+  await retryPage.getByText('The PDF could not be generated.', { exact: false }).waitFor();
+  assert(await retryPage.locator('#cv-download').isEnabled());
+  assert(!await retryPage.locator('#cv-open-pdf').isVisible(), 'Do not offer a stale PDF after a new selection fails');
+  await retryPage.unroute('**/assets/fonts/jetbrains-mono/*.ttf');
+  const [fontRetryDownload] = await Promise.all([retryPage.waitForEvent('download'), retryPage.locator('#cv-download').click()]);
+  assert(fontRetryDownload.suggestedFilename().includes('Company'));
   await retryContext.close();
   console.log('PASS: separate pages, direct reloads, active navigation, legacy links, static portrait, unique affiliation, independent CV scrolling, complete CV data on every page, cross-page preferences, PDF formatting, News exclusion, image zoom, retry, and accessibility');
   console.log(`Artifacts: ${artifacts}`);
