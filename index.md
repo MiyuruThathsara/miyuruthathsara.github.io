@@ -2,19 +2,27 @@
 title: About
 layout: default
 permalink: /
+interests:
+  - Embedded Intelligence
+  - Computer Architecture
+  - Hardware Acceleration
+  - Hardware–Software Co-design
 ---
 
 <div class="profile-layout" id="about">
   <header class="profile-heading">
-    <p class="eyebrow">Embedded Intelligence <span aria-hidden="true">|</span> Hardware Acceleration</p>
     <h1 id="profile-title">Miyuru Thathsara</h1>
     <p class="intro-subtitle">{{ site.data.profile.headline | escape }}, Singapore</p>
   </header>
-  <aside class="profile-sidebar" aria-label="Photograph and profile links">
+  <aside class="profile-sidebar" aria-label="Photograph, profile links, and interests">
     <div class="profile-portrait">
       <div class="profile-photo-frame"><img class="profile-photo" src="{{ '/me.jpeg' | relative_url }}" alt="Miyuru Thathsara beside the Google sign" width="800" height="800" fetchpriority="high"></div>
     </div>
     {% include profile-links.html %}
+    <section class="profile-interests" aria-labelledby="interests-title">
+      <h2 id="interests-title">Interests</h2>
+      <ul>{% for interest in page.interests %}<li>{{ interest | escape }}</li>{% endfor %}</ul>
+    </section>
   </aside>
   <div class="profile-content">
     <section class="introduction" aria-labelledby="profile-title">

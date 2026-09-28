@@ -173,6 +173,12 @@ try {
   }
   const homepage = await page.locator('main').innerText();
   const profileHeading = await page.locator('.profile-heading').innerText();
+  assert.equal(await page.locator('.profile-heading .eyebrow').count(), 0, 'Move the tagline out of the About heading');
+  assert(!profileHeading.includes('Embedded Intelligence') && !profileHeading.includes('Hardware Acceleration'));
+  assert.equal(await page.locator('.profile-sidebar #interests-title').innerText(), 'Interests');
+  assert.deepEqual(await page.locator('.profile-interests li').allTextContents(), [
+    'Embedded Intelligence', 'Computer Architecture', 'Hardware Acceleration', 'Hardware–Software Co-design'
+  ]);
   assert.equal(await page.locator('.intro-subtitle').innerText(), `${sharedData.profile.headline}, Singapore`);
   assert(!profileHeading.includes('College of Computing and Data Science'));
   assert.equal(await page.locator('.profile-college').count(), 0, 'Keep the homepage affiliation on a single line');
@@ -204,6 +210,15 @@ try {
     assert.equal(themeControl.y, cvButton.y, 'Keep CV and theme controls on one row');
     const brand = await page.locator('.site-brand').boundingBox();
     assert(Math.abs(brand.y + brand.height / 2 - cvButton.y - cvButton.height / 2) < 1, 'Align the toolbar with the branding');
+    const brandType = await page.locator('.site-brand').evaluate(el => {
+      const style = getComputedStyle(el);
+      return { font: style.fontFamily, weight: style.fontWeight, size: parseFloat(style.fontSize) };
+    });
+    const nameType = await page.locator('#profile-title').evaluate(el => ({ font: getComputedStyle(el).fontFamily, weight: getComputedStyle(el).fontWeight }));
+    assert.equal(brandType.font, nameType.font, 'Use the same serif font for the header and About-page name');
+    assert.equal(brandType.weight, nameType.weight, 'Match the About-page name weight');
+    assert(brandType.size >= (width > 540 ? 24 : 19.2), 'Make the header name larger on desktop and mobile');
+    assert(brand.x + brand.width <= cvButton.x, 'The larger name must not overlap the header controls');
     assert.equal(await page.locator('.cv-trigger-label').isVisible(), width > 1100, 'Use the CV icon when the label would crowd the header');
     assert.equal(await page.locator('[data-open-cv]').getAttribute('aria-label'), 'Generate CV PDF');
     await page.locator('#theme-toggle').click();
@@ -227,7 +242,11 @@ try {
     assert(contactBounds[0].y >= photo.y + photo.height, 'Place icons beneath the portrait at every width');
     const contactLeft = contactBounds[0].x, contactRight = contactBounds.at(-1).x + contactBounds.at(-1).width;
     assert(Math.abs((contactLeft + contactRight) / 2 - photo.x - photo.width / 2) < 1, 'Center the contact icons beneath the portrait');
+    const interests = await page.locator('.profile-interests').boundingBox();
+    assert(interests.y >= contactBounds[0].y + contactBounds[0].height, 'Place Interests beneath the contact icons');
+    assert(interests.width <= 264 && interests.x >= 0 && interests.x + interests.width <= width, 'Keep Interests compact and within the viewport');
     if (width <= 800) {
+      assert(Math.abs(interests.x + interests.width / 2 - photo.x - photo.width / 2) < 1, 'Center the Interests block beneath the photo on mobile');
       const heading = await page.locator('.profile-heading').boundingBox();
       assert(heading.y + heading.height <= photo.y + 1, 'Mobile name and headline must precede the photograph');
       const nav = await page.locator('.site-header nav').boundingBox();
@@ -243,6 +262,7 @@ try {
         assert(Math.abs((left + right) / 2 - nav.x - nav.width / 2) < 2, `Center every mobile navigation row at ${width}`);
       }
     }
+    else assert(Math.abs(interests.x - photo.x) < 1, 'Align Interests with the left sidebar on desktop');
     if ([1440, 390].includes(width)) {
       await audit();
       await page.screenshot({ path: join(artifacts, `profile-${width}.png`) });

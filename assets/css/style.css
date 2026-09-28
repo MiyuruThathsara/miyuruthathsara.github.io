@@ -72,7 +72,7 @@ a:focus-visible, summary:focus-visible, button:focus-visible, input:focus-visibl
 img { display: block; max-width: 100%; height: auto; }
 p { margin: 0 0 1rem; }
 h1, h2, h3 { color: var(--heading); }
-h1, h2 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; }
+h1, h2, .site-brand { font-family: Georgia, "Times New Roman", serif; font-weight: 400; }
 h1 { margin: 0 0 0.5rem; font-size: clamp(2.3rem, 4.2vw, 3.4rem); line-height: 1.15; letter-spacing: -0.035em; }
 h2 { margin: 0; font-size: 1.85rem; line-height: 1.25; letter-spacing: -0.02em; }
 h3 { margin: 0 0 0.5rem; font-size: 1rem; font-weight: 600; line-height: 1.5; }
@@ -98,7 +98,7 @@ h3 { margin: 0 0 0.5rem; font-size: 1rem; font-weight: 600; line-height: 1.5; }
 .theme-menu input { width: 16px; height: 16px; margin: 0; flex-shrink: 0; accent-color: var(--heading); }
 .theme-menu small { display: block; margin-top: 0.15rem; color: var(--muted); font-size: 0.7rem; }
 .site-header nav { grid-area: nav; justify-content: center; }
-.site-brand { grid-area: brand; display: flex; align-items: center; min-height: 44px; font-size: 1.05rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.3; text-decoration: none; }
+.site-brand { grid-area: brand; display: flex; align-items: center; min-height: 44px; font-size: 1.5rem; letter-spacing: -0.035em; line-height: 1.3; text-decoration: none; }
 nav { display: flex; flex-wrap: wrap; gap: 0.5rem 1.6rem; }
 nav a { padding: 0.5rem 0; font-size: 0.83rem; text-decoration: none; }
 nav a:hover { text-decoration: underline; }
@@ -122,6 +122,10 @@ nav a[aria-current="page"] { color: var(--heading); font-weight: 600; text-decor
 .profile-links a { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 6px; text-decoration: none; }
 .profile-links a:hover { background: var(--wash); }
 .social-icon { display: block; width: 25px; height: 25px; fill: currentColor; }
+.profile-interests { width: 100%; max-width: 264px; margin-top: 1.15rem; padding-top: 1.15rem; border-top: 1px solid var(--line); }
+.profile-interests h2 { margin-bottom: 0.65rem; font-size: 1.2rem; }
+.profile-interests ul { margin: 0; padding-left: 1.1rem; font-size: 0.83rem; }
+.profile-interests li + li { margin-top: 0.35rem; }
 .eyebrow { margin: 0 0 1rem; color: var(--muted); font-size: 0.68rem; letter-spacing: 0.13em; text-transform: uppercase; }
 .intro-subtitle { margin: 1rem 0 1.6rem; font-size: 0.95rem; color: var(--heading); }
 .introduction > p:not([class]) { max-width: 47rem; }
@@ -231,7 +235,7 @@ summary::marker { color: var(--accent); }
   .header-inner, .page-shell, .footer-inner { width: calc(100% - 40px); }
   .header-inner { column-gap: 0.5rem; }
   .header-actions { gap: 0.25rem; padding-left: 0; border-left: 0; }
-  .site-brand { font-size: 0.95rem; }
+  .site-brand { font-size: clamp(1.2rem, 5.6vw, 1.4rem); }
   .site-header nav { display: flex; flex-wrap: wrap; gap: 0.1rem 1rem; }
   .site-header nav a { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; font-size: 0.73rem; }
   h1 { font-size: clamp(2rem, 8.5vw, 2.8rem); }
