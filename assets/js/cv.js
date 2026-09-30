@@ -1,5 +1,4 @@
-import { createCvPdf } from './cv-pdf.js?v=20260929-circuit';
-import { companyLayout, sectionCode } from './cv-company-pdf.js?v=20260929-circuit';
+import { createCvPdf } from './cv-pdf.js?v=20260930-classic';
 
 const dialog = document.querySelector('#cv-dialog');
 const form = document.querySelector('#cv-form');
@@ -13,7 +12,8 @@ const entry = (title = '', meta = '', values = [], url = '') => ({ title, meta, 
 const records = values => values.map(record => ({
   // Preserve existing selection IDs while displaying institution lines with a separator.
   ...entry(record.title, [record.date, [record.organization, record.institution].filter(Boolean).join(' ')].filter(Boolean).join(' | '), record.paragraphs),
-  date: record.date, organization: [record.organization, record.institution].filter(Boolean).join(' · '), coursework: record.coursework
+  date: record.date, organization: [record.organization, record.institution].filter(Boolean).join(' · '), coursework: record.coursework,
+  institution: record.institution || record.organization, department: record.institution ? record.organization : ''
 }));
 const publications = values => values.map(paper => ({
   ...entry(paper.title, [paper.venue, paper.credit].filter(Boolean).join(' '), [paper.summary], paper.url),
@@ -39,7 +39,7 @@ sections.forEach(section => section.items.forEach(item => { item.id = `${section
 const contacts = source.contacts.map(contact => ({ ...contact, url: new URL(contact.url, document.baseURI).href, kind: contact.url.startsWith('mailto:') ? 'email' : 'web' }));
 
 const orders = {
-  company: ['summary', 'highlights', 'experience', 'publications', 'research', 'review', 'contributions', 'expertise', 'education', 'awards', 'earlier', 'interests'],
+  company: ['summary', 'expertise', 'experience', 'highlights', 'education', 'publications', 'research', 'review', 'contributions', 'awards', 'earlier', 'interests'],
   academia: ['summary', 'research', 'highlights', 'education', 'publications', 'review', 'experience', 'expertise', 'awards', 'contributions', 'earlier', 'interests']
 };
 let state;
@@ -122,7 +122,9 @@ function renderOptions() {
   document.querySelector('#cv-descriptions').checked = state.descriptions;
   document.querySelector('#cv-grades').checked = state.grades;
   document.querySelector('#cv-coursework').checked = state.coursework;
-  document.querySelector('#cv-preset-description').textContent = state.audience === 'company' ? 'Circuit / C++: a results-first engineering CV with a circuit-board header, JetBrains Mono typography, and a technical sidebar. The preview stacks columns on small screens; the PDF keeps its A4 layout.' : 'Formal academic template emphasizing research, publications, and academic service.';
+  document.querySelector('#cv-preset-description').textContent = state.audience === 'company'
+    ? 'A simple, single-column résumé with clear headings, concise experience, and results in plain text.'
+    : 'A classic academic CV with Computer Modern serif type, small-cap headings, thin rules, and institution-first education entries.';
   update();
 }
 
@@ -152,18 +154,21 @@ function model() {
         if (!state.descriptions && ['experience', 'publications', 'contributions'].includes(id)) values = [];
         if (!state.grades && ['education', 'earlier'].includes(id)) values = values.filter(value => !/A\/L:|O\/L:/.test(value)).map(value => value.replace(/ · GPA:.*/, ''));
         if (id === 'awards') return entry('', '', [[item.title, ...values].join(' — ')]);
+        if (id === 'highlights') return { ...entry('', '', [`${item.value} — ${values.join(' ')}`]), bullets: true };
+        if (state.audience === 'academia' && id === 'education') {
+          return { title: item.institution, meta: item.title, date: item.date, paragraphs: [...(item.department ? [item.department] : []), ...values] };
+        }
         return {
           title: state.audience === 'company' && id === 'education' && item.title.startsWith('Doctor of Philosophy') ? 'Ph.D., Computer Science' : item.title,
           meta: state.audience === 'company' && id === 'education' && item.title.startsWith('Doctor of Philosophy') ? 'CCDS · NTU, Singapore' : item.citationMeta ?? item.organization ?? item.meta,
           date: item.date, number: id === 'publications' ? index + 1 : undefined,
-          bullets: id === 'experience', paragraphs: values, url: state.hyperlinks ? item.url : '',
-          value: item.value, label: item.label
+          bullets: id === 'experience', paragraphs: values, url: state.hyperlinks ? item.url : ''
         };
       });
       return {
         id,
         title: id === 'summary' && state.audience === 'company' ? 'Professional profile' : section.title,
-        items: id === 'expertise' && items.length && state.audience !== 'company' ? [entry('', '', [items.flatMap(item => item.paragraphs).join('; ')])] : items
+        items: id === 'expertise' && items.length ? [entry('', '', [items.flatMap(item => item.paragraphs).join('; ')])] : items
       };
     }).filter(section => section.items.length)
   };
@@ -172,20 +177,6 @@ function model() {
 function renderPreview(data) {
   preview.dataset.audience = data.audience;
   const header = element('header', 'cv-preview-header');
-  if (data.audience === 'company') {
-    const masthead = element('div', 'cv-source-tab');
-    masthead.append(element('span', '', 'C++'), element('span', '', 'miyuru_thathsara.cpp'));
-    header.append(masthead, element('p', 'cv-namespace', 'namespace miyuru {'));
-    const trace = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    trace.setAttribute('viewBox', '0 0 500 88');
-    trace.setAttribute('focusable', 'false');
-    trace.setAttribute('aria-hidden', 'true');
-    trace.classList.add('cv-circuit');
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', 'M0 10h34l12 12h24 M0 38h50v16h20 M0 70h26l14-14 M500 10h-34l-12 12h-24 M500 38h-50v16h-20 M500 70h-26l-14-14 M18 28h12v-9h12 M482 28h-12v-9h-12 M70 16v12h10v-12z M430 16v12h-10v-12z M70 48v12h10v-12z M430 48v12h-10v-12z');
-    trace.append(path);
-    header.append(trace);
-  }
   header.append(element('h3', '', data.name), element('p', 'cv-headline', data.headline));
   const contactGroup = element('div', 'cv-contacts');
   for (const kind of ['email', 'web']) {
@@ -204,39 +195,11 @@ function renderPreview(data) {
   }
   header.append(contactGroup);
   preview.replaceChildren(header);
-  const containers = new Map();
-  if (data.audience === 'company') {
-    const { top, primary, sidebar } = companyLayout(data);
-    const intro = element('div', 'cv-engineering-intro');
-    const columns = element('div', `cv-engineering-columns${primary.length && sidebar.length ? '' : ' cv-single-column'}`);
-    const main = element('div', 'cv-engineering-main');
-    const rail = element('div', 'cv-engineering-rail');
-    top.forEach(section => containers.set(section.id, intro));
-    primary.forEach(section => containers.set(section.id, main));
-    sidebar.forEach(section => containers.set(section.id, rail));
-    if (primary.length) columns.append(main);
-    if (sidebar.length) columns.append(rail);
-    preview.append(intro, columns);
-  }
   data.sections.forEach(section => {
     const container = element('section', `cv-content-section cv-section-${section.id}`);
-    (containers.get(section.id) || preview).append(container);
+    preview.append(container);
     const heading = element('h4', '', section.title);
-    if (data.audience === 'company') {
-      heading.append(element('span', 'cv-code-brace', ' {'));
-      container.append(element('p', 'cv-section-code', sectionCode(section.id)));
-    }
     container.append(heading);
-    if (data.audience === 'company' && section.id === 'highlights') {
-      const cards = element('div', 'cv-result-grid');
-      section.items.forEach(item => {
-        const card = element('div', 'cv-result-card');
-        card.append(element('span', 'cv-result-label', item.label), element('strong', '', item.value), element('p', '', item.paragraphs.join(' ')));
-        cards.append(card);
-      });
-      container.append(cards);
-      return;
-    }
     section.items.forEach(item => {
       const block = element('div', 'cv-preview-item');
       if (item.number) {
@@ -263,7 +226,6 @@ function renderPreview(data) {
       } else item.paragraphs.forEach(value => block.append(element('p', '', value)));
       container.append(block);
     });
-    if (data.audience === 'company' && !['summary', 'expertise'].includes(section.id)) container.append(element('span', 'cv-closing-brace', '};'));
   });
 }
 
@@ -299,12 +261,12 @@ function loadLibrary() {
 }
 
 // Self-hosted, OFL-licensed fonts: no third-party requests or rasterized text.
-function loadCodeFonts() {
-  if (!fontPromise) fontPromise = Promise.all(['Regular', 'Bold'].map(async weight => {
+function loadAcademicFonts() {
+  if (!fontPromise) fontPromise = Promise.all(['cmunrm', 'cmunbx', 'cmunti'].map(async name => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
     try {
-      const response = await fetch(new URL(`../fonts/jetbrains-mono/JetBrainsMono-${weight}.ttf`, import.meta.url), { signal: controller.signal });
+      const response = await fetch(new URL(`../fonts/computer-modern/${name}.ttf`, import.meta.url), { signal: controller.signal });
       if (!response.ok) throw new Error(`CV font could not load (${response.status})`);
       const bytes = new Uint8Array(await response.arrayBuffer());
       let binary = '';
@@ -345,7 +307,7 @@ form.addEventListener('submit', async event => {
   document.querySelector('#cv-reset').disabled = true;
   status.textContent = 'Preparing your PDF…';
   try {
-    const [jsPDF, fonts] = await Promise.all([loadLibrary(), data.audience === 'company' ? loadCodeFonts() : null]);
+    const [jsPDF, fonts] = await Promise.all([loadLibrary(), data.audience === 'academia' ? loadAcademicFonts() : null]);
     const pdf = createCvPdf(jsPDF, data, fonts);
     const filename = `Miyuru-Thathsara-${data.audience === 'company' ? 'Company' : 'Academic'}-CV.pdf`;
     if (pdfUrl) URL.revokeObjectURL(pdfUrl);
