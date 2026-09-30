@@ -128,7 +128,6 @@ async function readPdf(bytes, name, render = false) {
     if (number === 1) inspection.firstPage = { items, width: viewport.width, styles: content.styles };
     inspection.pages.push(items);
     Object.values(content.styles).forEach(style => inspection.fonts.add(style.fontFamily));
-    if (companyTemplate) assert(Object.values(content.styles).every(style => style.fontFamily === 'sans-serif'), `Keep the company template in plain sans-serif type: ${name}`);
     assert(items.length > 5, `Unexpected empty page in ${name}`);
     for (const item of items) {
       const x = item.transform[4], y = item.transform[5];
@@ -146,14 +145,11 @@ async function readPdf(bytes, name, render = false) {
   }
   console.log(`PDF ${name}: ${pdf.numPages} pages; selectable text and margins verified`);
   // Embedded fonts can have a generic PDF.js fallback family; inspect the PDF's
-  // actual font descriptor to distinguish the two deliberately simple templates.
+  // actual font descriptor to enforce one shared reference-style template.
   const raw = Buffer.from(bytes).toString('latin1');
-  if (companyTemplate) {
-    assert(raw.includes('/BaseFont /Helvetica') && !raw.includes('/FontFile2'), `Use standard, dependency-free company fonts in ${name}`);
-    assert(!/miyuru_thathsara\.cpp|namespace miyuru|C\+\+/.test(text), `No decorative coding labels in ${name}`);
-  } else {
-    assert(raw.includes('/BaseFont /CMUSerif') && raw.includes('/FontFile2'), `Embed Computer Modern for the reference-style academic CV: ${name}`);
-  }
+  assert(raw.includes('/BaseFont /CMUSerif') && raw.includes('/FontFile2'), `Embed Computer Modern for both audiences: ${name}`);
+  assert(!raw.includes('/BaseFont /Helvetica'), 'Do not use a separate sans-serif company template');
+  if (companyTemplate) assert(!/miyuru_thathsara\.cpp|namespace miyuru|C\+\+/.test(text), `No decorative coding labels in ${name}`);
   assert(!raw.includes('/BaseFont /JetBrainsMono') && !raw.includes('/Subtype /Image'), 'No old coding font or rasterized content');
   assert(!/\bNEWS\b/.test(text), `News must never appear in ${name}`);
   if (!['all-sections', 'all-sections-no-descriptions', 'optional-no-grades', 'restored-options'].includes(name)) {
@@ -616,6 +612,11 @@ try {
   assert.equal(await page.locator('#cv-preview h4').first().evaluate(el => getComputedStyle(el).fontVariantCaps), 'small-caps');
   assert.equal(await page.locator('.cv-section-education h5').first().textContent(), 'Nanyang Technological University, Singapore');
   assert.match(await page.locator('.cv-section-education .cv-item-meta').first().textContent(), /Doctor of Philosophy/);
+  const previewTypography = () => page.evaluate(() => ['.cv-preview', '.cv-preview h3', '.cv-preview h4', '.cv-entry-date', '.cv-item-meta'].map(selector => {
+    const style = getComputedStyle(document.querySelector(selector));
+    return [style.fontFamily, style.fontSize, style.fontStyle, style.fontWeight, style.fontVariantCaps, style.color, style.borderBottomColor, style.textTransform];
+  }));
+  const academicTypography = await previewTypography();
   assert.equal(academic.pageCount, 2, 'The default academic CV should occupy two well-spaced pages');
   assert(pdfText.includes('region-aware descriptor grouping'));
   assert(pdfText.includes('approximately 12x faster matching than linear exhaustive search on FPGA'));
@@ -709,7 +710,8 @@ try {
   await page.locator('input[name="audience"][value="company"]').check();
   assert.equal(await page.locator('#cv-preview').getAttribute('data-audience'), 'company');
   assert.equal(await page.locator('.cv-circuit, .cv-section-code, .cv-result-card, .cv-engineering-rail, .cv-source-tab').count(), 0);
-  assert.match(await page.locator('.cv-preview h3').evaluate(el => getComputedStyle(el).fontFamily), /Arial|Helvetica/);
+  assert.deepEqual(await previewTypography(), academicTypography, 'Company and Academia must use exactly the same preview typography');
+  assert.equal(await page.locator('.cv-section-education h5').first().textContent(), 'Nanyang Technological University, Singapore', 'Use the same institution-first education layout');
   assert.equal(await page.locator('.cv-section-highlights li').count(), 3, 'Results are plain bullets, not cards');
   assert.equal(await page.locator('#cv-preview > .cv-section-experience').count(), 1);
   assert.equal(await page.locator('#cv-preview > .cv-section-education').count(), 1, 'One reading column with no sidebar');
@@ -737,13 +739,13 @@ try {
   assert(pdfText.includes('~20 FPS') && pdfText.includes('~5 W') && pdfText.includes('ENGINEERING RESULTS'));
   const company = pdfInspections.get('company');
   // The plain-text name and horizontal contact rows remain centered.
-  const companyName = company.firstPage.items.filter(item => item.height >= 22);
+  const companyName = company.firstPage.items.filter(item => item.height >= 18);
   assert.equal(companyName.map(item => item.str).join(' '), 'Miyuru Thathsara');
   const nameLeft = companyName[0].transform[4], nameRight = companyName.at(-1).transform[4] + companyName.at(-1).width;
   assert(Math.abs((nameLeft + nameRight) / 2 - company.firstPage.width / 2) < 2, 'Keep the company CV name centered');
-  assert(company.fonts.has('sans-serif'), 'Keep long descriptions in a readable body font');
+  assert.equal(companyName[0].height, academic.firstPage.items.find(item => item.str === 'Miyuru Thathsara').height, 'Use the same PDF name size');
   const dateLines = new Map();
-  for (const item of company.firstPage.items.filter(item => Math.abs(item.height - 9) < 0.01 && item.transform[4] > 420)) {
+  for (const item of company.firstPage.items.filter(item => Math.abs(item.height - 10.5) < 0.01 && item.transform[4] > 420)) {
     const key = item.transform[5];
     dateLines.set(key, [...(dateLines.get(key) || []), item]);
   }
@@ -751,12 +753,12 @@ try {
     const parts = [...dateLines.values()].find(items => items.map(item => item.str).join(' ').replace(/ +/g, ' ') === date.replace(/[\u2010-\u2015]/g, '-'));
     assert(parts, `Missing company date: ${date}`);
     const first = parts[0], last = parts.at(-1);
-    assert(Math.abs(last.transform[4] + last.width - company.firstPage.width + 48) < 2, 'Right-align company dates');
-    const title = company.firstPage.items.find(item => Math.abs(item.height - 10.5) < 0.01 && Math.abs(item.transform[5] - first.transform[5]) < 0.1);
+    assert(Math.abs(last.transform[4] + last.width - company.firstPage.width + 42.52) < 2, 'Right-align company dates to the shared margin');
+    const title = company.firstPage.items.find(item => Math.abs(item.height - 10.8) < 0.01 && Math.abs(item.transform[5] - first.transform[5]) < 0.1);
     assert(title && title.transform[4] + title.width + 8 < first.transform[4], `Keep company title and date separate: ${date}`);
   }
   for (const contact of await page.locator('.cv-contact-row a').evaluateAll(links => links.map(link => ({ label: link.textContent, url: link.href })))) {
-    const parts = company.firstPage.items.filter(item => Math.abs(item.height - 9) < 0.01);
+    const parts = company.firstPage.items.filter(item => Math.abs(item.height - 10) < 0.01);
     const item = parts.find(item => item.str === contact.label);
     const annotation = company.links.find(link => (link.url || link.unsafeUrl) === contact.url);
     assert(annotation, `Missing company hyperlink: ${contact.label}`);
@@ -786,7 +788,7 @@ try {
     const singleColumn = await downloadPdf(`${id}-only`);
     assert(singleColumn.includes(id === 'experience' ? 'Project Officer' : 'Certificate Level in Management (CIMA)'));
     const inspection = pdfInspections.get(`${id}-only`);
-    assert(inspection.firstPage.items.some(item => Math.abs(item.transform[4] - 48) < 1 && item.str.includes(id === 'experience' ? 'PROFESSIONAL' : 'EDUCATION')), 'Use the full page width for selected sections');
+    assert(inspection.firstPage.items.some(item => Math.abs(item.transform[4] - 42.52) < 1 && item.height === 12 && item.str === (id === 'experience' ? 'P' : 'E')), 'Align small-cap section headings with the shared page margin');
     await page.locator(`input[data-group="sections"][data-key="${id}"]`).uncheck();
   }
   await page.locator('input[name="audience"][value="academia"]').check();
@@ -875,18 +877,20 @@ try {
   const [retryDownload] = await Promise.all([retryPage.waitForEvent('download'), retryPage.locator('#cv-download').click()]);
   assert(retryDownload.suggestedFilename().endsWith('.pdf'));
 
-  // Embedded font requests also recover without a reload or broken controls.
-  await retryPage.route('**/assets/fonts/computer-modern/*.ttf', route => route.abort());
-  const [fontIndependentCompany] = await Promise.all([retryPage.waitForEvent('download'), retryPage.locator('#cv-download').click()]);
-  assert(fontIndependentCompany.suggestedFilename().includes('Company'), 'The simple company template must not depend on font downloads');
-  await retryPage.locator('input[name="audience"][value="academia"]').check();
-  await retryPage.locator('#cv-download').click();
-  await retryPage.getByText('The PDF could not be generated.', { exact: false }).waitFor();
-  assert(await retryPage.locator('#cv-download').isEnabled());
-  assert(!await retryPage.locator('#cv-open-pdf').isVisible(), 'Do not offer a stale PDF after a new selection fails');
-  await retryPage.unroute('**/assets/fonts/computer-modern/*.ttf');
-  const [fontRetryDownload] = await Promise.all([retryPage.waitForEvent('download'), retryPage.locator('#cv-download').click()]);
-  assert(fontRetryDownload.suggestedFilename().includes('Academic'));
+  // Both audiences share embedded fonts and must recover from a failed first load.
+  for (const audience of ['company', 'academia']) {
+    await retryPage.route('**/assets/fonts/computer-modern/*.ttf', route => route.abort());
+    await retryPage.reload();
+    await retryPage.locator('[data-open-cv]').click();
+    await retryPage.locator(`input[name="audience"][value="${audience}"]`).check();
+    await retryPage.locator('#cv-download').click();
+    await retryPage.getByText('The PDF could not be generated.', { exact: false }).waitFor();
+    assert(await retryPage.locator('#cv-download').isEnabled());
+    assert(!await retryPage.locator('#cv-open-pdf').isVisible(), 'Do not offer a stale PDF after a new selection fails');
+    await retryPage.unroute('**/assets/fonts/computer-modern/*.ttf');
+    const [fontRetryDownload] = await Promise.all([retryPage.waitForEvent('download'), retryPage.locator('#cv-download').click()]);
+    assert(fontRetryDownload.suggestedFilename().includes(audience === 'company' ? 'Company' : 'Academic'));
+  }
   await retryContext.close();
   console.log('PASS: separate pages, direct reloads, active navigation, legacy links, static portrait, unique affiliation, independent CV scrolling, complete CV data on every page, cross-page preferences, PDF formatting, News exclusion, image zoom, retry, and accessibility');
   console.log(`Artifacts: ${artifacts}`);

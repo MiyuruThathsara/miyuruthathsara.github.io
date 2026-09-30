@@ -1,31 +1,28 @@
-// Shared, text-based A4 layout. Academia follows the supplied LaTeX-style reference;
-// Company uses the same straightforward reading order with plain sans-serif type.
+// One reference-style A4 template for both audiences; only their content differs.
 export function createCvPdf(jsPDF, model, fonts) {
   const academic = model.audience === 'academia';
   const pdf = new jsPDF({ unit: 'pt', format: 'a4', compress: true, putOnlyUsedFonts: true });
-  if (academic) {
-    if (fonts?.length !== 3 || fonts.some(font => !font)) throw new Error('Academic fonts are unavailable.');
-    for (const [index, style] of ['normal', 'bold', 'italic'].entries()) {
-      const file = `CMUSerif-${style}.ttf`;
-      pdf.addFileToVFS(file, fonts[index]);
-      pdf.addFont(file, 'CMUSerif', style);
-    }
+  if (fonts?.length !== 3 || fonts.some(font => !font)) throw new Error('CV fonts are unavailable.');
+  for (const [index, style] of ['normal', 'bold', 'italic'].entries()) {
+    const file = `CMUSerif-${style}.ttf`;
+    pdf.addFileToVFS(file, fonts[index]);
+    pdf.addFont(file, 'CMUSerif', style);
   }
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
-  const margin = academic ? 42.52 : 48;
+  const margin = 42.52;
   const width = pageWidth - margin * 2;
   const bottom = pageHeight - 50;
-  const family = academic ? 'CMUSerif' : 'helvetica';
-  const bodySize = academic ? 10.8 : 10;
-  const titleSize = academic ? 10.8 : 10.5;
-  const metaSize = academic ? 10.8 : 9.4;
-  const dateSize = academic ? 10.5 : 9;
+  const family = 'CMUSerif';
+  const bodySize = 10.8;
+  const titleSize = 10.8;
+  const metaSize = 10.8;
+  const dateSize = 10.5;
   const ink = [20, 20, 20];
-  const linkColor = academic ? [0, 0, 180] : ink;
-  const muted = academic ? ink : [65, 65, 65];
-  const entryGap = academic ? 6 : 5;
-  let y = academic ? 30 : 38;
+  const linkColor = [0, 0, 180];
+  const muted = ink;
+  const entryGap = 6;
+  let y = 30;
   const clean = value => String(value).normalize('NFC').replace(/[\u2010-\u2015]/g, '-').replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"').replace(/\u00a0/g, ' ').replace(/\u2197/g, '').replace(/\u00d7/g, 'x');
 
   pdf.setProperties({ title: `${model.name} - ${academic ? 'Academic' : 'Professional'} CV`, author: model.name, subject: 'Curriculum Vitae', creator: 'Miyuru Thathsara CV Generator' });
@@ -70,7 +67,7 @@ export function createCvPdf(jsPDF, model, fonts) {
 
   function entryLayout(item) {
     const indent = item.number ? 22 : 0;
-    pdf.setFont(family, academic ? 'italic' : 'normal').setFontSize(dateSize);
+    pdf.setFont(family, 'italic').setFontSize(dateSize);
     const dateWidth = item.date ? pdf.getTextWidth(clean(item.date)) + 16 : 0;
     const titleWidth = width - indent - dateWidth;
     const titleHeight = item.title ? textHeight(item.title, titleSize, 'bold', titleWidth) : 0;
@@ -86,7 +83,7 @@ export function createCvPdf(jsPDF, model, fonts) {
   }
 
   function contactRows(contacts) {
-    const size = academic ? 10 : 9;
+    const size = 10;
     const gap = 16;
     const lineHeight = size * 1.4;
     pdf.setFont(family, 'normal').setFontSize(size);
@@ -113,7 +110,6 @@ export function createCvPdf(jsPDF, model, fonts) {
         pdf.text(item.label, x, y + size);
         if (item.url) {
           pdf.link(x, y, item.width, lineHeight, { url: item.url });
-          if (!academic) pdf.setDrawColor(...muted).setLineWidth(0.3).line(x, y + size + 1.5, x + item.width, y + size + 1.5);
         }
         x += item.width + gap;
       }
@@ -121,7 +117,7 @@ export function createCvPdf(jsPDF, model, fonts) {
     }
   }
 
-  paragraph(model.name, { size: academic ? 18.5 : 22, style: 'bold', after: 3, align: 'center' });
+  paragraph(model.name, { size: 18.5, style: 'bold', after: 3, align: 'center' });
   paragraph(model.headline, { size: 9.5, after: 4, align: 'center' });
   contactRows(model.contacts.filter(contact => contact.kind === 'email'));
   contactRows(model.contacts.filter(contact => contact.kind === 'web'));
@@ -131,20 +127,18 @@ export function createCvPdf(jsPDF, model, fonts) {
     if (!section.items.length) continue;
     ensure(28 + reserveEntry(section.items[0]));
     y += 7;
-    if (academic) {
-      // Optical small caps, like the reference's LaTeX section headings.
-      let x = margin;
-      for (const word of clean(section.title).split(' ')) {
-        for (const [part, size] of [[word.slice(0, 1).toUpperCase(), 12], [word.slice(1).toUpperCase(), 10]]) {
-          pdf.setFont(family, 'normal').setFontSize(size).setTextColor(...ink);
-          pdf.text(part, x, y + 12);
-          x += pdf.getTextWidth(part);
-        }
-        x += 3;
+    // Optical small caps, like the reference's LaTeX section headings.
+    let x = margin;
+    for (const word of clean(section.title).split(' ')) {
+      for (const [part, size] of [[word.slice(0, 1).toUpperCase(), 12], [word.slice(1).toUpperCase(), 10]]) {
+        pdf.setFont(family, 'normal').setFontSize(size).setTextColor(...ink);
+        pdf.text(part, x, y + 12);
+        x += pdf.getTextWidth(part);
       }
-      y += 15;
-    } else paragraph(section.title.toUpperCase(), { style: 'bold', size: 9.5, after: 2 });
-    pdf.setDrawColor(...(academic ? ink : [150, 150, 150])).setLineWidth(0.5).line(margin, y, pageWidth - margin, y);
+      x += 3;
+    }
+    y += 15;
+    pdf.setDrawColor(...ink).setLineWidth(0.5).line(margin, y, pageWidth - margin, y);
     y += 4;
     for (const item of section.items) {
       ensure(reserveEntry(item));
@@ -154,7 +148,7 @@ export function createCvPdf(jsPDF, model, fonts) {
         pdf.text(`[${item.number}]`, margin, y + titleSize);
       }
       if (item.date) {
-        pdf.setFont(family, academic ? 'italic' : 'normal').setFontSize(dateSize).setTextColor(...muted);
+        pdf.setFont(family, 'italic').setFontSize(dateSize).setTextColor(...muted);
         pdf.text(clean(item.date), pageWidth - margin, y + titleSize, { align: 'right' });
       }
       if (item.title) paragraph(item.title, { style: 'bold', size: titleSize, after: 0, url: item.url, indent, maxWidth: titleWidth });

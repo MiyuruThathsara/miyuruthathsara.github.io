@@ -1,4 +1,4 @@
-import { createCvPdf } from './cv-pdf.js?v=20260930-classic';
+import { createCvPdf } from './cv-pdf.js?v=20260930-shared';
 
 const dialog = document.querySelector('#cv-dialog');
 const form = document.querySelector('#cv-form');
@@ -123,8 +123,8 @@ function renderOptions() {
   document.querySelector('#cv-grades').checked = state.grades;
   document.querySelector('#cv-coursework').checked = state.coursework;
   document.querySelector('#cv-preset-description').textContent = state.audience === 'company'
-    ? 'A simple, single-column résumé with clear headings, concise experience, and results in plain text.'
-    : 'A classic academic CV with Computer Modern serif type, small-cap headings, thin rules, and institution-first education entries.';
+    ? 'The shared classic template, emphasizing technical expertise, professional experience, and engineering results.'
+    : 'The shared classic template, emphasizing research, publications, and academic service.';
   update();
 }
 
@@ -155,12 +155,15 @@ function model() {
         if (!state.grades && ['education', 'earlier'].includes(id)) values = values.filter(value => !/A\/L:|O\/L:/.test(value)).map(value => value.replace(/ · GPA:.*/, ''));
         if (id === 'awards') return entry('', '', [[item.title, ...values].join(' — ')]);
         if (id === 'highlights') return { ...entry('', '', [`${item.value} — ${values.join(' ')}`]), bullets: true };
-        if (state.audience === 'academia' && id === 'education') {
-          return { title: item.institution, meta: item.title, date: item.date, paragraphs: [...(item.department ? [item.department] : []), ...values] };
+        if (id === 'education') {
+          return {
+            title: item.institution,
+            meta: state.audience === 'company' && item.title.startsWith('Doctor of Philosophy') ? 'Ph.D., Computer Science' : item.title,
+            date: item.date, paragraphs: [...(item.department ? [item.department] : []), ...values]
+          };
         }
         return {
-          title: state.audience === 'company' && id === 'education' && item.title.startsWith('Doctor of Philosophy') ? 'Ph.D., Computer Science' : item.title,
-          meta: state.audience === 'company' && id === 'education' && item.title.startsWith('Doctor of Philosophy') ? 'CCDS · NTU, Singapore' : item.citationMeta ?? item.organization ?? item.meta,
+          title: item.title, meta: item.citationMeta ?? item.organization ?? item.meta,
           date: item.date, number: id === 'publications' ? index + 1 : undefined,
           bullets: id === 'experience', paragraphs: values, url: state.hyperlinks ? item.url : ''
         };
@@ -261,7 +264,7 @@ function loadLibrary() {
 }
 
 // Self-hosted, OFL-licensed fonts: no third-party requests or rasterized text.
-function loadAcademicFonts() {
+function loadCvFonts() {
   if (!fontPromise) fontPromise = Promise.all(['cmunrm', 'cmunbx', 'cmunti'].map(async name => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
@@ -307,7 +310,7 @@ form.addEventListener('submit', async event => {
   document.querySelector('#cv-reset').disabled = true;
   status.textContent = 'Preparing your PDF…';
   try {
-    const [jsPDF, fonts] = await Promise.all([loadLibrary(), data.audience === 'academia' ? loadAcademicFonts() : null]);
+    const [jsPDF, fonts] = await Promise.all([loadLibrary(), loadCvFonts()]);
     const pdf = createCvPdf(jsPDF, data, fonts);
     const filename = `Miyuru-Thathsara-${data.audience === 'company' ? 'Company' : 'Academic'}-CV.pdf`;
     if (pdfUrl) URL.revokeObjectURL(pdfUrl);
