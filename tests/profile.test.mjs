@@ -410,6 +410,9 @@ try {
       assert.equal(await page.locator('.research-themes').count(), 0, 'Replace the old theme cards with the Venn diagram');
       assert.equal(await page.locator('#publications .publication').count(), 4);
       assert.equal(await page.locator('.publication h3').count(), 5);
+      assert.equal(await page.locator('#fpl2025 h3 a').getAttribute('href'), 'https://ieeexplore.ieee.org/document/11449132');
+      assert.equal(await page.locator('#fpl2025 a.publication-link').first().getAttribute('href'), 'https://ieeexplore.ieee.org/document/11449132');
+      assert.equal(await page.locator('#fpl2025 .publication-venue span').innerText(), 'First author · Published');
       assert.equal(await page.locator('main #review').count(), 0, 'Review experience belongs on Experience');
       websiteSummaries = await page.locator('.publication > div > p:not(.publication-venue)').allTextContents();
       assert.equal(websiteSummaries.length, 5);
@@ -735,6 +738,7 @@ try {
   }
   const publicationUrls = await page.locator('.cv-entry-link').evaluateAll(links => links.map(link => link.href));
   assert(publicationUrls.length > 0);
+  assert(publicationUrls.includes('https://ieeexplore.ieee.org/document/11449132'), 'Include the published FPL 2025 link in digital CVs');
   assert(publicationUrls.every(url => academic.links.some(link => (link.url || link.unsafeUrl) === url)), 'Publication titles remain clickable in a digital CV');
 
   // Print-friendly output keeps email text and publication content, but no PDF annotations.
@@ -779,6 +783,9 @@ try {
     const certificate = Object.keys(saved.entries).find(key => key.startsWith('education:Certificate Level in Management (CIMA):'));
     saved.entries[certificate.replace('education:Certificate Level in Management (CIMA):', 'earlier:Certificate Level in Management:')] = false;
     delete saved.entries[certificate];
+    const fpl2025 = Object.keys(saved.entries).find(key => key.startsWith('publications:FPGA Stereo Visual SLAM'));
+    saved.entries[fpl2025.replace('First author · Published', 'First author · Accepted')] = false;
+    delete saved.entries[fpl2025];
     localStorage.setItem(key, JSON.stringify(saved));
   });
   await page.goto(`${base}/education/`);
@@ -789,6 +796,7 @@ try {
   assert(await page.locator('input[data-group="entries"][data-key*="Chess"]').isChecked(), 'Preserve existing selections for the restored Chess option');
   assert(!await page.locator('#cv-coursework').isChecked(), 'Coursework starts optional for old saved presets');
   assert(!await page.locator('input[data-group="entries"][data-key*="Certificate Level in Management (CIMA)"]').isChecked(), 'Preserve the old explicit certificate selection');
+  assert(!await page.locator('input[data-group="entries"][data-key*="FPGA Stereo Visual SLAM"]').isChecked(), 'Preserve an excluded FPL 2025 entry after its publication status changes');
 
   await page.locator('input[name="audience"][value="company"]').check();
   assert.equal(await page.locator('#cv-preview').getAttribute('data-audience'), 'company');

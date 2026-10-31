@@ -3,9 +3,9 @@
     "id": "fpl2025",
     "title": "FPGA Stereo Visual SLAM with Efficient Stereo Feature Matching and Key-frame Generation",
     "venue": "FPL 2025",
-    "credit": "First author · Accepted",
+    "credit": "First author · Published",
     "summary": "Helps a robot use two cameras to track its movement and build a map. Custom FPGA hardware matches image features faster, while selective map updates help keep tracking stable.",
-    "url": "",
+    "url": "https://ieeexplore.ieee.org/document/11449132",
     "featured": true,
     "video_id": "vtGebB7Yoc8"
   },

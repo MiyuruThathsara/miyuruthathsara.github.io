@@ -79,6 +79,12 @@ function restore() {
     const previousId = `earlier:Certificate Level in Management:${certificate.meta}`;
     if (typeof saved?.entries?.[previousId] === 'boolean') state.entries[certificate.id] = saved.entries[previousId];
   }
+  // Keep an existing include/exclude choice when FPL 2025 moves to Published.
+  const fpl2025 = sections.find(section => section.id === 'publications').items.find(item => item.cvId === 'fpl2025');
+  if (fpl2025 && typeof saved?.entries?.[fpl2025.id] !== 'boolean') {
+    const previousId = `publications:${fpl2025.title}:FPL 2025 First author · Accepted`;
+    if (typeof saved?.entries?.[previousId] === 'boolean') state.entries[fpl2025.id] = saved.entries[previousId];
+  }
   for (const key of ['hyperlinks', 'descriptions', 'grades', 'coursework']) if (typeof saved?.[key] === 'boolean') state[key] = saved[key];
 }
 
