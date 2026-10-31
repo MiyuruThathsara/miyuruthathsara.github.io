@@ -7,11 +7,34 @@ description: Research and publications in embedded intelligence, visual SLAM, an
 ---
 <div class="research-focus">
   <h2>Current focus</h2>
-  {% for paragraph in site.data.profile.research %}<p>{{ paragraph | escape }}</p>{% endfor %}
+  {% for paragraph in site.data.profile.research %}<p>{{ paragraph | escape | replace: 'Collaborative Robotics', '<strong>Collaborative Robotics</strong>' }}</p>{% endfor %}
 </div>
-<div class="research-themes">
-  {% for theme in site.data.profile.themes %}<div class="research-theme"><h2>{{ theme.title | escape }}</h2><p>{{ theme.summary | escape }}</p></div>{% endfor %}
-</div>
+<figure class="research-map">
+  <svg class="research-venn" viewBox="0 0 400 370" role="img" aria-labelledby="research-venn-title research-venn-description" focusable="false">
+    <title id="research-venn-title">My research at the intersection of three areas</title>
+    <desc id="research-venn-description">Three overlapping circles represent visual understanding, efficient onboard computing, and collaborative autonomy. My research is highlighted in their shared intersection, connecting current work on efficient visual perception with the goal of collaborative robotics.</desc>
+    <defs>
+      <clipPath id="venn-visual"><circle cx="130" cy="130" r="125"/></clipPath>
+      <clipPath id="venn-computing"><circle cx="270" cy="130" r="125"/></clipPath>
+    </defs>
+    <circle class="venn-area venn-area--visual" cx="130" cy="130" r="125"/>
+    <circle class="venn-area venn-area--computing" cx="270" cy="130" r="125"/>
+    <circle class="venn-area venn-area--autonomy" cx="200" cy="230" r="125"/>
+    <g clip-path="url(#venn-visual)"><g clip-path="url(#venn-computing)">
+      <circle class="venn-intersection" cx="200" cy="230" r="125"/>
+    </g></g>
+    {% for theme in site.data.profile.themes %}
+      {% case forloop.index %}{% when 1 %}{% assign label_x = 90 %}{% assign label_y = 55 %}{% when 2 %}{% assign label_x = 307 %}{% assign label_y = 43 %}{% when 3 %}{% assign label_x = 200 %}{% assign label_y = 308 %}{% endcase %}
+      <text class="venn-label" x="{{ label_x }}" y="{{ label_y }}">{% assign words = theme.title | split: ' ' %}{% for word in words %}<tspan x="{{ label_x }}"{% unless forloop.first %} dy="24"{% endunless %}>{{ word | escape }}</tspan>{% endfor %}</text>
+    {% endfor %}
+    <text class="venn-label venn-label--focus" x="200" y="156"><tspan x="200">My</tspan><tspan x="200" dy="24">research</tspan></text>
+  </svg>
+  <figcaption>
+    <dl class="research-definitions">
+      {% for theme in site.data.profile.themes %}<div><dt>{{ theme.title | escape }}</dt><dd>{{ theme.summary | escape }}</dd></div>{% endfor %}
+    </dl>
+  </figcaption>
+</figure>
 <section class="content-section" id="publications" aria-labelledby="publications-title">
   <div class="section-heading"><h2 id="publications-title">Selected publications</h2></div>
   <p class="section-note"><a href="{{ site.scholar_url | escape }}">View Google Scholar <span aria-hidden="true">↗</span></a></p>

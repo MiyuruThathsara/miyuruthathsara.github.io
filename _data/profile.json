@@ -9,20 +9,20 @@
   ],
   "research": [
     "My current research helps a robot estimate its position and build a map using cameras, a process known as visual simultaneous localization and mapping (SLAM). I design the algorithms and the computing hardware together, using reconfigurable chips called FPGAs to make demanding vision tasks faster and more energy efficient.",
-    "This work provides a foundation for robots that can share spatial information and act together. I aim to support practical applications such as precision agriculture, infrastructure inspection, and environmental monitoring."
+    "This work provides a foundation for Collaborative Robotics where robots can share spatial information and act together. I aim to support practical applications such as precision agriculture, infrastructure inspection, and environmental monitoring."
   ],
   "themes": [
     {
       "title": "Visual understanding",
-      "summary": "Using camera images to recognize landmarks, track movement, and build a map of the surroundings."
+      "summary": "Localize and map the surroundings using cameras."
     },
     {
       "title": "Efficient onboard computing",
-      "summary": "Combining software and tailored hardware to process sensor data quickly while using less energy."
+      "summary": "Co-design software and hardware for fast, low-power perception."
     },
     {
       "title": "Collaborative autonomy",
-      "summary": "Working toward teams of robots that share useful observations, align their maps, and coordinate their actions."
+      "summary": "Enable robots to share spatial information and coordinate actions."
     }
   ],
   "experience": [

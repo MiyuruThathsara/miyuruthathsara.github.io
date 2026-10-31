@@ -56,6 +56,34 @@ async function checkMobileNavigation(target = page) {
   });
 }
 
+async function checkResearchDiagram(target = page) {
+  const diagram = target.getByRole('img', { name: 'My research at the intersection of three areas' });
+  assert(await diagram.isVisible(), 'Render the research diagram as an accessible inline SVG');
+  const bounds = await diagram.boundingBox();
+  assert(bounds.width <= 400 && bounds.x >= 0 && bounds.x + bounds.width <= target.viewportSize().width, 'Keep the Venn diagram compact and within the viewport');
+  assert.equal(await diagram.locator('.venn-area').count(), 3);
+  assert.equal(await diagram.locator('.venn-intersection').count(), 1);
+  const labels = await diagram.locator('.venn-label').evaluateAll(nodes => nodes.map(node => {
+    const box = node.getBoundingClientRect();
+    return { left: box.left, right: box.right, top: box.top, bottom: box.bottom, fontSize: parseFloat(getComputedStyle(node).fontSize) * node.getScreenCTM().a };
+  }));
+  for (const [index, label] of labels.entries()) {
+    assert(label.left >= bounds.x && label.right <= bounds.x + bounds.width, 'Keep all labels inside the diagram');
+    assert(label.fontSize >= 14, 'Keep diagram labels readable even at 320px');
+    for (const other of labels.slice(index + 1)) {
+      assert(label.right <= other.left || label.left >= other.right || label.bottom <= other.top || label.top >= other.bottom, 'Venn labels must not overlap');
+    }
+  }
+  assert(await diagram.evaluate(svg => {
+    const label = svg.querySelector('.venn-label--focus').getBBox();
+    const corners = [[label.x, label.y], [label.x + label.width, label.y], [label.x, label.y + label.height], [label.x + label.width, label.y + label.height]];
+    return [...svg.querySelectorAll('.venn-area')].every(circle => corners.every(([x, y]) => Math.hypot(x - circle.cx.baseVal.value, y - circle.cy.baseVal.value) < circle.r.baseVal.value));
+  }), 'Place My research within the actual three-way intersection');
+  const definitions = await target.locator('.research-definitions').boundingBox();
+  if (target.viewportSize().width <= 800) assert(definitions.y >= bounds.y + bounds.height, 'Stack definitions below the diagram on mobile');
+  else assert(definitions.x >= bounds.x + bounds.width, 'Place definitions alongside the diagram on desktop');
+}
+
 const currentTheme = (target = page) => target.locator('input[name="theme-preference"]:checked').inputValue();
 async function chooseTheme(value, target = page) {
   const control = target.locator('.theme-control');
@@ -339,6 +367,12 @@ try {
     if (route === '/research/') {
       assert.equal(await page.locator('h1').innerText(), 'Research');
       assert(await page.locator('.research-focus').isVisible());
+      assert.equal(await page.locator('.research-focus strong').innerText(), 'Collaborative Robotics');
+      assert.deepEqual(await page.locator('.research-focus p').allTextContents(), sharedData.profile.research, 'Preserve the user\'s research text while emphasizing the phrase');
+      assert(sharedData.profile.research.every(paragraph => !/<\/?(?:strong|svg)\b/.test(paragraph)), 'Keep HTML formatting out of shared CV data');
+      assert.deepEqual(await page.locator('.research-definitions dt').allTextContents(), sharedData.profile.themes.map(theme => theme.title));
+      assert((await page.locator('.research-definitions dd').allTextContents()).every(summary => summary.trim().split(/\s+/).length <= 12), 'Keep the theme definitions concise');
+      assert.equal(await page.locator('.research-themes').count(), 0, 'Replace the old theme cards with the Venn diagram');
       assert.equal(await page.locator('#publications .publication').count(), 4);
       assert.equal(await page.locator('.publication h3').count(), 5);
       assert.equal(await page.locator('main #review').count(), 0, 'Review experience belongs on Experience');
@@ -376,6 +410,10 @@ try {
       }
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${route} overflow at ${width}`);
       if (route === '/education/') await checkDisclosures();
+      if (route === '/research/') {
+        await checkResearchDiagram();
+        await page.locator('.research-map').screenshot({ path: join(artifacts, `research-venn-${width}.png`) });
+      }
       for (const figure of await page.locator('.publication-media').all()) {
         const bounds = await figure.boundingBox();
         assert(bounds.width <= 240 && bounds.height <= 215, 'Keep diagrams compact');
@@ -416,6 +454,10 @@ try {
     for (const width of [1440, 390, 320]) {
       await page.setViewportSize({ width, height: 1100 });
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Dark theme overflow at ${route} ${width}`);
+      if (route === '/research/') {
+        await checkResearchDiagram();
+        await page.locator('.research-map').screenshot({ path: join(artifacts, `dark-research-venn-${width}.png`) });
+      }
       if (width === 390) await audit();
       if (width !== 320) await page.screenshot({ path: join(artifacts, `dark-${route.split('/')[1] || 'home'}-${width}.png`) });
     }
@@ -518,6 +560,8 @@ try {
   await noJsPage.locator('nav a[href="/research/"]').click();
   assert.equal(new URL(noJsPage.url()).pathname, '/research/');
   assert(await noJsPage.locator('.research-focus').isVisible(), 'Pages should work without JavaScript');
+  await checkResearchDiagram(noJsPage);
+  assert.equal(await noJsPage.locator('.research-focus strong').innerText(), 'Collaborative Robotics');
   assert(!await noJsPage.locator('.theme-control').isVisible(), 'Do not show an inactive selector without JavaScript');
   assert.equal(await noJsPage.locator('body').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(21, 28, 34)', 'CSS should follow system dark mode without JavaScript');
   await noJsPage.emulateMedia({ colorScheme: 'light' });
