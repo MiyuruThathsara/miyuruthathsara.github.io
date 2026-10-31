@@ -34,7 +34,9 @@ let newsHeadlines = [];
 page.on('pageerror', error => pageErrors.push(error.message));
 
 async function audit() {
-  const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
+  // YouTube owns its cross-origin player markup (which has upstream ARIA issues).
+  // Audit our page, and check the embed's title, controls, and sizing separately.
+  const result = await new AxeBuilder({ page }).exclude('.publication-video iframe').withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
   assert.deepEqual(result.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => n.target) })), []);
 }
 
@@ -74,14 +76,46 @@ async function checkResearchDiagram(target = page) {
       assert(label.right <= other.left || label.left >= other.right || label.bottom <= other.top || label.top >= other.bottom, 'Venn labels must not overlap');
     }
   }
-  assert(await diagram.evaluate(svg => {
-    const label = svg.querySelector('.venn-label--focus').getBBox();
-    const corners = [[label.x, label.y], [label.x + label.width, label.y], [label.x, label.y + label.height], [label.x + label.width, label.y + label.height]];
-    return [...svg.querySelectorAll('.venn-area')].every(circle => corners.every(([x, y]) => Math.hypot(x - circle.cx.baseVal.value, y - circle.cy.baseVal.value) < circle.r.baseVal.value));
-  }), 'Place My research within the actual three-way intersection');
+  const borderClearances = await diagram.evaluate(svg => {
+    const circles = [...svg.querySelectorAll('.venn-area')];
+    return [...svg.querySelectorAll('.venn-label')].flatMap((label, index) => [...label.querySelectorAll('tspan')].flatMap(line => {
+      const { x, y, width, height } = line.getBBox();
+      return circles.map((circle, circleIndex) => {
+        const cx = circle.cx.baseVal.value, cy = circle.cy.baseVal.value, radius = circle.r.baseVal.value;
+        const farthest = Math.max(...[[x, y], [x + width, y], [x, y + height], [x + width, y + height]].map(([px, py]) => Math.hypot(px - cx, py - cy)));
+        const nearest = Math.hypot(Math.max(x - cx, 0, cx - x - width), Math.max(y - cy, 0, cy - y - height));
+        // Each theme stays in its own exclusive area; My work stays inside all three.
+        return { text: line.textContent, circle: circleIndex, clearance: index === circleIndex || label.classList.contains('venn-label--focus') ? radius - farthest : nearest - radius };
+      });
+    }));
+  });
+  assert(borderClearances.every(result => result.clearance >= 6), `Keep every word at least 6 SVG units away from every circle border: ${JSON.stringify(borderClearances.filter(result => result.clearance < 6))}`);
   const definitions = await target.locator('.research-definitions').boundingBox();
   if (target.viewportSize().width <= 800) assert(definitions.y >= bounds.y + bounds.height, 'Stack definitions below the diagram on mobile');
   else assert(definitions.x >= bounds.x + bounds.width, 'Place definitions alongside the diagram on desktop');
+}
+
+async function checkPublicationVideo(target = page) {
+  const video = target.locator('#fpl2025 .publication-video');
+  const iframe = video.locator('iframe');
+  assert(await iframe.isVisible(), 'Show the demo without expanding a disclosure');
+  assert.equal(await target.locator('.demo-disclosure').count(), 0);
+  const source = new URL(await iframe.getAttribute('src'));
+  assert.equal(source.hostname, 'www.youtube-nocookie.com');
+  assert.equal(source.pathname, '/embed/vtGebB7Yoc8');
+  for (const parameter of ['autoplay', 'mute', 'playsinline', 'controls']) assert.equal(source.searchParams.get(parameter), '1');
+  assert((await iframe.getAttribute('allow')).includes('autoplay'));
+  assert(await iframe.getAttribute('title'));
+  const bounds = await video.boundingBox(), frame = await iframe.boundingBox();
+  const figure = await target.locator('#fpt2024 .publication-media').boundingBox();
+  assert(Math.abs(bounds.width - figure.width) < 1 && Math.abs(bounds.height - figure.height) < 1, 'Give the video the same footprint as the other publication diagrams');
+  assert(frame.width >= 200 && frame.height >= 200, 'Meet the minimum YouTube player viewport size');
+  assert(bounds.x >= 0 && bounds.x + bounds.width <= target.viewportSize().width);
+  if (target.viewportSize().width > 540) {
+    const copy = await target.locator('#fpl2025 > div:not(.publication-media)').boundingBox();
+    assert(bounds.x + bounds.width < copy.x, 'Put the demo to the left of its publication text');
+  }
+  assert.equal(await target.getByRole('link', { name: 'Watch on YouTube' }).getAttribute('href'), 'https://www.youtube.com/watch?v=vtGebB7Yoc8');
 }
 
 const currentTheme = (target = page) => target.locator('input[name="theme-preference"]:checked').inputValue();
@@ -371,6 +405,7 @@ try {
       assert.deepEqual(await page.locator('.research-focus p').allTextContents(), sharedData.profile.research, 'Preserve the user\'s research text while emphasizing the phrase');
       assert(sharedData.profile.research.every(paragraph => !/<\/?(?:strong|svg)\b/.test(paragraph)), 'Keep HTML formatting out of shared CV data');
       assert.deepEqual(await page.locator('.research-definitions dt').allTextContents(), sharedData.profile.themes.map(theme => theme.title));
+      assert.equal(await page.locator('.research-definitions dd').first().innerText(), 'Understand the surroundings (perception) and estimate position and orientation (localization) using cameras.');
       assert((await page.locator('.research-definitions dd').allTextContents()).every(summary => summary.trim().split(/\s+/).length <= 12), 'Keep the theme definitions concise');
       assert.equal(await page.locator('.research-themes').count(), 0, 'Replace the old theme cards with the Venn diagram');
       assert.equal(await page.locator('#publications .publication').count(), 4);
@@ -412,7 +447,9 @@ try {
       if (route === '/education/') await checkDisclosures();
       if (route === '/research/') {
         await checkResearchDiagram();
+        await checkPublicationVideo();
         await page.locator('.research-map').screenshot({ path: join(artifacts, `research-venn-${width}.png`) });
+        await page.locator('#fpl2025').screenshot({ path: join(artifacts, `research-video-${width}.png`) });
       }
       for (const figure of await page.locator('.publication-media').all()) {
         const bounds = await figure.boundingBox();
@@ -456,6 +493,7 @@ try {
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Dark theme overflow at ${route} ${width}`);
       if (route === '/research/') {
         await checkResearchDiagram();
+        await checkPublicationVideo();
         await page.locator('.research-map').screenshot({ path: join(artifacts, `dark-research-venn-${width}.png`) });
       }
       if (width === 390) await audit();
@@ -561,6 +599,7 @@ try {
   assert.equal(new URL(noJsPage.url()).pathname, '/research/');
   assert(await noJsPage.locator('.research-focus').isVisible(), 'Pages should work without JavaScript');
   await checkResearchDiagram(noJsPage);
+  await checkPublicationVideo(noJsPage);
   assert.equal(await noJsPage.locator('.research-focus strong').innerText(), 'Collaborative Robotics');
   assert(!await noJsPage.locator('.theme-control').isVisible(), 'Do not show an inactive selector without JavaScript');
   assert.equal(await noJsPage.locator('body').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(21, 28, 34)', 'CSS should follow system dark mode without JavaScript');
@@ -597,7 +636,7 @@ try {
   await audit();
   await page.keyboard.press('Escape');
   assert(await page.locator('[data-vector-url]').evaluate(el => document.activeElement === el));
-  await page.locator('.publication-media').first().click();
+  await page.locator('.publication-media[data-image-viewer]').first().click();
   assert(!await page.locator('#image-vector').isVisible());
   await page.locator('[data-close-image]').click();
   await page.goto(base);

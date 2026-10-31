@@ -10,24 +10,24 @@ description: Research and publications in embedded intelligence, visual SLAM, an
   {% for paragraph in site.data.profile.research %}<p>{{ paragraph | escape | replace: 'Collaborative Robotics', '<strong>Collaborative Robotics</strong>' }}</p>{% endfor %}
 </div>
 <figure class="research-map">
-  <svg class="research-venn" viewBox="0 0 400 370" role="img" aria-labelledby="research-venn-title research-venn-description" focusable="false">
+  <svg class="research-venn" viewBox="0 0 400 385" role="img" aria-labelledby="research-venn-title" aria-describedby="research-venn-description" focusable="false">
     <title id="research-venn-title">My research at the intersection of three areas</title>
     <desc id="research-venn-description">Three overlapping circles represent visual understanding, efficient onboard computing, and collaborative autonomy. My research is highlighted in their shared intersection, connecting current work on efficient visual perception with the goal of collaborative robotics.</desc>
     <defs>
-      <clipPath id="venn-visual"><circle cx="130" cy="130" r="125"/></clipPath>
-      <clipPath id="venn-computing"><circle cx="270" cy="130" r="125"/></clipPath>
+      <clipPath id="venn-visual"><circle cx="122" cy="130" r="120"/></clipPath>
+      <clipPath id="venn-computing"><circle cx="278" cy="130" r="120"/></clipPath>
     </defs>
-    <circle class="venn-area venn-area--visual" cx="130" cy="130" r="125"/>
-    <circle class="venn-area venn-area--computing" cx="270" cy="130" r="125"/>
-    <circle class="venn-area venn-area--autonomy" cx="200" cy="230" r="125"/>
+    <circle class="venn-area venn-area--visual" cx="122" cy="130" r="120"/>
+    <circle class="venn-area venn-area--computing" cx="278" cy="130" r="120"/>
+    <circle class="venn-area venn-area--autonomy" cx="200" cy="243" r="120"/>
     <g clip-path="url(#venn-visual)"><g clip-path="url(#venn-computing)">
-      <circle class="venn-intersection" cx="200" cy="230" r="125"/>
+      <circle class="venn-intersection" cx="200" cy="243" r="120"/>
     </g></g>
     {% for theme in site.data.profile.themes %}
-      {% case forloop.index %}{% when 1 %}{% assign label_x = 90 %}{% assign label_y = 55 %}{% when 2 %}{% assign label_x = 307 %}{% assign label_y = 43 %}{% when 3 %}{% assign label_x = 200 %}{% assign label_y = 308 %}{% endcase %}
+      {% case forloop.index %}{% when 1 %}{% assign label_x = 82 %}{% assign label_y = 99 %}{% when 2 %}{% assign label_x = 309 %}{% assign label_y = 73 %}{% when 3 %}{% assign label_x = 200 %}{% assign label_y = 310 %}{% endcase %}
       <text class="venn-label" x="{{ label_x }}" y="{{ label_y }}">{% assign words = theme.title | split: ' ' %}{% for word in words %}<tspan x="{{ label_x }}"{% unless forloop.first %} dy="24"{% endunless %}>{{ word | escape }}</tspan>{% endfor %}</text>
     {% endfor %}
-    <text class="venn-label venn-label--focus" x="200" y="156"><tspan x="200">My</tspan><tspan x="200" dy="24">research</tspan></text>
+    <text class="venn-label venn-label--focus" x="200" y="151"><tspan x="200">My</tspan><tspan x="200" dy="24">work</tspan></text>
   </svg>
   <figcaption>
     <dl class="research-definitions">
