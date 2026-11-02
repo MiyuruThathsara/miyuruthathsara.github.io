@@ -402,6 +402,7 @@ try {
     if (route === '/research/') {
       assert.equal(await page.locator('h1').innerText(), 'Research');
       assert(await page.locator('.research-focus').isVisible());
+      assert.equal(await page.locator('.research-focus h2').textContent(), 'Current Focus');
       assert.equal(await page.locator('.research-focus strong').innerText(), 'Collaborative Robotics');
       assert.deepEqual(await page.locator('.research-focus p').allTextContents(), sharedData.profile.research, 'Preserve the user\'s research text while emphasizing the phrase');
       assert(sharedData.profile.research.every(paragraph => !/<\/?(?:strong|svg)\b/.test(paragraph)), 'Keep HTML formatting out of shared CV data');

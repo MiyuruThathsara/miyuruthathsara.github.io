@@ -8,8 +8,8 @@
     "More broadly, I am interested in designing efficient computing architectures, including specialized hardware and deep learning accelerators, that bring increasingly capable intelligence directly onto edge devices. Beyond autonomous robotics, these ideas are also relevant to emerging applications such as Augmented Reality (AR) and Mixed Reality (MR), where accurate, low-latency visual perception and localization must be performed continuously under tight computational and energy constraints."
   ],
   "research": [
-    "My current research helps a robot estimate its position and build a map using cameras, a process known as visual simultaneous localization and mapping (SLAM). I design the algorithms and the computing hardware together, using reconfigurable chips called FPGAs to make demanding vision tasks faster and more energy efficient.",
-    "This work provides a foundation for Collaborative Robotics where robots can share spatial information and act together. I aim to support practical applications such as precision agriculture, infrastructure inspection, and environmental monitoring."
+    "My research focuses on enabling robots to understand and navigate their surroundings using cameras through Visual Simultaneous Localization and Mapping (SLAM). I design and develop hardware-aware algorithms and specialized computing architectures to make visual SLAM faster, more energy-efficient, and practical for resource-constrained robotic platforms.",
+    "Building on this foundation, my long-term goal is to advance Collaborative Robotics, enabling multiple robots to share spatial information, coordinate their actions, and operate effectively as a team. This research aims to support real-world applications such as precision agriculture, infrastructure inspection, and environmental monitoring."
   ],
   "themes": [
     {
