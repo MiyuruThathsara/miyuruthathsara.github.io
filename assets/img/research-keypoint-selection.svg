@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="720" viewBox="0 0 480 360" role="img" aria-labelledby="title description">
+  <title id="title">Spatially uniform keypoint selection</title>
+  <desc id="description">Conceptual camera views, not experimental results. The left view contains many detected features concentrated around textured structures. The right view retains a subset of those same features with more even spatial coverage.</desc>
+  <style>
+    :root{--bg:#fcfbf8;--ink:#183b4e;--line:#9babb3;--grid:#dce3e5;--accent:#087c69;--candidate:#a26416}
+    @media(prefers-color-scheme:dark){:root{--bg:#151c22;--ink:#dce3e8;--line:#788d99;--grid:#283844;--accent:#80dbc0;--candidate:#e9bd78}}
+    text{font-family:Arial,Helvetica,sans-serif;fill:var(--ink);font-size:30px;text-anchor:middle}
+    .scene{fill:none;stroke:var(--line);stroke-width:2.5;stroke-linejoin:round}
+    .frame{fill:none;stroke:var(--line);stroke-width:2}
+    .point{stroke:var(--bg);stroke-width:2}
+  </style>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="var(--grid)" stroke-width=".7"/></pattern>
+    <g id="room" class="scene">
+      <path d="M0 22L58 58H194M58 58V154L8 186M58 154H194"/>
+      <path d="M14 55H44V132H14ZM14 93H44M78 30H168V98H78ZM123 30V98M78 64H168"/>
+      <path d="M108 130H170V180H108ZM108 145H170"/>
+    </g>
+    <g id="selected-keypoints" class="point">
+      <circle cx="14" cy="55" r="6"/><circle cx="78" cy="30" r="6"/><circle cx="168" cy="30" r="6"/>
+      <circle cx="194" cy="58" r="6"/><circle cx="44" cy="93" r="6"/><circle cx="123" cy="64" r="6"/>
+      <circle cx="168" cy="98" r="6"/><circle cx="14" cy="132" r="6"/><circle cx="58" cy="154" r="6"/>
+      <circle cx="108" cy="130" r="6"/><circle cx="170" cy="145" r="6"/><circle cx="108" cy="180" r="6"/>
+      <circle cx="170" cy="180" r="6"/><circle cx="8" cy="186" r="6"/>
+    </g>
+    <g id="extra-keypoints" class="point">
+      <circle cx="44" cy="55" r="5"/><circle cx="14" cy="93" r="5"/><circle cx="44" cy="132" r="5"/>
+      <circle cx="123" cy="30" r="5"/><circle cx="78" cy="64" r="5"/><circle cx="168" cy="64" r="5"/>
+      <circle cx="78" cy="98" r="5"/><circle cx="123" cy="98" r="5"/><circle cx="58" cy="58" r="5"/>
+      <circle cx="194" cy="154" r="5"/><circle cx="170" cy="130" r="5"/><circle cx="108" cy="145" r="5"/>
+      <circle cx="85" cy="31" r="5"/><circle cx="94" cy="31" r="5"/><circle cx="104" cy="31" r="5"/>
+      <circle cx="114" cy="31" r="5"/><circle cx="137" cy="31" r="5"/><circle cx="151" cy="31" r="5"/>
+      <circle cx="166" cy="45" r="5"/><circle cx="166" cy="54" r="5"/><circle cx="151" cy="63" r="5"/>
+      <circle cx="141" cy="64" r="5"/><circle cx="124" cy="75" r="5"/><circle cx="123" cy="85" r="5"/>
+      <circle cx="89" cy="98" r="5"/><circle cx="100" cy="98" r="5"/><circle cx="111" cy="98" r="5"/>
+    </g>
+  </defs>
+  <rect width="480" height="360" fill="var(--bg)"/>
+  <rect width="480" height="360" fill="url(#grid)"/>
+  <text x="116" y="43">Detected</text><text x="364" y="43">Selected</text>
+  <g transform="translate(16 70)">
+    <rect class="frame" width="200" height="200" rx="5"/><use href="#room"/>
+    <g fill="var(--candidate)"><use href="#selected-keypoints"/><use href="#extra-keypoints"/></g>
+  </g>
+  <path d="M226 170H251M243 162L251 170L243 178" fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(264 70)">
+    <rect class="frame" width="200" height="200" rx="5"/><use href="#room"/>
+    <path d="M50 0V200M100 0V200M150 0V200M0 50H200M0 100H200M0 150H200" fill="none" stroke="var(--accent)" stroke-opacity=".3" stroke-width="1.5" stroke-dasharray="5 5"/>
+    <use href="#selected-keypoints" fill="var(--accent)"/>
+  </g>
+  <text x="240" y="326" font-weight="600">Even spatial coverage</text>
+</svg>

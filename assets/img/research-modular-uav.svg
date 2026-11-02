@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="720" viewBox="0 0 480 360" role="img" aria-labelledby="title description">
+  <title id="title">A cross-assembled multi-quadrotor UAV</title>
+  <desc id="description">Conceptual top-down illustration, not a drawing to scale. Four quadrotor modules, with four rotors each, are joined by a cross-shaped structure. The highlighted central unit represents one shared flight controller.</desc>
+  <style>
+    :root{--bg:#fcfbf8;--ink:#183b4e;--line:#9babb3;--grid:#dce3e5;--accent:#087c69}
+    @media(prefers-color-scheme:dark){:root{--bg:#151c22;--ink:#dce3e8;--line:#788d99;--grid:#283844;--accent:#80dbc0}}
+    text{font-family:Arial,Helvetica,sans-serif;fill:var(--ink);font-size:29px;text-anchor:middle}
+    .rotor{fill:var(--bg);stroke:var(--ink);stroke-width:3}
+    .arm{fill:none;stroke:var(--ink);stroke-width:6;stroke-linecap:round}
+  </style>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="var(--grid)" stroke-width=".7"/></pattern>
+    <g id="quadrotor">
+      <path class="arm" d="M-24-24L24 24M-24 24L24-24"/>
+      <circle class="rotor" cx="-24" cy="-24" r="14"/><circle class="rotor" cx="24" cy="-24" r="14"/>
+      <circle class="rotor" cx="-24" cy="24" r="14"/><circle class="rotor" cx="24" cy="24" r="14"/>
+      <path d="M-33-24H-15M15-24H33M-33 24H-15M15 24H33" stroke="var(--line)" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="-11" y="-11" width="22" height="22" rx="6" fill="var(--ink)"/>
+    </g>
+  </defs>
+  <rect width="480" height="360" fill="var(--bg)"/>
+  <rect width="480" height="360" fill="url(#grid)"/>
+  <text x="240" y="32">Cross-assembled UAV</text>
+  <path d="M120 180H360M240 90V270" fill="none" stroke="var(--line)" stroke-width="14" stroke-linecap="round"/>
+  <path d="M120 180H360M240 90V270" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="7 6"/>
+  <g id="modules">
+    <use href="#quadrotor" transform="translate(240 90)"/><use href="#quadrotor" transform="translate(120 180)"/>
+    <use href="#quadrotor" transform="translate(360 180)"/><use href="#quadrotor" transform="translate(240 270)"/>
+  </g>
+  <rect x="215" y="159" width="50" height="42" rx="6" fill="var(--bg)" stroke="var(--accent)" stroke-width="4"/>
+  <path d="M225 151V158M235 151V158M245 151V158M255 151V158M225 202V209M235 202V209M245 202V209M255 202V209" stroke="var(--accent)" stroke-width="3"/>
+  <path d="M229 181L236 188L252 172" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="240" y="345" font-size="27" font-weight="600">4 quadrotors · 1 controller</text>
+</svg>

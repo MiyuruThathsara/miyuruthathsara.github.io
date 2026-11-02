@@ -240,6 +240,7 @@ try {
   await page.locator('[data-open-cv]').waitFor({ state: 'visible' });
   assert.equal(await page.title(), 'About | Miyuru Thathsara');
   const sharedData = JSON.parse(await page.locator('#cv-data').textContent());
+  websiteSummaries = sharedData.publications.map(paper => paper.summary);
   const socialContacts = [
     ['LinkedIn', 'linkedin'], ['Google Scholar', 'google-scholar'], ['GitHub', 'github'],
     ['Email Miyuru Thathsara', 'university'], ['Personal website: miyuruthathsara.com', 'website']
@@ -417,9 +418,38 @@ try {
       assert.equal(await page.locator('#fpl2025 a.publication-link').first().getAttribute('href'), 'https://ieeexplore.ieee.org/document/11449132');
       assert.equal(await page.locator('#fpl2025 .publication-venue span').innerText(), 'First author · Published');
       assert.equal(await page.locator('main #review').count(), 0, 'Review experience belongs on Experience');
-      websiteSummaries = await page.locator('.publication > div > p:not(.publication-venue)').allTextContents();
-      assert.equal(websiteSummaries.length, 5);
-      assert(websiteSummaries.every(summary => summary.trim().split(/\s+/).length <= 40));
+      assert.equal(await page.locator('.publication p:not(.publication-authors):not(.publication-venue)').count(), 0, 'Use citation metadata instead of publication descriptions on the website');
+      const expectedAuthors = {
+        fpl2025: ['Miyuru Thathsara', 'Damith Anhettigama', 'Siew-Kei Lam'],
+        fpt2024: ['Miyuru Thathsara', 'Damith Anhettigama', 'Siew-Kei Lam', 'Duvindu Piyasena'],
+        iscas2024: ['Miyuru Thathsara', 'Siew-Kei Lam', 'Damith Kawshan', 'Duvindu Piyasena'],
+        fpl2020: ['Duvindu Piyasena', 'Miyuru Thathsara', 'Sathursan Kanagarajah', 'Siew-Kei Lam', 'Meiqing Wu'],
+        iciafs2018: ['Roshan Lalantha', 'Rohan Munasinghe']
+      };
+      for (const paper of sharedData.publications) {
+        const article = page.locator(`#${paper.id}`);
+        assert.deepEqual(paper.authors, expectedAuthors[paper.id], 'Preserve published author order, including the acknowledged paper');
+        assert.equal(await article.locator('.publication-authors').innerText(), paper.authors.join(', '));
+        assert.equal(await article.locator('.publication-authors strong').count(), paper.contribution ? 0 : 1, 'Highlight Miyuru only where he is a co-author');
+        assert((await article.locator('.publication-venue').innerText()).startsWith(paper.conference));
+        assert.match(paper.conference, /^(2018|2020|2024|2025) .*International (Conference|Symposium) on /);
+        assert(!(await article.innerText()).includes(paper.summary), 'Hide website summaries without removing CV source data');
+        if (!paper.image) continue;
+        assert(paper.image.endsWith('.svg'), 'Use scalable concept diagrams for the four non-video papers');
+        assert.equal(await article.locator('img').getAttribute('src'), paper.image);
+        assert.equal(await article.locator('[data-image-viewer]').getAttribute('href'), paper.image);
+        assert.equal(await article.locator('source').count(), 0, 'Do not load an old raster alternative');
+        assert.match(await article.locator('.image-caption').innerText(), /concept diagram/);
+        const response = await context.request.get(`${base}${paper.image}`);
+        assert(response.ok());
+        const svg = await response.text();
+        const valid = await page.evaluate(source => {
+          const document = new DOMParser().parseFromString(source, 'image/svg+xml');
+          return !document.querySelector('parsererror') && !!document.querySelector('title') && /conceptual/i.test(document.querySelector('desc')?.textContent) && !document.querySelector('image, script');
+        }, svg);
+        assert(valid, 'Concept figures are accessible, self-contained vector drawings, not experimental results');
+      }
+      assert.equal(await page.locator('#iciafs2018 .publication-venue span').innerText(), 'Acknowledged contributor');
     }
     if (route === '/experience/') {
       assert.match(content, /HESL, CCDS/);
@@ -456,6 +486,7 @@ try {
         await checkPublicationVideo();
         await page.locator('.research-map').screenshot({ path: join(artifacts, `research-venn-${width}.png`) });
         await page.locator('#fpl2025').screenshot({ path: join(artifacts, `research-video-${width}.png`) });
+        await page.locator('#publications').screenshot({ path: join(artifacts, `publication-citations-${width}.png`) });
       }
       for (const figure of await page.locator('.publication-media').all()) {
         const bounds = await figure.boundingBox();
@@ -507,7 +538,7 @@ try {
     }
   }
   await page.goto(`${base}/research/`);
-  await page.locator('[data-vector-url]').click();
+  await page.locator('#iscas2024 [data-image-viewer]').click();
   await page.locator('#image-full').evaluate(img => img.decode());
   await audit();
   await page.locator('[data-close-image]').click();
@@ -631,17 +662,18 @@ try {
   await noJsContext.close();
 
   await page.goto(`${base}/research/`);
-  await page.locator('[data-vector-url]').click();
+  await page.locator('#iscas2024 [data-image-viewer]').click();
   await page.locator('#image-full').evaluate(image => image.decode());
   await page.waitForFunction(() => document.querySelector('#image-zoom-out').disabled);
   const initialWidth = (await page.locator('#image-full').boundingBox()).width;
   await page.locator('#image-zoom-in').click();
   assert((await page.locator('#image-full').boundingBox()).width > initialWidth);
-  assert(await page.locator('#image-vector').isVisible());
+  assert(!await page.locator('#image-vector').isVisible(), 'The old architecture PDF must not be linked as the new illustration');
+  assert((await page.locator('#image-original').getAttribute('href')).endsWith('/assets/img/research-feature-matching.svg'));
   await page.locator('#image-fit').click();
   await audit();
   await page.keyboard.press('Escape');
-  assert(await page.locator('[data-vector-url]').evaluate(el => document.activeElement === el));
+  assert(await page.locator('#iscas2024 [data-image-viewer]').evaluate(el => document.activeElement === el));
   await page.locator('.publication-media[data-image-viewer]').first().click();
   assert(!await page.locator('#image-vector').isVisible());
   await page.locator('[data-close-image]').click();

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="720" viewBox="0 0 480 360" role="img" aria-labelledby="title description">
+  <title id="title">Growing a self-organizing neural network on an FPGA</title>
+  <desc id="description">Conceptual illustration, not a hardware floorplan or measured result. Within an FPGA chip outline, a small network grows new highlighted neurons and connections as new objects are learned. Existing network structure is retained.</desc>
+  <style>
+    :root{--bg:#fcfbf8;--ink:#183b4e;--line:#9babb3;--grid:#dce3e5;--accent:#087c69;--new:#a26416}
+    @media(prefers-color-scheme:dark){:root{--bg:#151c22;--ink:#dce3e8;--line:#788d99;--grid:#283844;--accent:#80dbc0;--new:#e9bd78}}
+    text{font-family:Arial,Helvetica,sans-serif;fill:var(--ink);font-size:30px;text-anchor:middle}
+    .wire{fill:none;stroke:var(--line);stroke-width:3;stroke-linejoin:round}
+    .node{fill:var(--bg);stroke:var(--accent);stroke-width:4}
+    .new-node{fill:var(--new);stroke:var(--bg);stroke-width:3}
+  </style>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="var(--grid)" stroke-width=".7"/></pattern>
+    <g id="known-network">
+      <path class="wire" d="M-48-36L4-52L46-8L12 48L-40 34Z M-48-36L-40 34M-48-36L46-8M-40 34L46-8M4-52L12 48"/>
+      <g class="node"><circle cx="-48" cy="-36" r="10"/><circle cx="4" cy="-52" r="10"/><circle cx="46" cy="-8" r="10"/><circle cx="12" cy="48" r="10"/><circle cx="-40" cy="34" r="10"/></g>
+    </g>
+  </defs>
+  <rect width="480" height="360" fill="var(--bg)"/>
+  <rect width="480" height="360" fill="url(#grid)"/>
+  <text x="240" y="34">Learn new objects</text>
+  <g class="wire">
+    <rect x="28" y="68" width="424" height="225" rx="14"/>
+    <path d="M72 56V68M120 56V68M168 56V68M216 56V68M264 56V68M312 56V68M360 56V68M408 56V68M72 293V305M120 293V305M168 293V305M216 293V305M264 293V305M312 293V305M360 293V305M408 293V305M16 110H28M16 150H28M16 190H28M16 230H28M452 110H464M452 150H464M452 190H464M452 230H464"/>
+  </g>
+  <use href="#known-network" transform="translate(120 168)"/>
+  <path d="M208 168H256M246 158L256 168L246 178" fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(350 168)">
+    <use href="#known-network"/>
+    <path d="M4-52L52-66L46-8L70 38L12 48M52-66L70 38" fill="none" stroke="var(--new)" stroke-width="3.5" stroke-dasharray="7 4"/>
+    <circle class="new-node" cx="52" cy="-66" r="11"/><circle class="new-node" cx="70" cy="38" r="11"/>
+  </g>
+  <text x="120" y="273">Before</text><text x="350" y="273">After</text>
+  <text x="240" y="345" font-weight="600">SONN · FPGA</text>
+</svg>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="720" viewBox="0 0 480 360" role="img" aria-labelledby="title description">
+  <title id="title">Matching landmarks between camera views</title>
+  <desc id="description">Conceptual illustration, not experimental output. Five colored lines connect the same visual landmarks in two camera views of a room, illustrating feature correspondences used for visual localization.</desc>
+  <style>
+    :root{--bg:#fcfbf8;--ink:#183b4e;--line:#9babb3;--grid:#dce3e5;--teal:#087c69;--gold:#a26416;--blue:#356fa6}
+    @media(prefers-color-scheme:dark){:root{--bg:#151c22;--ink:#dce3e8;--line:#788d99;--grid:#283844;--teal:#80dbc0;--gold:#e9bd78;--blue:#90bce9}}
+    text{font-family:Arial,Helvetica,sans-serif;fill:var(--ink);font-size:30px;text-anchor:middle}
+    .scene{fill:none;stroke:var(--line);stroke-width:2.5;stroke-linejoin:round}
+    .match-link{stroke:currentColor;stroke-width:4;fill:none}
+    .matched-feature{fill:currentColor;stroke:var(--bg);stroke-width:2.5}
+  </style>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="var(--grid)" stroke-width=".7"/></pattern>
+    <clipPath id="frame"><rect width="200" height="200" rx="5"/></clipPath>
+    <g id="room" class="scene">
+      <path d="M0 22L58 58H200M58 58V154L0 200M58 154H200"/>
+      <path d="M14 55H44V132H14ZM14 93H44M78 30H168V98H78ZM123 30V98M78 64H168"/>
+      <path d="M108 130H170V180H108ZM108 145H170"/>
+    </g>
+  </defs>
+  <rect width="480" height="360" fill="var(--bg)"/>
+  <rect width="480" height="360" fill="url(#grid)"/>
+  <text x="116" y="43">Frame A</text><text x="364" y="43">Frame B</text>
+  <g transform="translate(16 70)"><g clip-path="url(#frame)"><use href="#room"/></g><rect width="200" height="200" rx="5" class="scene"/></g>
+  <g transform="translate(264 70)"><g clip-path="url(#frame)"><use href="#room" transform="translate(-10 8)"/></g><rect width="200" height="200" rx="5" class="scene"/></g>
+  <g color="var(--teal)">
+    <path class="match-link" d="M60 125L298 133"/><circle class="matched-feature" cx="60" cy="125" r="7"/><circle class="matched-feature" cx="298" cy="133" r="7"/>
+    <path class="match-link" d="M74 224L312 232"/><circle class="matched-feature" cx="74" cy="224" r="7"/><circle class="matched-feature" cx="312" cy="232" r="7"/>
+  </g>
+  <g color="var(--gold)">
+    <path class="match-link" d="M139 100L377 108"/><circle class="matched-feature" cx="139" cy="100" r="7"/><circle class="matched-feature" cx="377" cy="108" r="7"/>
+    <path class="match-link" d="M186 250L424 258"/><circle class="matched-feature" cx="186" cy="250" r="7"/><circle class="matched-feature" cx="424" cy="258" r="7"/>
+  </g>
+  <g color="var(--blue)">
+    <path class="match-link" d="M184 168L422 176"/><circle class="matched-feature" cx="184" cy="168" r="7"/><circle class="matched-feature" cx="422" cy="176" r="7"/>
+  </g>
+  <text x="240" y="326" font-weight="600">Same visual landmarks</text>
+</svg>
