@@ -13,16 +13,16 @@
   ],
   "themes": [
     {
-      "title": "Visual understanding",
-      "summary": "Percieve surrounding (perception) and estimate position and orientation (localization) using cameras."
+      "title": "Visual Understanding",
+      "summary": "Enable robots to perceive their surroundings, estimate their position and orientation, and build spatial maps using cameras."
     },
     {
-      "title": "Efficient onboard computing",
-      "summary": "Co-design software and hardware for fast, low-power perception."
+      "title": "Efficient Onboard Computing",
+      "summary": "Co-design algorithms and specialized hardware to enable fast, energy-efficient visual processing on resource-constrained robotic platforms."
     },
     {
-      "title": "Collaborative autonomy",
-      "summary": "Enable robots to share spatial information and coordinate actions."
+      "title": "Collaborative Autonomy",
+      "summary": "Enable multiple robots to share spatial knowledge, coordinate decisions, and work together toward common goals."
     }
   ],
   "experience": [
