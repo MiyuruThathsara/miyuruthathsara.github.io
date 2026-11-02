@@ -1,9 +1,9 @@
 ntu:
   name: Nanyang Technological University
-  logo: /assets/img/logos/ntu.png
-  width: 3006
-  height: 1079
-  source: https://www.ntu.edu.sg/ResourcePackages/NTU/assets/images/NTU_Logo.png
+  logo: /assets/img/logos/ntu-crest.svg
+  width: 110
+  height: 142
+  source: https://www.samanthachan.net/media/icons/brands/ntu.svg
 
 lseg:
   name: LSEG

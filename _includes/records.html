@@ -1,17 +1,6 @@
 {% for record in include.records %}
-{% assign organization = nil %}
-{% if include.show_logos and record.organization_id %}{% assign organization = site.data.organizations[record.organization_id] %}{% endif %}
-<div class="record{% if organization %} record--with-logo{% endif %}">
-  {% if organization %}
-  <div class="record-meta">
-    <div class="organization-logo">
-      <img src="{{ organization.logo | relative_url }}" alt="{{ organization.name | escape }} logo" width="{{ organization.width }}" height="{{ organization.height }}" decoding="async">
-    </div>
-    <p class="record-date">{{ record.date | escape }}</p>
-  </div>
-  {% else %}
+<div class="record">
   <p class="record-date">{{ record.date | escape }}</p>
-  {% endif %}
   <div>
     <{{ include.heading | default: 'h2' }}>{{ record.title | escape }}</{{ include.heading | default: 'h2' }}>
     {% if record.organization != '' %}<p class="record-organization">{{ record.organization | escape }}{% if record.institution %}<br>{{ record.institution | escape }}{% endif %}</p>{% endif %}

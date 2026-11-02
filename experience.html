@@ -5,7 +5,28 @@ section: experience
 permalink: /experience/
 description: Research and engineering experience in FPGA systems, embedded intelligence, and hardware acceleration.
 ---
-{% include records.html records=site.data.profile.experience show_logos=true %}
+<ol class="experience-list" aria-label="Employment history, most recent first">
+  {% for record in site.data.profile.experience %}
+  {% assign organization = site.data.organizations[record.organization_id] %}
+  <li>
+    <article class="experience-card" aria-labelledby="experience-role-{{ forloop.index }}">
+      <header class="experience-card-heading">
+        <div class="organization-logo">
+          <img src="{{ organization.logo | relative_url }}" alt="{{ organization.name | escape }} logo" width="{{ organization.width }}" height="{{ organization.height }}" decoding="async">
+        </div>
+        <div>
+          <h2 id="experience-role-{{ forloop.index }}">{{ record.title | escape }}</h2>
+          <p class="experience-organization">{{ record.organization | escape }}</p>
+          <p class="experience-date">{{ record.date | escape }}</p>
+        </div>
+      </header>
+      <div class="experience-description">
+        {% for paragraph in record.paragraphs %}<p>{{ paragraph | escape }}</p>{% endfor %}
+      </div>
+    </article>
+  </li>
+  {% endfor %}
+</ol>
 <section class="content-section" id="review" aria-labelledby="review-title">
   <div class="section-heading"><h2 id="review-title">Review experience</h2></div>
   {% include records.html records=site.data.profile.review heading='h3' %}
