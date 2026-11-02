@@ -14,11 +14,9 @@ description: Research and engineering experience in FPGA systems, embedded intel
         <div class="organization-logo">
           <img src="{{ organization.logo | relative_url }}" alt="{{ organization.name | escape }} logo" width="{{ organization.width }}" height="{{ organization.height }}" decoding="async">
         </div>
-        <div>
-          <h2 id="experience-role-{{ forloop.index }}">{{ record.title | escape }}</h2>
-          <p class="experience-organization">{{ record.organization | escape }}</p>
-          <p class="experience-date">{{ record.date | escape }}</p>
-        </div>
+        <h2 id="experience-role-{{ forloop.index }}">{{ record.title | escape }}</h2>
+        <p class="experience-organization">{{ record.organization | escape }}</p>
+        <p class="experience-date">{{ record.date | escape }}</p>
       </header>
       <div class="experience-description">
         {% for paragraph in record.paragraphs %}<p>{{ paragraph | escape }}</p>{% endfor %}

@@ -7,9 +7,10 @@ ntu:
 
 lseg:
   name: LSEG
-  logo: /assets/img/logos/lseg.svg
-  width: 120
-  height: 48
+  # Original wordmark paths with equal surrounding space for centered display.
+  logo: /assets/img/logos/lseg-balanced.svg
+  width: 107
+  height: 39
   source: https://www.lseg.com/content/dam/lseg/en_us/images/logos/bespoke/lseg-logo.svg
 
 moratuwa:
