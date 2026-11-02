@@ -14,7 +14,7 @@
   "themes": [
     {
       "title": "Visual understanding",
-      "summary": "Understand the surroundings (perception) and estimate position and orientation (localization) using cameras."
+      "summary": "Percieve surrounding (perception) and estimate position and orientation (localization) using cameras."
     },
     {
       "title": "Efficient onboard computing",

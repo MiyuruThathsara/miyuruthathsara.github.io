@@ -405,7 +405,7 @@ try {
       assert.deepEqual(await page.locator('.research-focus p').allTextContents(), sharedData.profile.research, 'Preserve the user\'s research text while emphasizing the phrase');
       assert(sharedData.profile.research.every(paragraph => !/<\/?(?:strong|svg)\b/.test(paragraph)), 'Keep HTML formatting out of shared CV data');
       assert.deepEqual(await page.locator('.research-definitions dt').allTextContents(), sharedData.profile.themes.map(theme => theme.title));
-      assert.equal(await page.locator('.research-definitions dd').first().innerText(), 'Understand the surroundings (perception) and estimate position and orientation (localization) using cameras.');
+      assert.equal(await page.locator('.research-definitions dd').first().innerText(), 'Percieve surrounding (perception) and estimate position and orientation (localization) using cameras.');
       assert((await page.locator('.research-definitions dd').allTextContents()).every(summary => summary.trim().split(/\s+/).length <= 12), 'Keep the theme definitions concise');
       assert.equal(await page.locator('.research-themes').count(), 0, 'Replace the old theme cards with the Venn diagram');
       assert.equal(await page.locator('#publications .publication').count(), 4);
