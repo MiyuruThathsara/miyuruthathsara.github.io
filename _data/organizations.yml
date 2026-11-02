@@ -1,0 +1,20 @@
+ntu:
+  name: Nanyang Technological University
+  logo: /assets/img/logos/ntu.png
+  width: 3006
+  height: 1079
+  source: https://www.ntu.edu.sg/ResourcePackages/NTU/assets/images/NTU_Logo.png
+
+lseg:
+  name: LSEG
+  logo: /assets/img/logos/lseg.svg
+  width: 120
+  height: 48
+  source: https://www.lseg.com/content/dam/lseg/en_us/images/logos/bespoke/lseg-logo.svg
+
+moratuwa:
+  name: University of Moratuwa
+  logo: /assets/img/logos/university-of-moratuwa.png
+  width: 100
+  height: 100
+  source: https://uom.lk/sites/default/files/logoUoM_0_0_0.png
