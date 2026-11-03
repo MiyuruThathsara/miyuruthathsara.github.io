@@ -1,15 +1,5 @@
 # CV-specific wording; shared entries live in profile.json/publications.json and contacts in _config.yml.
 company_summary: Final-year PhD candidate at NTU, Singapore, building energy-efficient computing for autonomous robots. Combines FPGA acceleration, computer vision, and hardware/software co-design with industry experience in financial market data systems.
-engineering_results:
-  - value: "~20 FPS"
-    label: Real-time perception
-    description: Complete visual SLAM on an FPGA-based SoC.
-  - value: "~5 W"
-    label: Low-power computing
-    description: Power budget of the complete FPGA-SoC visual SLAM system.
-  - value: AXI DMA
-    label: Industry integration
-    description: Multi-channel engine integrated into LSEG's market data pipeline.
 # Company-only editing preserves the full source descriptions on the site and academic CV.
 company_roles:
   Project Officer (Research):

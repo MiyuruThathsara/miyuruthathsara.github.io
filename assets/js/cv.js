@@ -24,7 +24,6 @@ const publications = values => values.map(paper => ({
 // Shared build-time data keeps every page's CV complete. News is deliberately excluded.
 const sections = [
   { id: 'summary', title: 'Profile', items: [entry('', '', source.profile.summary)] },
-  { id: 'highlights', title: 'Engineering results', items: wording.engineering_results.map(result => ({ ...entry(`${result.value} — ${result.label}`, '', [result.description]), ...result })) },
   { id: 'expertise', title: 'Technical expertise', items: wording.expertise.map(value => entry('', '', [value])) },
   { id: 'research', title: 'Research focus', items: [entry('', '', source.profile.research)] },
   { id: 'experience', title: 'Professional experience', items: records(source.profile.experience) },
@@ -40,8 +39,8 @@ sections.forEach(section => section.items.forEach(item => { item.id = `${section
 const contacts = source.contacts.map(contact => ({ ...contact, url: new URL(contact.url, document.baseURI).href, kind: contact.url.startsWith('mailto:') ? 'email' : 'web' }));
 
 const orders = {
-  company: ['summary', 'expertise', 'experience', 'highlights', 'education', 'publications', 'research', 'review', 'contributions', 'awards', 'earlier', 'interests'],
-  academia: ['summary', 'research', 'highlights', 'education', 'publications', 'review', 'experience', 'expertise', 'awards', 'contributions', 'earlier', 'interests']
+  company: ['summary', 'expertise', 'experience', 'education', 'publications', 'research', 'review', 'contributions', 'awards', 'earlier', 'interests'],
+  academia: ['summary', 'research', 'education', 'publications', 'review', 'experience', 'expertise', 'awards', 'contributions', 'earlier', 'interests']
 };
 let state;
 let opener;
@@ -51,7 +50,7 @@ let pdfUrl;
 
 function preset(audience) {
   const selected = audience === 'company'
-    ? ['summary', 'highlights', 'expertise', 'experience', 'education']
+    ? ['summary', 'expertise', 'experience', 'education']
     : ['summary', 'research', 'education', 'publications', 'experience', 'review', 'expertise', 'awards'];
   return {
     audience,
@@ -136,7 +135,7 @@ function renderOptions() {
   document.querySelector('#cv-grades').checked = state.grades;
   document.querySelector('#cv-coursework').checked = state.coursework;
   document.querySelector('#cv-preset-description').textContent = state.audience === 'company'
-    ? 'The shared classic template, emphasizing technical expertise, professional experience, and engineering results.'
+    ? 'The shared classic template, emphasizing technical expertise, professional experience, and education.'
     : 'The shared classic template, emphasizing research, publications, and academic service.';
   update();
 }
@@ -168,7 +167,6 @@ function model() {
         if (!state.descriptions && ['experience', 'publications', 'contributions'].includes(id)) values = [];
         if (!state.grades && ['education', 'earlier'].includes(id)) values = values.filter(value => !/A\/L:|O\/L:/.test(value)).map(value => value.replace(/ · GPA:.*/, ''));
         if (id === 'awards') return entry('', '', [[item.title, ...values].join(' — ')]);
-        if (id === 'highlights') return { ...entry('', '', [`${item.value} — ${values.join(' ')}`]), bullets: true };
         if (id === 'education') {
           return {
             title: item.institution,

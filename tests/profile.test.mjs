@@ -214,6 +214,7 @@ async function readPdf(bytes, name, render = false) {
   if (companyTemplate) assert(!/miyuru_thathsara\.cpp|namespace miyuru|C\+\+/.test(text), `No decorative coding labels in ${name}`);
   assert(!raw.includes('/BaseFont /JetBrainsMono') && !raw.includes('/Subtype /Image'), 'No old coding font or rasterized content');
   assert(!/\bNEWS\b/.test(text), `News must never appear in ${name}`);
+  assert(!/engineering\s*results/i.test(text), `Engineering Results must never appear in ${name}`);
   if (!['all-sections', 'all-sections-no-descriptions', 'optional-no-grades', 'restored-options'].includes(name)) {
     assert(!/\bchess\b|selected coursework|Digital IC Design|Advanced Digital Systems/i.test(text), `Optional details should stay out of the preset: ${name}`);
   }
@@ -820,6 +821,8 @@ try {
     const key = 'miyuru-cv-options-v1';
     const saved = JSON.parse(localStorage.getItem(key));
     delete saved.hyperlinks;
+    saved.sections.highlights = true;
+    saved.entries['highlights:~20 FPS — Real-time perception:'] = true;
     saved.entries['awards:Chess:'] = true;
     // A previously excluded certificate must remain excluded after moving sections.
     const certificate = Object.keys(saved.entries).find(key => key.startsWith('education:Certificate Level in Management (CIMA):'));
@@ -839,6 +842,7 @@ try {
   });
   await page.goto(`${base}/education/`);
   await page.locator('[data-open-cv]').click();
+  assert.equal(await page.locator('[data-section="highlights"], .cv-section-highlights').count(), 0, 'Ignore Engineering Results in old saved selections');
   assert(!await page.locator('input[data-group="contacts"][data-key="university"]').isChecked());
   assert(!await page.locator('input[data-group="entries"][data-key*="Hardware Accelerator for Feature Matching"]').isChecked(), 'Entry selections should persist across pages');
   assert(await page.locator('#cv-hyperlinks').isChecked());
@@ -856,7 +860,7 @@ try {
   assert.equal(await page.locator('.cv-circuit, .cv-section-code, .cv-result-card, .cv-engineering-rail, .cv-source-tab').count(), 0);
   assert.deepEqual(await previewTypography(), academicTypography, 'Company and Academia must use exactly the same preview typography');
   assert.equal(await page.locator('.cv-section-education h5').first().textContent(), 'Nanyang Technological University, Singapore', 'Use the same institution-first education layout');
-  assert.equal(await page.locator('.cv-section-highlights li').count(), 3, 'Results are plain bullets, not cards');
+  assert.equal(await page.locator('[data-section="highlights"], .cv-section-highlights').count(), 0, 'Engineering Results is absent from company options and preview');
   assert.equal(await page.locator('#cv-preview > .cv-section-experience').count(), 1);
   assert.equal(await page.locator('#cv-preview > .cv-section-education').count(), 1, 'One reading column with no sidebar');
   for (const width of [1440, 390, 320]) {
@@ -883,7 +887,6 @@ try {
   assert(!pdfText.includes('Nalanda College'));
   assert(pdfText.includes('mthathsara@outlook.com'));
   assert(!pdfText.includes('.cpp') && !pdfText.includes('namespace'));
-  assert(pdfText.includes('~20 FPS') && pdfText.includes('~5 W') && pdfText.includes('ENGINEERING RESULTS'));
   const company = pdfInspections.get('company');
   // The plain-text name and horizontal contact rows remain centered.
   const companyName = company.firstPage.items.filter(item => item.height >= 18);
@@ -916,19 +919,9 @@ try {
   assert.deepEqual(pdfInspections.get('print-company').links, []);
   assert(printedCompany.includes('mthathsara@outlook.com') && !printedCompany.includes('LinkedIn'));
 
-  // Plain-text results and every section must still honor explicit choices.
+  // The remaining sections must still honor explicit choices.
   await page.locator('#cv-hyperlinks').check();
-  await page.locator('[data-section="highlights"] details').evaluate(el => { el.open = true; });
-  await page.locator('input[data-group="entries"][data-key^="highlights:~20 FPS"]').uncheck();
-  assert.equal(await page.locator('.cv-section-highlights li').count(), 2);
-  const twoResults = await downloadPdf('two-results');
-  assert(!twoResults.includes('~20 FPS') && twoResults.includes('~5 W') && twoResults.includes('AXI DMA'));
   for (const checkbox of await page.locator('input[data-group="sections"]').all()) await checkbox.uncheck();
-  await page.locator('input[data-group="sections"][data-key="highlights"]').check();
-  await page.locator('input[data-group="entries"][data-key^="highlights:AXI DMA"]').uncheck();
-  const resultOnly = await downloadPdf('result-only');
-  assert(resultOnly.includes('~5 W') && !resultOnly.includes('AXI DMA') && !resultOnly.includes('PROFESSIONAL EXPERIENCE'));
-  await page.locator('input[data-group="sections"][data-key="highlights"]').uncheck();
   for (const id of ['experience', 'education']) {
     await page.locator(`input[data-group="sections"][data-key="${id}"]`).check();
     assert.equal(await page.locator('#cv-preview > .cv-content-section').count(), 1);

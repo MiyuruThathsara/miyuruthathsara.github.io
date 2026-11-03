@@ -76,7 +76,6 @@ dialog::backdrop { background: #13252fe0; }
 .cv-preview { --heading: #141414; color: #141414; }
 .cv-preview .cv-contact-row a { color: #141414; }
 .cv-preview .cv-entry-date { color: #414141; }
-.cv-preview .cv-section-highlights .cv-preview-item { margin-bottom: 0.35rem; }
 .cv-preview { font-family: "CMU Serif", "Times New Roman", serif; font-size: 0.9rem; line-height: 1.25; }
 .cv-preview h3 { font-size: 1.5rem; color: #141414; }
 .cv-preview h4 { margin: 1rem 0 0.3rem; padding-bottom: 0.15rem; border-color: #141414; color: #141414; font-size: 1rem; font-weight: 400; font-variant: small-caps; letter-spacing: 0; text-transform: none; }
