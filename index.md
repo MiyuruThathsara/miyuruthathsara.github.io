@@ -12,7 +12,7 @@ interests:
 <div class="profile-layout" id="about">
   <header class="profile-heading">
     <h1 id="profile-title">Miyuru Thathsara</h1>
-    <p class="intro-subtitle">{{ site.data.profile.headline | escape }}, Singapore</p>
+    <p class="intro-subtitle">{% include profile-text.html text=site.data.profile.headline %}, Singapore</p>
   </header>
   <aside class="profile-sidebar" aria-label="Photograph, profile links, and interests">
     <div class="profile-portrait">
@@ -26,7 +26,7 @@ interests:
   </aside>
   <div class="profile-content">
     <section class="introduction" aria-labelledby="profile-title">
-      {% for paragraph in site.data.profile.summary %}<p>{{ paragraph | escape }}</p>{% endfor %}
+      {% for paragraph in site.data.profile.summary %}<p>{% include profile-text.html text=paragraph %}</p>{% endfor %}
     </section>
   </div>
 </div>

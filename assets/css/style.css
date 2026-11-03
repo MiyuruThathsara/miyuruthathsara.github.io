@@ -124,6 +124,9 @@ nav a[aria-current="page"] { color: var(--heading); font-weight: 600; text-decor
 .eyebrow { margin: 0 0 1rem; color: var(--muted); font-size: 0.68rem; letter-spacing: 0.13em; text-transform: uppercase; }
 .intro-subtitle { margin: 1rem 0 1.6rem; font-size: 0.95rem; color: var(--heading); }
 .introduction > p:not([class]) { max-width: 47rem; }
+.introduction strong { color: var(--heading); font-weight: 600; }
+.introduction a, .intro-subtitle a { text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.introduction a:hover, .intro-subtitle a:hover { text-decoration-thickness: 2px; }
 .text-link { display: inline-block; margin-top: 0.15rem; font-size: 0.88rem; font-weight: 600; }
 .content-section { margin-top: 3.25rem; }
 .section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--line); padding-bottom: 0.95rem; margin-bottom: 1.5rem; }

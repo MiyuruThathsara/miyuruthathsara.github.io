@@ -1,0 +1,18 @@
+{%- assign profile_text = include.text | escape -%}
+{%- for annotation in site.data.profile_annotations -%}
+  {%- assign term = annotation.term | escape -%}
+  {%- if profile_text contains term -%}
+    {%- capture formatted_term -%}
+      {%- if annotation.emphasis -%}<strong>{%- endif -%}
+      {%- if annotation.url -%}
+        {%- assign destination = annotation.url -%}
+        {%- assign first_character = destination | slice: 0, 1 -%}
+        {%- if first_character == '/' -%}{%- assign destination = destination | relative_url -%}{%- endif -%}
+        <a href="{{ destination | escape }}">{{ term }}</a>
+      {%- else -%}{{ term }}{%- endif -%}
+      {%- if annotation.emphasis -%}</strong>{%- endif -%}
+    {%- endcapture -%}
+    {%- assign profile_text = profile_text | replace_first: term, formatted_term -%}
+  {%- endif -%}
+{%- endfor -%}
+{{- profile_text -}}

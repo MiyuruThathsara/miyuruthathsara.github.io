@@ -1,0 +1,34 @@
+# About-page formatting only; keep the shared biography and CV source as plain text.
+# Use exact, non-overlapping phrases from profile.json.
+- term: final-year PhD candidate
+  emphasis: true
+- term: Nanyang Technological University
+  url: https://www.ntu.edu.sg/
+- term: efficient onboard computing systems
+  emphasis: true
+- term: hardware-software co-design
+  emphasis: true
+- term: Visual Simultaneous Localization and Mapping (V-SLAM)
+  emphasis: true
+  url: https://www.mathworks.com/discovery/slam.html
+- term: Field-Programmable Gate Array (FPGA)
+  url: https://www.amd.com/en/products/adaptive-socs-and-fpgas/fpga.html
+- term: specialized hardware acceleration
+  emphasis: true
+- term: complete V-SLAM system
+  url: /research/#fpl2025
+- term: approximately 20 FPS
+  emphasis: true
+- term: around 5 W
+  emphasis: true
+- term: ARM Cortex-A53
+  url: https://www.arm.com/products/silicon-ip-cpu/cortex-a/cortex-a53
+- term: collaborative localization and autonomy
+  emphasis: true
+  url: /research/
+- term: deep learning accelerators
+  emphasis: true
+- term: edge devices
+  emphasis: true
+- term: Augmented Reality (AR) and Mixed Reality (MR)
+  url: https://learn.microsoft.com/en-us/windows/mixed-reality/discover/mixed-reality
