@@ -118,14 +118,29 @@ export function createCvPdf(jsPDF, model, fonts) {
   }
 
   paragraph(model.name, { size: 18.5, style: 'bold', after: 3, align: 'center' });
-  paragraph(model.headline, { size: 9.5, after: 4, align: 'center' });
+  paragraph(model.affiliation, { size: 9.5, after: 4, align: 'center' });
+  // Wrap between complete topics, keeping separators away from line boundaries.
+  pdf.setFont(family, 'normal').setFontSize(9.5);
+  const topicRows = [];
+  let topicRow = '';
+  for (const topic of model.topics) {
+    const candidate = topicRow ? `${topicRow} | ${topic}` : topic;
+    if (topicRow && pdf.getTextWidth(clean(candidate)) > width) {
+      topicRows.push(topicRow);
+      topicRow = topic;
+    } else topicRow = candidate;
+  }
+  if (topicRow) topicRows.push(topicRow);
+  paragraph(topicRows.join('\n'), { size: 9.5, after: 4, align: 'center' });
   contactRows(model.contacts.filter(contact => contact.kind === 'email'));
   contactRows(model.contacts.filter(contact => contact.kind === 'web'));
   y += 6;
 
   for (const section of model.sections) {
     if (!section.items.length) continue;
-    ensure(28 + reserveEntry(section.items[0]));
+    const educationHeight = section.id === 'education' ? section.items.reduce((height, item) => height + entryLayout(item).height, 0) : 0;
+    const keepEducationTogether = educationHeight > 0 && educationHeight < (bottom - margin) / 2;
+    ensure(28 + (keepEducationTogether ? educationHeight : reserveEntry(section.items[0])));
     y += 7;
     // Optical small caps, like the reference's LaTeX section headings.
     let x = margin;

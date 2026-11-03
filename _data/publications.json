@@ -1,6 +1,9 @@
 [
   {
     "id": "fpl2025",
+    "doi": "10.1109/FPL68686.2025.00041",
+    "year": 2025,
+    "pages": "236-244",
     "title": "FPGA Stereo Visual SLAM with Efficient Stereo Feature Matching and Key-frame Generation",
     "venue": "FPL 2025",
     "conference": "2025 35th International Conference on Field-Programmable Logic and Applications (FPL)",
@@ -13,6 +16,9 @@
   },
   {
     "id": "fpt2024",
+    "doi": "10.1109/ICFPT64416.2024.11113393",
+    "year": 2024,
+    "pages": "1-2",
     "title": "Hardware-Efficient Homogenized Key-Point Selection for Visual SLAM",
     "venue": "FPT 2024",
     "conference": "2024 International Conference on Field Programmable Technology (ICFPT)",
@@ -29,6 +35,9 @@
   },
   {
     "id": "iscas2024",
+    "doi": "10.1109/ISCAS58744.2024.10558431",
+    "year": 2024,
+    "pages": "1-5",
     "title": "Hardware Accelerator for Feature Matching with Binary Search Tree",
     "venue": "ISCAS 2024",
     "conference": "2024 IEEE International Symposium on Circuits and Systems (ISCAS)",
@@ -45,6 +54,10 @@
   },
   {
     "id": "fpl2020",
+    "doi": "10.1109/FPL50879.2020.00051",
+    "year": 2020,
+    "pages": "262-268",
+    "citation_authors": ["Duvindu Piyasena", "Miyuru Thathsara", "Sathursan Kanagarajah", "Siew Kei Lam", "Meiqing Wu"],
     "title": "Dynamically Growing Neural Network Architecture for Lifelong Deep Learning on the Edge",
     "venue": "FPL 2020",
     "conference": "2020 30th International Conference on Field-Programmable Logic and Applications (FPL)",
@@ -61,6 +74,10 @@
   },
   {
     "id": "iciafs2018",
+    "doi": "10.1109/ICIAFS.2018.8913338",
+    "year": 2018,
+    "pages": "1-6",
+    "citation_title": "Feasibility Study of a Novel Cross Assembled Multi-quadrotor Unmanned Aerial Vehicle",
     "title": "Feasibility Study of a Novel Cross Assembled Multi-quadrotor UAV",
     "venue": "ICIAfS 2018",
     "conference": "2018 IEEE International Conference on Information and Automation for Sustainability (ICIAfS)",

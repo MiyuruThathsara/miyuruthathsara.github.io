@@ -1,0 +1,16 @@
+<dialog class="citation-dialog" id="citation-dialog" aria-labelledby="citation-title">
+  <div class="dialog-header">
+    <h2 id="citation-title">Cite publication</h2>
+    <button class="button button-secondary" type="button" data-close-citation autofocus>Close</button>
+  </div>
+  <div class="citation-content">
+    <p id="citation-reference"></p>
+    <label for="citation-bibtex">BibTeX</label>
+    <textarea id="citation-bibtex" rows="12" readonly spellcheck="false"></textarea>
+    <div class="citation-actions">
+      <button class="button" type="button" id="citation-copy">Copy BibTeX</button>
+      <a class="button button-secondary" id="citation-download" download>Download .bib</a>
+    </div>
+    <p id="citation-status" role="status"></p>
+  </div>
+</dialog>

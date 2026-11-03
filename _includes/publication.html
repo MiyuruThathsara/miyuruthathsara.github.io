@@ -13,10 +13,12 @@
   <div>
     <{{ include.heading | default: 'h2' }}>{% if paper.url != '' %}<a href="{{ paper.url | escape }}">{{ paper.title | escape }}</a>{% else %}{{ paper.title | escape }}{% endif %}</{{ include.heading | default: 'h2' }}>
     <p class="publication-authors">{% for author in paper.authors %}{% unless forloop.first %}, {% endunless %}{% if author == site.title %}<strong>{{ author | escape }}</strong>{% else %}{{ author | escape }}{% endif %}{% endfor %}</p>
-    <p class="publication-venue">{{ paper.conference | escape }} <span>{{ paper.credit | escape }}</span></p>
-    {% if paper.url != '' %}<a class="publication-link" href="{{ paper.url | escape }}" aria-label="Read {{ paper.title | escape }} on IEEE Xplore">Paper <span aria-hidden="true">↗</span></a>{% endif %}
-    {% if paper.video_id %}
-    <a class="publication-link" href="https://www.youtube.com/watch?v={{ paper.video_id | escape }}">Watch on YouTube <span aria-hidden="true">↗</span></a>
-    {% endif %}
+    <p class="publication-venue">{{ paper.conference | escape }}{% if paper.contribution %} <span>{{ paper.credit | escape }}</span>{% endif %}</p>
+    <div class="publication-actions" role="group" aria-label="Links for {{ paper.title | escape }}">
+      {% if paper.url != '' %}<a class="publication-action publication-action--primary" href="{{ paper.url | escape }}" aria-label="Read {{ paper.title | escape }} on IEEE Xplore">{% include publication-icon.html name='paper' %}Paper</a>{% endif %}
+      {% if paper.doi %}<a class="publication-action" href="https://doi.org/{{ paper.doi | escape }}" aria-label="DOI for {{ paper.title | escape }}">{% include publication-icon.html name='doi' %}DOI</a>{% endif %}
+      <a class="publication-action" href="{{ '/assets/citations/' | append: paper.id | append: '.bib' | relative_url }}" data-cite="{{ paper.id }}" aria-label="Cite {{ paper.title | escape }}" download>{% include publication-icon.html name='cite' %}Cite</a>
+      {% if paper.video_id %}<a class="publication-action" href="https://www.youtube.com/watch?v={{ paper.video_id | escape }}" aria-label="Watch video for {{ paper.title | escape }}">{% include publication-icon.html name='video' %}Video</a>{% endif %}
+    </div>
   </div>
 </article>

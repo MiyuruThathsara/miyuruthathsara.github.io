@@ -115,7 +115,7 @@ async function checkPublicationVideo(target = page) {
     const copy = await target.locator('#fpl2025 > div:not(.publication-media)').boundingBox();
     assert(bounds.x + bounds.width < copy.x, 'Put the demo to the left of its publication text');
   }
-  assert.equal(await target.getByRole('link', { name: 'Watch on YouTube' }).getAttribute('href'), 'https://www.youtube.com/watch?v=vtGebB7Yoc8');
+  assert.equal(await target.getByRole('link', { name: /^Watch video for/ }).getAttribute('href'), 'https://www.youtube.com/watch?v=vtGebB7Yoc8');
 }
 
 const currentTheme = (target = page) => target.locator('input[name="theme-preference"]:checked').inputValue();
@@ -215,6 +215,7 @@ async function readPdf(bytes, name, render = false) {
   assert(!raw.includes('/BaseFont /JetBrainsMono') && !raw.includes('/Subtype /Image'), 'No old coding font or rasterized content');
   assert(!/\bNEWS\b/.test(text), `News must never appear in ${name}`);
   assert(!/engineering\s*results/i.test(text), `Engineering Results must never appear in ${name}`);
+  assert(!text.includes('CORe50'), `Keep dataset-specific wording out of ${name}`);
   if (!['all-sections', 'all-sections-no-descriptions', 'optional-no-grades', 'restored-options'].includes(name)) {
     assert(!/\bchess\b|selected coursework|Digital IC Design|Advanced Digital Systems/i.test(text), `Optional details should stay out of the preset: ${name}`);
   }
@@ -281,7 +282,10 @@ try {
   assert.equal((profileHeading.match(/Nanyang Technological University/g) || []).length, 1, 'Keep a single university in the profile heading');
   assert(!/Ph\.D\. Candidate|Nanyang Technological University/.test(await page.locator('.profile-sidebar').innerText()), 'Do not duplicate the affiliation in the sidebar');
   assert.deepEqual(await page.locator('.introduction > p').allTextContents(), sharedData.profile.summary, 'Render the complete supplied bio as separate paragraphs');
-  assert.equal(await page.locator('main #news, main #research, main #publications, main #experience, main #education, main #review, main #contact').count(), 0, 'Homepage must not contain the other full pages');
+  assert.equal(await page.locator('main #news, main #research, main #publications, main #experience, main #education, main #review').count(), 0, 'Homepage must not contain the other full pages');
+  assert.equal(await page.locator('.profile-sidebar #contact').count(), 1);
+  assert.deepEqual(await page.locator('#contact a').evaluateAll(links => links.map(link => link.href)), ['university', 'personal', 'website'].map(id => new URL(sharedData.contacts.find(contact => contact.id === id).url).href));
+  assert(!/Contact me|Explore research|Read the latest news/.test(homepage));
   assert.equal(await page.locator('.profile-photo').getAttribute('src'), '/me.jpeg');
   assert(await page.locator('.profile-photo').evaluate(img => !img.closest('a, button, [data-image-viewer]')), 'The profile photo should be static');
   assert(!homepage.includes('View full photograph'));
@@ -331,10 +335,14 @@ try {
     const contactLeft = contactBounds[0].x, contactRight = contactBounds.at(-1).x + contactBounds.at(-1).width;
     assert(Math.abs((contactLeft + contactRight) / 2 - photo.x - photo.width / 2) < 1, 'Center the contact icons beneath the portrait');
     const interests = await page.locator('.profile-interests').boundingBox();
+    const contactDetails = await page.locator('.profile-contact').boundingBox();
+    assert(contactDetails.x >= 0 && contactDetails.x + contactDetails.width <= width);
+    assert(interests.y >= contactDetails.y + contactDetails.height);
     assert(interests.y >= contactBounds[0].y + contactBounds[0].height, 'Place Interests beneath the contact icons');
     assert(interests.x >= 0 && interests.x + interests.width <= width, 'Keep Interests within the viewport');
     if (width <= 800) {
       const content = await page.locator('.profile-content').boundingBox();
+      assert(contactDetails.y >= content.y + content.height, 'Stack contact details beneath the mobile biography');
       assert(interests.y >= content.y + content.height, 'Move Interests below all About content on mobile');
       assert(Math.abs(interests.width - content.width) < 1 && Math.abs(interests.x - content.x) < 1, 'Fill the mobile content width with the interest cards');
       assert(await page.locator('.profile-interests ul').evaluate(el => parseFloat(getComputedStyle(el).fontSize) >= 17));
@@ -344,6 +352,7 @@ try {
     }
     else {
       assert(interests.width <= 264);
+      assert(Math.abs(contactDetails.x - photo.x) < 1 && contactDetails.width <= 264, 'Keep contact details in the left desktop column');
       assert(Math.abs(interests.x - photo.x) < 1, 'Keep Interests in the desktop sidebar');
     }
     if ([1440, 390].includes(width)) {
@@ -362,7 +371,7 @@ try {
     assert(tab.x >= strip.x - 1 && tab.x + tab.width <= strip.x + strip.width + 1);
   }
 
-  const routes = ['/', '/news/', '/research/', '/experience/', '/education/', '/contact/'];
+  const routes = ['/', '/news/', '/research/', '/experience/', '/education/'];
   assert.deepEqual(await page.locator('nav a').evaluateAll(links => links.map(link => new URL(link.href).pathname)), routes);
   let referenceCv;
   for (const route of routes) {
@@ -417,8 +426,9 @@ try {
       assert.equal(await page.locator('#publications .publication').count(), 4);
       assert.equal(await page.locator('.publication h3').count(), 5);
       assert.equal(await page.locator('#fpl2025 h3 a').getAttribute('href'), 'https://ieeexplore.ieee.org/document/11449132');
-      assert.equal(await page.locator('#fpl2025 a.publication-link').first().getAttribute('href'), 'https://ieeexplore.ieee.org/document/11449132');
-      assert.equal(await page.locator('#fpl2025 .publication-venue span').innerText(), 'First author · Published');
+      assert.equal(await page.locator('#fpl2025 .publication-action--primary').getAttribute('href'), 'https://ieeexplore.ieee.org/document/11449132');
+      assert.equal(await page.locator('#publications .publication-venue span').count(), 0, 'Hide authorship and disclosure labels on authored website papers');
+      assert.equal(await page.locator('#iciafs2018 .publication-venue span').innerText(), 'Acknowledged contributor');
       assert.equal(await page.locator('main #review').count(), 0, 'Review experience belongs on Experience');
       assert.equal(await page.locator('.publication p:not(.publication-authors):not(.publication-venue)').count(), 0, 'Use citation metadata instead of publication descriptions on the website');
       const expectedAuthors = {
@@ -436,6 +446,38 @@ try {
         assert((await article.locator('.publication-venue').innerText()).startsWith(paper.conference));
         assert.match(paper.conference, /^(2018|2020|2024|2025) .*International (Conference|Symposium) on /);
         assert(!(await article.innerText()).includes(paper.summary), 'Hide website summaries without removing CV source data');
+        assert(await article.locator('h3').evaluate(el => parseInt(getComputedStyle(el).fontWeight, 10) >= 700));
+        assert.equal(await article.locator('.publication-actions a').count(), paper.video_id ? 4 : 3);
+        assert.equal(await article.getByRole('link', { name: `DOI for ${paper.title}`, exact: true }).getAttribute('href'), `https://doi.org/${paper.doi}`);
+        const cite = article.locator('[data-cite]');
+        const bibResponse = await context.request.get(`${base}${await cite.getAttribute('href')}`);
+        assert(bibResponse.ok());
+        const bibtex = await bibResponse.text();
+        assert(bibtex.includes(`doi = {${paper.doi}}`) && bibtex.includes(`year = {${paper.year}}`));
+        assert(bibtex.includes(`pages = {${paper.pages.replace('-', '--')}}`));
+        if (paper.contribution) assert(!bibtex.includes('Thathsara'), 'Acknowledgement is not authorship');
+        await cite.click();
+        await page.waitForFunction(() => !document.querySelector('#citation-copy').disabled);
+        assert.equal(await page.locator('#citation-bibtex').inputValue(), bibtex);
+        assert((await page.locator('#citation-reference').innerText()).includes(paper.citation_title || paper.title));
+        await audit();
+        if (paper.id === 'fpl2025') {
+          await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: base });
+          await page.locator('#citation-copy').click();
+          await page.waitForFunction(() => document.querySelector('#citation-status').textContent === 'Citation copied.');
+          assert.equal(await page.evaluate(() => navigator.clipboard.readText()), bibtex);
+          const [citationDownload] = await Promise.all([page.waitForEvent('download'), page.locator('#citation-download').click()]);
+          assert.equal(citationDownload.suggestedFilename(), `${paper.id}.bib`);
+          assert.equal(await readFile(await citationDownload.path(), 'utf8'), bibtex);
+          for (const width of [1440, 390, 320]) {
+            await page.setViewportSize({ width, height: 1100 });
+            assert(await page.locator('#citation-dialog').evaluate(el => el.scrollWidth <= el.clientWidth + 1));
+            await page.screenshot({ path: join(artifacts, `citation-${width}.png`) });
+          }
+          await page.setViewportSize({ width: 1440, height: 1100 });
+        }
+        await page.keyboard.press('Escape');
+        assert(await cite.evaluate(el => document.activeElement === el));
         if (!paper.image) continue;
         assert(paper.image.endsWith('.svg'), 'Use scalable concept diagrams for the four non-video papers');
         assert.equal(await article.locator('img').getAttribute('src'), paper.image);
@@ -462,7 +504,6 @@ try {
       assert.equal(await consultingRole.locator('img').getAttribute('alt'), 'ChipTip Technologies logo');
       assert.match(await page.locator('#review').innerText(), /External Reviewer[\s\S]*ICCAD 2026/);
     }
-    if (route === '/contact/') assert(!content.includes(sharedData.profile.interests), 'Keep the personal-interest note off the Contact page');
     if (route === '/education/') {
       assert(content.includes('Honours & awards') && content.includes('NTU Research Scholarship'));
       assert(content.includes('Chess') && content.includes('Selected coursework'), 'Show discoverable disclosure labels');
@@ -499,6 +540,10 @@ try {
       for (const figure of await page.locator('.publication-media').all()) {
         const bounds = await figure.boundingBox();
         assert(bounds.width <= 240 && bounds.height <= 215, 'Keep diagrams compact');
+      }
+      for (const action of await page.locator('.publication-action').all()) {
+        const box = await action.boundingBox();
+        assert(box.height >= 44 && box.x >= 0 && box.x + box.width <= width, 'Publication actions wrap within mobile width and remain easy to tap');
       }
       if (width !== 320) {
         await page.evaluate(() => scrollTo(0, 0));
@@ -617,6 +662,8 @@ try {
   await page.goto(`${base}/#research`);
   await page.waitForURL('**/research/');
   await page.goto(`${base}/contact/`);
+  await page.waitForURL(`${base}/#contact`);
+  assert(await page.locator('#contact').isVisible());
   await page.goto(`${base}/#profile`);
   await page.waitForURL(`${base}/#about`);
   assert(await page.locator('#about').isVisible());
@@ -645,6 +692,8 @@ try {
   assert(await noJsPage.locator('.research-focus').isVisible(), 'Pages should work without JavaScript');
   await checkResearchDiagram(noJsPage);
   await checkPublicationVideo(noJsPage);
+  const noJsBib = await noJsPage.locator('#fpl2025 [data-cite]').getAttribute('href');
+  assert((await noJsContext.request.get(`${base}${noJsBib}`)).ok(), 'Cite links have downloadable BibTeX without JavaScript');
   assert.equal(await noJsPage.locator('.research-focus strong').innerText(), 'Collaborative Robotics');
   assert(!await noJsPage.locator('.theme-control').isVisible(), 'Do not show an inactive selector without JavaScript');
   assert.equal(await noJsPage.locator('body').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(21, 28, 34)', 'CSS should follow system dark mode without JavaScript');
@@ -656,6 +705,9 @@ try {
   await noJsPage.waitForURL('**/research/#publications');
   await noJsPage.goto(`${base}/education/`);
   await checkDisclosures(noJsPage);
+  await noJsPage.goto(`${base}/contact/`);
+  await noJsPage.waitForURL(`${base}/#contact`);
+  assert.equal(await noJsPage.locator('#contact a').count(), 3);
   await noJsPage.goto(`${base}/#about`);
   assert.equal(await noJsPage.locator('.profile-links a').count(), 5, 'Contact links work without JavaScript');
   assert.equal(await noJsPage.locator('.profile-links svg:visible').count(), 5);
@@ -731,6 +783,7 @@ try {
   assert.match(pdfText, /Hardware Accelerator for Feature Matching/);
   assert(!pdfText.includes('Nalanda College'));
   assert(pdfText.includes('Certificate Level in Management (CIMA)'));
+  assert(pdfText.includes('Sri Lankan Olympiad Mathematics Competition'));
   assert(pdfText.indexOf('REVIEW EXPERIENCE') < pdfText.indexOf('PROFESSIONAL EXPERIENCE'), 'Prioritize academic review service in the academic CV');
   assert(!pdfText.includes('Cross Assembled Multi-quadrotor'));
   assert(pdfText.indexOf('RESEARCH FOCUS') < pdfText.indexOf('PROFESSIONAL EXPERIENCE'));
@@ -823,6 +876,14 @@ try {
     delete saved.hyperlinks;
     saved.sections.highlights = true;
     saved.entries['highlights:~20 FPS — Real-time perception:'] = true;
+    // Previously excluded groups should stay excluded after splitting expertise topics.
+    for (const item of JSON.parse(document.querySelector('#cv-wording').textContent).expertise) {
+      delete saved.entries[`expertise:${item.id}`];
+      if (item.previous_selection_key) saved.entries[`expertise:${item.previous_selection_key}:`] = false;
+    }
+    saved.entries['awards:Olympiad Mathematics Competition:'] = false;
+    delete saved.topics;
+    delete saved.affiliation;
     saved.entries['awards:Chess:'] = true;
     // A previously excluded certificate must remain excluded after moving sections.
     const certificate = Object.keys(saved.entries).find(key => key.startsWith('education:Certificate Level in Management (CIMA):'));
@@ -843,6 +904,10 @@ try {
   await page.goto(`${base}/education/`);
   await page.locator('[data-open-cv]').click();
   assert.equal(await page.locator('[data-section="highlights"], .cv-section-highlights').count(), 0, 'Ignore Engineering Results in old saved selections');
+  assert.equal(await page.locator('[data-section="expertise"] input[data-group="entries"]').count(), 10);
+  assert.deepEqual(await page.locator('[data-section="expertise"] input[data-group="entries"]').evaluateAll(inputs => inputs.filter(input => input.checked).map(input => input.dataset.key)), ['expertise:partial-reconfiguration']);
+  assert(!await page.locator('input[data-key="awards:Olympiad Mathematics Competition:"]').isChecked(), 'Preserve the renamed award selection');
+  assert(await page.locator('#cv-affiliation').isChecked(), 'Older academic preferences retain the affiliation heading');
   assert(!await page.locator('input[data-group="contacts"][data-key="university"]').isChecked());
   assert(!await page.locator('input[data-group="entries"][data-key*="Hardware Accelerator for Feature Matching"]').isChecked(), 'Entry selections should persist across pages');
   assert(await page.locator('#cv-hyperlinks').isChecked());
@@ -873,11 +938,10 @@ try {
   }
   await page.setViewportSize({ width: 1440, height: 1100 });
   pdfText = await downloadPdf('company', true);
-  assert.equal(pdfInspections.get('company').pageCount, 1, 'The default company CV should fit one page without a sparse continuation');
+  assert.equal(pdfInspections.get('company').pageCount, 2, 'Keep the complete experience descriptions readable across two pages');
   assert(pdfText.includes('AXI DMA'));
   assert(pdfText.includes('ChipTip Technologies') && pdfText.includes('Cloud Native Logic'));
-  assert.match(await page.locator('.cv-section-experience .cv-preview-item').filter({ hasText: 'Jul 2019' }).innerText(), /systolic-array SONN/);
-  assert.match(await page.locator('.cv-section-experience .cv-preview-item').filter({ hasText: 'Jan 2018' }).innerText(), /hexacopter flight controller/);
+  assert.deepEqual(await page.locator('.cv-section-experience .cv-entry-bullets li').allTextContents(), sharedData.profile.experience.flatMap(role => role.paragraphs), 'Use the complete shared experience descriptions in company CVs');
   assert(pdfText.indexOf('PROFESSIONAL EXPERIENCE') < pdfText.indexOf('EDUCATION'));
   assert(!pdfText.includes('External Reviewer'));
   assert(!pdfText.includes('SELECTED PUBLICATIONS'));
@@ -894,17 +958,20 @@ try {
   const nameLeft = companyName[0].transform[4], nameRight = companyName.at(-1).transform[4] + companyName.at(-1).width;
   assert(Math.abs((nameLeft + nameRight) / 2 - company.firstPage.width / 2) < 2, 'Keep the company CV name centered');
   assert.equal(companyName[0].height, academic.firstPage.items.find(item => item.str === 'Miyuru Thathsara').height, 'Use the same PDF name size');
-  const dateLines = new Map();
-  for (const item of company.firstPage.items.filter(item => Math.abs(item.height - 10.5) < 0.01 && item.transform[4] > 420)) {
-    const key = item.transform[5];
-    dateLines.set(key, [...(dateLines.get(key) || []), item]);
-  }
+  const dateLines = company.pages.flatMap(pageItems => {
+    const lines = new Map();
+    for (const item of pageItems.filter(item => Math.abs(item.height - 10.5) < 0.01 && item.transform[4] > 420)) {
+      lines.set(item.transform[5], [...(lines.get(item.transform[5]) || []), item]);
+    }
+    return [...lines.values()].map(parts => ({ parts, pageItems }));
+  });
   for (const date of await page.locator('.cv-entry-date').allTextContents()) {
-    const parts = [...dateLines.values()].find(items => items.map(item => item.str).join(' ').replace(/ +/g, ' ') === date.replace(/[\u2010-\u2015]/g, '-'));
-    assert(parts, `Missing company date: ${date}`);
+    const line = dateLines.find(({ parts }) => parts.map(item => item.str).join(' ').replace(/ +/g, ' ') === date.replace(/[\u2010-\u2015]/g, '-'));
+    assert(line, `Missing company date: ${date}`);
+    const { parts, pageItems } = line;
     const first = parts[0], last = parts.at(-1);
     assert(Math.abs(last.transform[4] + last.width - company.firstPage.width + 42.52) < 2, 'Right-align company dates to the shared margin');
-    const title = company.firstPage.items.find(item => Math.abs(item.height - 10.8) < 0.01 && Math.abs(item.transform[5] - first.transform[5]) < 0.1);
+    const title = pageItems.find(item => Math.abs(item.height - 10.8) < 0.01 && Math.abs(item.transform[5] - first.transform[5]) < 0.1);
     assert(title && title.transform[4] + title.width + 8 < first.transform[4], `Keep company title and date separate: ${date}`);
   }
   for (const contact of await page.locator('.cv-contact-row a').evaluateAll(links => links.map(link => ({ label: link.textContent, url: link.href })))) {
@@ -918,6 +985,40 @@ try {
   const printedCompany = await downloadPdf('print-company', true);
   assert.deepEqual(pdfInspections.get('print-company').links, []);
   assert(printedCompany.includes('mthathsara@outlook.com') && !printedCompany.includes('LinkedIn'));
+
+  // Heading topics and expertise selections are independent and persist across pages.
+  await page.locator('.cv-heading-options details').evaluate(el => { el.open = true; });
+  assert.equal(await page.locator('#cv-heading-topics input').count(), 11);
+  assert.equal(await page.locator('.cv-headline').textContent(), 'Embedded Intelligence | Hardware Acceleration');
+  await page.locator('input[data-group="topics"][data-key="hardware-software-codesign"]').check();
+  await page.locator('input[data-group="topics"][data-key="embedded-intelligence"]').uncheck();
+  await page.locator('[data-section="expertise"] details').evaluate(el => { el.open = true; });
+  await page.locator('input[data-key="expertise:localization"]').uncheck();
+  const expertiseText = await page.locator('.cv-section-expertise').innerText();
+  assert(!expertiseText.includes('Localization') && expertiseText.includes('Mapping') && expertiseText.includes('Visual perception'));
+  assert(!expertiseText.includes('Energy-efficient computing') && expertiseText.includes('Partial reconfiguration'));
+  await page.goto(`${base}/experience/`);
+  await page.locator('[data-open-cv]').click();
+  assert.equal(await page.locator('.cv-headline').textContent(), 'Hardware Acceleration | Hardware-Software Co-Design');
+  assert(!await page.locator('input[data-key="expertise:localization"]').isChecked());
+  const headingText = await downloadPdf('custom-heading');
+  assert(headingText.includes('Hardware Acceleration | Hardware-Software Co-Design'));
+  assert(!headingText.includes('Embedded Intelligence'));
+  await page.locator('.cv-heading-options details').evaluate(el => { el.open = true; });
+  for (const checkbox of await page.locator('#cv-heading-topics input').all()) await checkbox.check();
+  await page.locator('#cv-affiliation').check();
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: 1100 });
+    assert(await page.locator('#cv-preview').evaluate(el => el.scrollWidth <= el.clientWidth + 1), `Wrap heading topics at ${width}`);
+  }
+  await page.setViewportSize({ width: 1440, height: 1100 });
+  await downloadPdf('all-heading-topics', true);
+  for (const checkbox of await page.locator('#cv-heading-topics input').all()) await checkbox.uncheck();
+  await page.locator('#cv-affiliation').uncheck();
+  assert.equal(await page.locator('.cv-headline').count(), 0, 'Omit an empty heading without leaving a blank line');
+  await downloadPdf('no-heading');
+  assert(!pdfInspections.get('no-heading').firstPage.items.some(item => Math.abs(item.height - 9.5) < 0.01));
+  await page.locator('#cv-reset').click();
 
   // The remaining sections must still honor explicit choices.
   await page.locator('#cv-hyperlinks').check();
@@ -954,6 +1055,7 @@ try {
   assert(!optionalNoGrades.includes('A+') && !optionalNoGrades.includes('GPA:'));
   await page.locator('#cv-grades').check();
   await page.goto(`${base}/contact/`);
+  await page.waitForURL(`${base}/#contact`);
   await page.locator('[data-open-cv]').click();
   assert(await page.locator('#cv-coursework').isChecked(), 'Remember the independent coursework choice across pages');
   assert(await page.locator('input[data-group="entries"][data-key*="Chess"]').isChecked());

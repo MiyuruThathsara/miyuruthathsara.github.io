@@ -40,6 +40,8 @@ description: Research and publications in embedded intelligence, visual SLAM, an
   <p class="section-note"><a href="{{ site.scholar_url | escape }}">View Google Scholar <span aria-hidden="true">↗</span></a></p>
   {% for paper in site.data.publications %}{% unless paper.contribution %}{% include publication.html paper=paper heading='h3' %}{% endunless %}{% endfor %}
 </section>
+{% include citation-dialog.html %}
+<script src="{{ '/assets/js/citations.js' | relative_url }}?v=20261103" defer></script>
 <section class="content-section" aria-labelledby="contributions-title">
   <div class="section-heading"><h2 id="contributions-title">Additional research contribution</h2></div>
   {% for paper in site.data.publications %}{% if paper.contribution %}{% include publication.html paper=paper heading='h3' %}{% endif %}{% endfor %}

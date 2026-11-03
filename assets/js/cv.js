@@ -1,4 +1,4 @@
-import { createCvPdf } from './cv-pdf.js?v=20260930-shared';
+import { createCvPdf } from './cv-pdf.js?v=20261103-heading-pagination';
 
 const dialog = document.querySelector('#cv-dialog');
 const form = document.querySelector('#cv-form');
@@ -13,7 +13,6 @@ const records = values => values.map(record => ({
   // Preserve existing selection IDs while displaying institution lines with a separator.
   ...entry(record.title, [record.date, [record.organization, record.institution].filter(Boolean).join(' ')].filter(Boolean).join(' | '), record.paragraphs),
   date: record.date, organization: [record.organization, record.institution].filter(Boolean).join(' · '), coursework: record.coursework,
-  organizationId: record.organization_id,
   institution: record.institution || record.organization, department: record.institution ? record.organization : ''
 }));
 const publications = values => values.map(paper => ({
@@ -24,19 +23,26 @@ const publications = values => values.map(paper => ({
 // Shared build-time data keeps every page's CV complete. News is deliberately excluded.
 const sections = [
   { id: 'summary', title: 'Profile', items: [entry('', '', source.profile.summary)] },
-  { id: 'expertise', title: 'Technical expertise', items: wording.expertise.map(({ selection_key, label }) => ({ ...entry('', '', [label]), id: `expertise:${selection_key}:` })) },
+  { id: 'expertise', title: 'Technical expertise', items: wording.expertise.map(({ id, label, previous_selection_key }) => ({
+    ...entry('', '', [label]), id: `expertise:${id}`,
+    previousId: previous_selection_key ? `expertise:${previous_selection_key}:` : undefined
+  })) },
   { id: 'research', title: 'Research focus', items: [entry('', '', source.profile.research)] },
   { id: 'experience', title: 'Professional experience', items: records(source.profile.experience) },
   { id: 'education', title: 'Education', items: records(source.profile.education) },
   { id: 'publications', title: 'Selected publications', items: publications(source.publications.filter(paper => !paper.contribution)) },
   { id: 'review', title: 'Review Experience', items: records(source.profile.review) },
-  { id: 'awards', title: 'Honours and awards', items: source.profile.awards.map(award => ({ ...entry(award.title, '', award.paragraphs), optional: award.collapsed })) },
+  { id: 'awards', title: 'Honours and awards', items: source.profile.awards.map(award => ({ ...entry(award.title, '', award.paragraphs), id: `awards:${award.selection_key || award.title}:`, optional: award.collapsed })) },
   { id: 'earlier', title: 'Earlier education', items: records(source.profile.earlier) },
   { id: 'contributions', title: 'Additional research contributions', items: publications(source.publications.filter(paper => paper.contribution)) },
   { id: 'interests', title: 'Personal interests', items: [entry('', '', [source.profile.interests])] }
 ];
 sections.forEach(section => section.items.forEach(item => { item.id ||= `${section.id}:${item.title || item.paragraphs[0]}:${item.meta}`; }));
 const contacts = source.contacts.map(contact => ({ ...contact, url: new URL(contact.url, document.baseURI).href, kind: contact.url.startsWith('mailto:') ? 'email' : 'web' }));
+const headingTopics = [
+  { id: 'embedded-intelligence', label: 'Embedded Intelligence' },
+  ...wording.expertise.map(({ id, label }) => ({ id, label: label.replace(/\b\w/g, letter => letter.toUpperCase()) }))
+];
 
 const orders = {
   company: ['summary', 'expertise', 'experience', 'education', 'publications', 'research', 'review', 'contributions', 'awards', 'earlier', 'interests'],
@@ -57,6 +63,8 @@ function preset(audience) {
     sections: Object.fromEntries(sections.map(section => [section.id, selected.includes(section.id)])),
     entries: Object.fromEntries(sections.flatMap(section => section.items.map(item => [item.id, !item.optional]))),
     contacts: Object.fromEntries(contacts.map(contact => [contact.id, ['website', 'github', 'linkedin', audience === 'company' ? 'personal' : 'university', ...(audience === 'academia' ? ['google-scholar'] : [])].includes(contact.id)])),
+    topics: Object.fromEntries(headingTopics.map(topic => [topic.id, audience === 'company' && ['embedded-intelligence', 'hardware-acceleration'].includes(topic.id)])),
+    affiliation: audience === 'academia',
     hyperlinks: true,
     descriptions: true,
     grades: audience === 'academia',
@@ -68,9 +76,15 @@ function restore() {
   let saved;
   try { saved = JSON.parse(localStorage.getItem(savedKey)); } catch { /* Private browsing may block storage. */ }
   state = preset(saved?.audience === 'company' ? 'company' : 'academia');
-  for (const group of ['sections', 'entries', 'contacts']) {
+  for (const group of ['sections', 'entries', 'contacts', 'topics']) {
     for (const key of Object.keys(state[group])) {
       if (typeof saved?.[group]?.[key] === 'boolean') state[group][key] = saved[group][key];
+    }
+  }
+  // Split grouped expertise choices without restoring previously excluded topics.
+  for (const item of sections.find(section => section.id === 'expertise').items) {
+    if (typeof saved?.entries?.[item.id] !== 'boolean' && typeof saved?.entries?.[item.previousId] === 'boolean') {
+      state.entries[item.id] = saved.entries[item.previousId];
     }
   }
   // Keep include/exclude choices when the research group and LSEG team names change.
@@ -91,7 +105,7 @@ function restore() {
     const previousId = `publications:${fpl2025.title}:FPL 2025 First author · Accepted`;
     if (typeof saved?.entries?.[previousId] === 'boolean') state.entries[fpl2025.id] = saved.entries[previousId];
   }
-  for (const key of ['hyperlinks', 'descriptions', 'grades', 'coursework']) if (typeof saved?.[key] === 'boolean') state[key] = saved[key];
+  for (const key of ['hyperlinks', 'descriptions', 'grades', 'coursework', 'affiliation']) if (typeof saved?.[key] === 'boolean') state[key] = saved[key];
 }
 
 function element(tag, className, value) {
@@ -129,6 +143,8 @@ function renderOptions() {
   }
   const contactOptions = document.querySelector('#cv-contacts');
   contactOptions.replaceChildren(...contacts.map(contact => checkbox(contact.label === 'Personal' || contact.label === 'University' ? `${contact.label} email` : contact.label, 'contacts', contact.id, state.contacts[contact.id])));
+  document.querySelector('#cv-heading-topics').replaceChildren(...headingTopics.map(topic => checkbox(topic.label, 'topics', topic.id, state.topics[topic.id])));
+  document.querySelector('#cv-affiliation').checked = state.affiliation;
   form.elements.audience.value = state.audience;
   document.querySelector('#cv-hyperlinks').checked = state.hyperlinks;
   document.querySelector('#cv-descriptions').checked = state.descriptions;
@@ -138,9 +154,12 @@ function renderOptions() {
 }
 
 function model() {
+  const affiliation = state.affiliation ? source.profile.headline : '';
+  const topics = headingTopics.filter(topic => state.topics[topic.id]).map(topic => topic.label);
   return {
     name: source.name,
-    headline: state.audience === 'company' ? 'Embedded Intelligence | Hardware Acceleration' : source.profile.headline,
+    affiliation, topics,
+    headline: [affiliation, topics.join(' | ')].filter(Boolean).join('\n'),
     audience: state.audience,
     contacts: contacts.filter(contact => state.contacts[contact.id] && (state.hyperlinks || contact.kind === 'email')).map(contact => ({
       ...contact,
@@ -156,8 +175,6 @@ function model() {
         if (id === 'research') values = [wording.research_focus];
         if (item.cvId && wording.publications[item.cvId]) values = [wording.publications[item.cvId]];
         if (state.audience === 'company') {
-          const companyRole = wording.company_roles[`${item.organizationId}:${item.title}`] || wording.company_roles[item.title];
-          if (id === 'experience' && companyRole) values = companyRole;
           if (item.cvId && wording.company_publications[item.cvId]) values = [wording.company_publications[item.cvId]];
           if (id === 'education' && item.title.startsWith('Doctor of Philosophy')) values = ['Final-year candidate (in progress).'];
         }
@@ -189,7 +206,8 @@ function model() {
 function renderPreview(data) {
   preview.dataset.audience = data.audience;
   const header = element('header', 'cv-preview-header');
-  header.append(element('h3', '', data.name), element('p', 'cv-headline', data.headline));
+  header.append(element('h3', '', data.name));
+  if (data.headline) header.append(element('p', 'cv-headline', data.headline));
   const contactGroup = element('div', 'cv-contacts');
   for (const kind of ['email', 'web']) {
     const contacts = data.contacts.filter(contact => contact.kind === kind);
@@ -306,6 +324,7 @@ form.addEventListener('change', event => {
   if (input.id === 'cv-descriptions') state.descriptions = input.checked;
   if (input.id === 'cv-grades') state.grades = input.checked;
   if (input.id === 'cv-coursework') state.coursework = input.checked;
+  if (input.id === 'cv-affiliation') state.affiliation = input.checked;
   update();
 });
 form.addEventListener('submit', async event => {

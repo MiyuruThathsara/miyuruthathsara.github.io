@@ -7,13 +7,20 @@ button:disabled { cursor: wait; opacity: 0.55; }
 .button-secondary { background: var(--paper); color: var(--heading); border-color: var(--line); }
 .button-secondary:hover { background: var(--wash); color: var(--heading); }
 .button-format { padding-left: 0.65rem; border-left: 1px solid currentColor; font-size: 0.68rem; letter-spacing: 0.04em; }
-.profile-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem 1.5rem; margin-top: 1.4rem; }
 body:has(dialog[open]) { overflow: hidden; }
 dialog { max-width: calc(100% - 32px); max-height: calc(100dvh - 32px); padding: 0; border: 1px solid var(--line); border-radius: 4px; background: var(--paper); color: var(--ink); box-shadow: 0 20px 80px #14252e40; }
 dialog::backdrop { background: #13252fe0; }
 .dialog-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--line); background: var(--paper); }
 .dialog-header h2 { font-size: 1.65rem; }
 .dialog-header .eyebrow { margin-bottom: 0.35rem; }
+.citation-dialog { width: 740px; }
+.citation-content { padding: 1.5rem; }
+#citation-reference { font-size: 0.9rem; overflow-wrap: anywhere; }
+.citation-content label { display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; }
+#citation-bibtex { width: 100%; padding: 0.85rem; resize: vertical; border: 1px solid var(--line); border-radius: 4px; background: var(--wash); color: var(--ink); font: 0.8rem/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; }
+#citation-bibtex:focus-visible { outline: 2px solid var(--heading); outline-offset: 3px; }
+.citation-actions { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-top: 1rem; }
+#citation-status { margin: 0.75rem 0 0; font-size: 0.8rem; color: var(--muted); }
 .image-dialog { width: 1200px; }
 .image-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; padding: 1rem 1.5rem 0; }
 .image-controls .button { padding: 0.5rem 0.8rem; }
@@ -37,6 +44,8 @@ dialog::backdrop { background: #13252fe0; }
 .cv-settings input:disabled { opacity: 0.5; }
 .cv-contact-options label:has(input:disabled) { color: var(--muted); cursor: default; }
 .cv-purpose { display: flex; flex-wrap: wrap; gap: 0.6rem 1.5rem; }
+.cv-heading-options summary { min-height: 44px; padding: 0.6rem 0; }
+.cv-heading-options details label { padding-left: 1.5rem; }
 .cv-selection-group { padding: 0.4rem 0; border-bottom: 1px solid var(--line); }
 .cv-selection-group > label { font-weight: 600; }
 .cv-selection-group details { padding: 0 0 0.4rem 1.8rem; }
@@ -81,7 +90,7 @@ dialog::backdrop { background: #13252fe0; }
 .cv-preview .cv-headline,
 .cv-preview .cv-contact-row,
 .cv-preview .cv-item-meta { font-family: inherit; }
-.cv-preview .cv-headline { font-size: 0.8rem; }
+.cv-preview .cv-headline { font-size: 0.8rem; white-space: pre-line; }
 .cv-preview .cv-contact-row { font-size: 0.85rem; }
 .cv-preview .cv-contact-row a { color: #0000b4; text-decoration: none; }
 .cv-preview .cv-contact-row a:hover { text-decoration: underline; }

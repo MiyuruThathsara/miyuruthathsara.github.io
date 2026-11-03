@@ -112,7 +112,6 @@ nav a[aria-current="page"] { color: var(--heading); font-weight: 600; text-decor
 .page-heading { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--line); }
 .page-heading h1 { font-size: clamp(2rem, 4vw, 2.8rem); }
 .page-related { margin-top: 2rem; font-size: 0.88rem; }
-.profile-explore { display: flex; flex-wrap: wrap; gap: 0.6rem 1.5rem; margin-top: 1.5rem; font-size: 0.83rem; }
 .profile-layout { display: grid; grid-template-columns: 264px minmax(0, 1fr); grid-template-areas: "sidebar heading" "sidebar content"; column-gap: 48px; align-items: start; }
 .profile-heading { grid-area: heading; }
 .profile-content { grid-area: content; min-width: 0; }
@@ -126,8 +125,8 @@ nav a[aria-current="page"] { color: var(--heading); font-weight: 600; text-decor
 .profile-links a { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 6px; text-decoration: none; }
 .profile-links a:hover { background: var(--wash); }
 .social-icon { display: block; width: 25px; height: 25px; fill: currentColor; }
-.profile-interests { width: 100%; max-width: 264px; margin-top: 1.15rem; padding-top: 1.15rem; border-top: 1px solid var(--line); }
-.profile-interests h2 { margin-bottom: 0.75rem; font-size: 1.35rem; }
+.profile-interests, .profile-contact { width: 100%; max-width: 264px; margin-top: 1.15rem; padding-top: 1.15rem; border-top: 1px solid var(--line); }
+.profile-interests h2, .profile-contact h2 { margin-bottom: 0.75rem; font-size: 1.35rem; }
 .profile-interests ul { display: grid; gap: 0.5rem; margin: 0; padding: 0; list-style: none; font-size: 0.92rem; line-height: 1.45; }
 .profile-interests li { display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem; border: 1px solid var(--line); border-radius: 6px; background: var(--wash); }
 .profile-interests svg { flex-shrink: 0; width: 18px; height: 18px; color: var(--heading); }
@@ -167,7 +166,7 @@ nav a[aria-current="page"] { color: var(--heading); font-weight: 600; text-decor
 .section-note { font-size: 0.83rem; color: var(--muted); }
 .publication { display: grid; grid-template-columns: 220px minmax(0, 1fr); align-items: start; gap: 1.5rem; padding: 1.75rem 0; border-bottom: 1px solid var(--line); }
 .publication-featured { padding-top: 0.6rem; }
-.publication h2, .publication h3 { margin-bottom: 0.5rem; font-family: inherit; font-size: 1.02rem; font-weight: 600; line-height: 1.5; letter-spacing: 0; }
+.publication h2, .publication h3 { margin-bottom: 0.5rem; font-family: inherit; font-size: 1.02rem; font-weight: 700; line-height: 1.5; letter-spacing: 0; }
 .publication h2 a, .publication h3 a { text-decoration: none; }
 .publication h2 a:hover, .publication h3 a:hover { text-decoration: underline; }
 .publication p:not(.publication-venue) { margin-bottom: 0.6rem; font-size: 0.85rem; line-height: 1.75; }
@@ -180,8 +179,12 @@ nav a[aria-current="page"] { color: var(--heading); font-weight: 600; text-decor
 .publication-media .image-caption { padding: 0.5rem 0; font-size: 0.72rem; }
 .publication-video { padding: 0; cursor: auto; }
 .publication-video iframe { display: block; width: 100%; height: 100%; border: 0; }
-.publication-link { font-size: 0.78rem; font-weight: 600; }
-.publication-link + .publication-link { margin-left: 1rem; }
+.publication-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+.publication-action { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; min-height: 44px; padding: 0.45rem 0.8rem; border: 1px solid var(--line); border-radius: 6px; background: var(--wash); color: var(--heading); font-size: 0.78rem; font-weight: 600; line-height: 1.25; text-decoration: none; }
+.publication-action:hover { border-color: var(--heading); background: var(--paper); }
+.publication-action svg { width: 17px; height: 17px; flex-shrink: 0; }
+.publication-action--primary { border-color: var(--button-bg); background: var(--button-bg); color: var(--button-ink); }
+.publication-action--primary:hover { background: var(--button-hover); color: var(--button-ink); }
 summary { width: fit-content; cursor: pointer; color: var(--heading); font-size: 0.82rem; font-weight: 500; text-underline-offset: 4px; }
 summary:hover { text-decoration: underline; }
 summary::marker { color: var(--accent); }
@@ -248,11 +251,11 @@ summary::marker { color: var(--accent); }
 .award-list li:last-child { border-bottom: 0; padding-bottom: 0; }
 .award-list strong { font-weight: 500; }
 .award-list span { color: var(--muted); }
-.contact-section > p { font-size: 0.9rem; }
-.contact-list { margin: 1.5rem 0; font-size: 0.88rem; }
-.contact-list > div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 1rem; margin: 0.5rem 0; }
-.contact-list dt { color: var(--muted); }
+.contact-list { margin: 0; font-size: 0.84rem; }
+.contact-list > div + div { margin-top: 0.65rem; }
+.contact-list dt { color: var(--muted); font-size: 0.75rem; }
 .contact-list dd { margin: 0; overflow-wrap: anywhere; }
+.contact-list a { display: inline-block; padding: 0.3rem 0; }
 .site-footer { border-top: 1px solid var(--line); }
 .footer-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 2rem; padding: 1.6rem 0; font-size: 0.74rem; color: var(--muted); }
 .footer-inner p { margin: 0; }
@@ -291,13 +294,17 @@ summary::marker { color: var(--accent); }
   .education-date { position: static; grid-area: date; width: auto; text-align: left; }
   .education-details > summary { margin-left: 30px; }
   .research-map { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
-  .profile-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "heading" "portrait" "links" "content" "interests"; column-gap: 0; }
+  .profile-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "heading" "portrait" "links" "content" "contact" "interests"; column-gap: 0; }
   .profile-heading { text-align: center; }
   .profile-sidebar { display: contents; }
   .profile-portrait { grid-area: portrait; justify-self: center; width: min(100%, 360px); margin-bottom: 1rem; }
   .profile-links { grid-area: links; justify-self: center; margin-bottom: 2rem; }
-  .profile-interests { grid-area: interests; max-width: none; margin-top: 2rem; padding-top: 1.5rem; }
-  .profile-interests h2 { font-size: 1.6rem; }
+  .profile-contact { grid-area: contact; }
+  .profile-interests { grid-area: interests; }
+  .profile-interests, .profile-contact { max-width: none; margin-top: 2rem; padding-top: 1.5rem; }
+  .profile-interests h2, .profile-contact h2 { font-size: 1.6rem; }
+  .contact-list { font-size: 0.95rem; }
+  .contact-list dt { font-size: 0.82rem; }
   .profile-interests ul { gap: 0.75rem; font-size: 1.08rem; }
   .profile-interests li { min-height: 56px; gap: 0.75rem; padding: 0.9rem 1rem; }
   .profile-interests li span { min-width: 0; overflow-wrap: anywhere; }
@@ -342,7 +349,6 @@ summary::marker { color: var(--accent); }
   .record { grid-template-columns: 1fr; gap: 0.25rem; }
   .record-date { margin: 0; }
   .award-list li { grid-template-columns: 1fr; gap: 0.15rem; }
-  .contact-list > div { grid-template-columns: 80px minmax(0, 1fr); gap: 0.6rem; font-size: 0.81rem; }
   .footer-inner { column-gap: 1rem; }
   .footer-inner p { flex-basis: 100%; }
 }
@@ -354,7 +360,7 @@ summary::marker { color: var(--accent); }
 @media print {
   :root { color-scheme: light !important; --paper: #fff !important; --ink: #000 !important; --heading: #183b4e !important; --muted: #606b70 !important; --line: #dedfd9 !important; --accent: #806134 !important; --wash: #f2f3ef !important; }
   body { border: 0; background: #fff; color: #000; font-size: 10pt; }
-  .site-header, .site-footer, .skip-link, .publication-video, .profile-actions, .profile-links, dialog { display: none !important; }
+  .site-header, .site-footer, .skip-link, .publication-video, .profile-links, dialog { display: none !important; }
   .page-shell { width: 100%; padding: 0; }
   .profile-layout { grid-template-columns: 145px minmax(0, 1fr); grid-template-areas: "sidebar heading" "sidebar content"; column-gap: 30px; }
   .profile-heading { text-align: left; }

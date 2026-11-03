@@ -1,7 +1,8 @@
 // Keep links to the former one-page sections useful after the page split.
 const navigation = document.querySelector('.site-header nav');
 const home = new URL(navigation.querySelector('[data-section="about"]').href);
-if (location.pathname === home.pathname && location.hash) {
+function redirectLegacySection() {
+  if (location.pathname !== home.pathname || !location.hash) return;
   const section = location.hash.slice(1);
   const link = [...document.querySelectorAll('nav [data-section]')].find(link => link.dataset.section === section);
   if (link && new URL(link.href).pathname !== home.pathname) location.replace(link.href);
@@ -10,6 +11,8 @@ if (location.pathname === home.pathname && location.hash) {
   else if (section === 'review') location.replace(new URL('experience/#review', home).href);
   else if (section === 'awards') location.replace(new URL('education/#awards', home).href);
 }
+redirectLegacySection();
+window.addEventListener('hashchange', redirectLegacySection);
 
 // Keep the current tab visible in the single-row strip without scrolling the page.
 function revealTab(current) {

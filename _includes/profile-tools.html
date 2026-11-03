@@ -33,17 +33,25 @@
           <label><input type="radio" name="audience" value="company"> Company</label>
           <label><input type="radio" name="audience" value="academia" checked> Academia</label>
         </fieldset>
+        <fieldset class="cv-heading-options">
+          <legend>2. Heading</legend>
+          <label><input type="checkbox" id="cv-affiliation" checked> PhD affiliation</label>
+          <details>
+            <summary>Choose heading topics</summary>
+            <div id="cv-heading-topics"></div>
+          </details>
+        </fieldset>
         <fieldset>
-          <legend>2. Choose what to include</legend>
+          <legend>3. Choose what to include</legend>
           <div id="cv-selections"></div>
         </fieldset>
         <fieldset>
-          <legend>3. Contact details</legend>
+          <legend>4. Contact details</legend>
           <label><input type="checkbox" id="cv-hyperlinks" checked> Include hyperlinks (digital CV)</label>
           <div id="cv-contacts" class="cv-contact-options"></div>
         </fieldset>
         <fieldset class="cv-detail-options">
-          <legend>4. Level of detail</legend>
+          <legend>5. Level of detail</legend>
           <label><input type="checkbox" id="cv-descriptions" checked> Role and publication descriptions</label>
           <label><input type="checkbox" id="cv-grades" checked> Grades</label>
           <label><input type="checkbox" id="cv-coursework"> Selected coursework</label>
