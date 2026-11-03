@@ -12,9 +12,24 @@ description: Academic training, qualifications, and honours.
 </details>
 <section class="content-section" id="awards" aria-labelledby="awards-title">
   <div class="section-heading"><h2 id="awards-title">Honours &amp; awards</h2></div>
-  <ul class="award-list">
-    {% for award in site.data.profile.awards %}<li>{% if award.collapsed %}
-      <details class="award-details"><summary>{{ award.title | escape }}</summary><p>{{ award.paragraphs | join: ' ' | escape }}</p></details>
-    {% else %}<strong>{{ award.title | escape }}</strong><span>{{ award.paragraphs | join: ' ' | escape }}</span>{% endif %}</li>{% endfor %}
+  <ul class="award-list" role="list">
+    {% for award in site.data.profile.awards %}
+    <li{% if award.collapsed %} class="award-item--expandable"{% endif %}>
+      {% if award.collapsed %}
+      <details class="award-details">
+        <summary><span class="award-icon">{% include award-icon.html name=award.icon %}</span><span>{{ award.title | escape }}</span><svg class="award-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <p>{{ award.paragraphs | join: ' ' | escape }}</p>
+      </details>
+      {% else %}
+      <article class="award-card" aria-labelledby="award-{{ forloop.index }}">
+        <span class="award-icon">{% include award-icon.html name=award.icon %}</span>
+        <div class="award-content">
+          <h3 id="award-{{ forloop.index }}">{{ award.title | escape }}</h3>
+          <p>{{ award.paragraphs | join: ' ' | escape }}</p>
+        </div>
+      </article>
+      {% endif %}
+    </li>
+    {% endfor %}
   </ul>
 </section>

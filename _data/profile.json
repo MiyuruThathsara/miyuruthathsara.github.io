@@ -124,18 +124,21 @@
   "awards": [
     {
       "title": "NTU Research Scholarship",
+      "icon": "scholarship",
       "paragraphs": [
         "Awarded in 2023 · Four-year scholarship"
       ]
     },
     {
       "title": "Dean’s List, University of Moratuwa",
+      "icon": "academic",
       "paragraphs": [
         "Semesters 1, 2, 3, 6, and 8"
       ]
     },
     {
       "title": "Sri Lankan Olympiad Mathematics Competition",
+      "icon": "medal",
       "selection_key": "Olympiad Mathematics Competition",
       "paragraphs": [
         "Distinction · 2014"
@@ -143,6 +146,7 @@
     },
     {
       "title": "Chess",
+      "icon": "chess",
       "collapsed": true,
       "paragraphs": [
         "School team captain, 2005–2010. Individual: 25th nationally and 5th provincially. Team: 3rd nationally on two occasions."

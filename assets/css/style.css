@@ -234,23 +234,32 @@ summary::marker { color: var(--accent); }
 /* A small white backing preserves each mark's original colors in dark mode. */
 .organization-logo { grid-area: logo; display: flex; align-items: center; justify-content: center; width: 64px; height: 72px; padding: 4px; border-radius: 3px; background: #fff; }
 .organization-logo img { width: 100%; height: 100%; object-fit: contain; }
-.record-details summary, .award-details summary { min-height: 44px; padding: 0.6rem 0; font-size: 0.82rem; }
-.record-details p, .award-details p { margin: 0.25rem 0 0.6rem; max-width: 42rem; font-size: 0.82rem; color: var(--muted); }
-.award-details { grid-column: 1 / -1; }
+.record-details summary { min-height: 44px; padding: 0.6rem 0; font-size: 0.82rem; }
+.record-details p { margin: 0.25rem 0 0.6rem; max-width: 42rem; font-size: 0.82rem; color: var(--muted); }
 .degree-status { font-weight: 400; font-size: 0.85rem; }
 .education-details { margin-top: 1.75rem; }
 .education-details > summary { display: list-item; min-height: 44px; margin-left: 164px; padding: 0.5rem 0; }
 .education-details[open] > summary { margin-bottom: 1rem; }
 #education #awards { margin-top: 2.5rem; }
 #education #awards .section-heading h2 { font-size: 1.5rem; }
-#education .award-list li { grid-template-columns: minmax(0, 1fr) auto; }
-#education .award-list span { text-align: right; }
-.award-list { list-style: none; padding: 0; margin: 0; }
-.award-list li { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 0.75rem 0; border-bottom: 1px solid var(--line); font-size: 0.83rem; }
-.award-list li:first-child { padding-top: 0; }
-.award-list li:last-child { border-bottom: 0; padding-bottom: 0; }
-.award-list strong { font-weight: 500; }
-.award-list span { color: var(--muted); }
+.award-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; list-style: none; padding: 0; margin: 0; }
+.award-list > li { min-width: 0; }
+.award-card { display: flex; flex-direction: column; gap: 1.15rem; height: 100%; padding: 1.4rem; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+.award-icon { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 50%; background: var(--paper); color: var(--accent); }
+.award-icon svg { width: 24px; height: 24px; }
+.award-content { min-width: 0; }
+.award-content h3 { margin: 0 0 0.6rem; font-size: 1rem; font-weight: 600; line-height: 1.45; }
+.award-content p { margin: 0; font-size: 0.85rem; line-height: 1.65; color: var(--muted); }
+.award-item--expandable { grid-column: 1 / -1; }
+.award-details { border: 1px solid var(--line); border-radius: 10px; }
+.award-details summary { display: flex; align-items: center; gap: 1rem; width: 100%; min-height: 44px; padding: 1rem 1.4rem; list-style: none; font-size: 0.95rem; font-weight: 500; }
+.award-details summary::-webkit-details-marker { display: none; }
+.award-details summary:hover { background: var(--wash); border-radius: 10px; }
+.award-details summary .award-icon { width: 36px; height: 36px; border-color: transparent; }
+.award-details summary .award-icon svg { width: 22px; height: 22px; }
+.award-chevron { width: 18px; height: 18px; flex-shrink: 0; margin-left: auto; color: var(--muted); }
+.award-details[open] .award-chevron { transform: rotate(180deg); }
+.award-details p { margin: 0; max-width: 50rem; padding: 0 1.4rem 1.25rem calc(1.4rem + 36px + 1rem); font-size: 0.85rem; line-height: 1.7; color: var(--muted); }
 .contact-list { margin: 1.5rem 0; font-size: 0.88rem; }
 .contact-list > div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 1rem; margin: 0.5rem 0; }
 .contact-list dt { color: var(--muted); }
@@ -321,8 +330,14 @@ summary::marker { color: var(--accent); }
   .experience-organization { margin: 0.875rem 0 0; font-size: 0.875rem; line-height: 1.6; }
   .experience-description { margin-top: 0.875rem; padding-top: 0.875rem; border-top: 1px solid var(--line); font-size: 0.875rem; line-height: 1.7; }
   .organization-logo { width: 60px; height: 60px; padding: 4px; border: 1px solid #e4e6e8; border-radius: 8px; }
-  #education .award-list li { grid-template-columns: 1fr; gap: 0.15rem; }
-  #education .award-list span { text-align: left; }
+}
+
+@media (max-width: 800px) {
+  .award-list { grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
+  .award-card { flex-direction: row; align-items: flex-start; gap: 1rem; padding: 1.2rem; }
+  .award-content h3 { margin-bottom: 0.4rem; }
+  .award-details summary { padding: 0.85rem 1.2rem; }
+  .award-details p { padding: 0 1.2rem 1.2rem calc(1.2rem + 36px + 1rem); }
 }
 
 @media (max-width: 540px) {
@@ -345,7 +360,6 @@ summary::marker { color: var(--accent); }
   .publication-media { order: 1; }
   .record { grid-template-columns: 1fr; gap: 0.25rem; }
   .record-date { margin: 0; }
-  .award-list li { grid-template-columns: 1fr; gap: 0.15rem; }
   .footer-inner { column-gap: 1rem; }
   .footer-inner p { flex-basis: 100%; }
 }
@@ -373,6 +387,7 @@ summary::marker { color: var(--accent); }
   .record { grid-template-columns: 100px minmax(0, 1fr); }
   .experience-card { background: #fff; box-shadow: none; break-inside: avoid; }
   .education-entry { break-inside: avoid; }
+  .award-card { background: #fff; }
   .publication, .record, .award-list li, .research-map { break-inside: avoid; }
   .section-heading { break-after: avoid; }
 }
