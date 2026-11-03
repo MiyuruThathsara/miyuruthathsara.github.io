@@ -37,7 +37,6 @@ dialog::backdrop { background: #13252fe0; }
 .cv-settings input:disabled { opacity: 0.5; }
 .cv-contact-options label:has(input:disabled) { color: var(--muted); cursor: default; }
 .cv-purpose { display: flex; flex-wrap: wrap; gap: 0.6rem 1.5rem; }
-.cv-settings .cv-purpose { margin-bottom: 0.4rem; }
 .cv-help { margin: 0 0 0.75rem; color: var(--muted); font-size: 0.75rem; line-height: 1.6; }
 .cv-selection-group { padding: 0.4rem 0; border-bottom: 1px solid var(--line); }
 .cv-selection-group > label { font-weight: 600; }

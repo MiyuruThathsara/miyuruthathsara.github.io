@@ -134,9 +134,6 @@ function renderOptions() {
   document.querySelector('#cv-descriptions').checked = state.descriptions;
   document.querySelector('#cv-grades').checked = state.grades;
   document.querySelector('#cv-coursework').checked = state.coursework;
-  document.querySelector('#cv-preset-description').textContent = state.audience === 'company'
-    ? 'The shared classic template, emphasizing technical expertise, professional experience, and education.'
-    : 'The shared classic template, emphasizing research, publications, and academic service.';
   update();
 }
 
