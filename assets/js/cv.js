@@ -24,7 +24,7 @@ const publications = values => values.map(paper => ({
 // Shared build-time data keeps every page's CV complete. News is deliberately excluded.
 const sections = [
   { id: 'summary', title: 'Profile', items: [entry('', '', source.profile.summary)] },
-  { id: 'expertise', title: 'Technical expertise', items: wording.expertise.map(value => entry('', '', [value])) },
+  { id: 'expertise', title: 'Technical expertise', items: wording.expertise.map(({ selection_key, label }) => ({ ...entry('', '', [label]), id: `expertise:${selection_key}:` })) },
   { id: 'research', title: 'Research focus', items: [entry('', '', source.profile.research)] },
   { id: 'experience', title: 'Professional experience', items: records(source.profile.experience) },
   { id: 'education', title: 'Education', items: records(source.profile.education) },
@@ -35,7 +35,7 @@ const sections = [
   { id: 'contributions', title: 'Additional research contributions', items: publications(source.publications.filter(paper => paper.contribution)) },
   { id: 'interests', title: 'Personal interests', items: [entry('', '', [source.profile.interests])] }
 ];
-sections.forEach(section => section.items.forEach(item => { item.id = `${section.id}:${item.title || item.paragraphs[0]}:${item.meta}`; }));
+sections.forEach(section => section.items.forEach(item => { item.id ||= `${section.id}:${item.title || item.paragraphs[0]}:${item.meta}`; }));
 const contacts = source.contacts.map(contact => ({ ...contact, url: new URL(contact.url, document.baseURI).href, kind: contact.url.startsWith('mailto:') ? 'email' : 'web' }));
 
 const orders = {

@@ -1,5 +1,5 @@
 # CV-specific wording; shared entries live in profile.json/publications.json and contacts in _config.yml.
-company_summary: Final-year PhD candidate at NTU, Singapore, building energy-efficient computing for autonomous robots. Combines FPGA acceleration, computer vision, and hardware/software co-design with industry experience in financial market data systems.
+company_summary: Final-year PhD candidate in Computer Science at Nanyang Technological University, Singapore, with research and industry experience in embedded intelligence and hardware acceleration. Combines algorithm development, hardware design, and system integration to build efficient computing solutions for autonomous robotics and low-latency data processing.
 # Company-only editing preserves the full source descriptions on the site and academic CV.
 company_roles:
   Project Officer (Research):
@@ -17,8 +17,8 @@ company_publications:
   fpt2024: Designed a streaming FPGA architecture for spatially uniform keypoint selection with variable input sizes and efficient resource use.
   iscas2024: Accelerated feature matching by approximately 12× over linear exhaustive search on FPGA using a balanced binary search tree.
   fpl2020: Designed a lifelong deep-learning FPGA architecture using computation scheduling and hardware reuse; evaluated on CORe50.
-academic_summary: Ph.D. candidate at Nanyang Technological University specializing in FPGA-based visual SLAM and hardware/software co-design. Research addresses efficient onboard perception and localization for resource-constrained robots, with a long-term focus on collaborative autonomy.
-research_focus: Algorithm and architecture co-design for stereo visual SLAM, including feature selection, feature matching, and keyframe generation. The broader objective is energy-efficient onboard intelligence that enables robots to share spatial information and coordinate their actions.
+academic_summary: Final-year PhD candidate in Computer Science at Nanyang Technological University, Singapore, working at the intersection of computer vision, robotics, and computer architecture. Studies the joint design of algorithms and computing systems to support practical, energy-efficient autonomy.
+research_focus: Current research addresses efficient onboard visual perception, localization, and mapping for autonomous robots. The approach combines algorithm design and hardware acceleration to operate within tight computing and energy budgets. The longer-term goal is collaborative autonomy, enabling teams of robots to share spatial knowledge and coordinate their actions.
 publications:
   fpl2025: FPGA-SoC implementation of stereo visual SLAM with region-aware descriptor grouping for low-latency feature matching and tracking-driven keyframe generation. Evaluated on benchmark sequences and in real-world experiments.
   fpt2024: Streaming FPGA architecture for spatially uniform keypoint selection, combining grid-based processing with efficient neighbour sorting to accommodate variable input sizes and improve resource efficiency.
@@ -26,9 +26,16 @@ publications:
   fpl2020: FPGA architecture for lifelong deep learning on resource-constrained edge devices, using computation scheduling and hardware reuse. Evaluated on the CORe50 benchmark.
   iciafs2018: Acknowledged contribution to prototype development and flight-stabilization validation for a modular multi-quadrotor UAV, investigating controller reuse and replaceable quadrotor units.
 expertise:
-  - FPGA acceleration and reconfigurable computing
-  - Hardware/software co-design
-  - Visual SLAM, localization, and feature matching
-  - Streaming hardware architectures
-  - AXI DMA and data movement
-  - Energy-efficient embedded systems
+  # Keep selection keys stable so revised labels preserve saved include/exclude choices.
+  - selection_key: FPGA acceleration and reconfigurable computing
+    label: Hardware acceleration and reconfigurable computing
+  - selection_key: Hardware/software co-design
+    label: Hardware-software co-design
+  - selection_key: Visual SLAM, localization, and feature matching
+    label: Visual perception, localization, and mapping
+  - selection_key: Streaming hardware architectures
+    label: Computer architecture and heterogeneous computing
+  - selection_key: AXI DMA and data movement
+    label: Embedded system integration
+  - selection_key: Energy-efficient embedded systems
+    label: Energy-efficient computing
