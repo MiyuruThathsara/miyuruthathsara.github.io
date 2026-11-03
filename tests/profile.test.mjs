@@ -465,10 +465,11 @@ try {
     if (route === '/education/') {
       assert(content.includes('Honours & awards') && content.includes('NTU Research Scholarship'));
       assert(content.includes('Chess') && content.includes('Selected coursework'), 'Show discoverable disclosure labels');
-      assert.equal(await page.locator('.section-page > .education-card').count(), 3);
-      assert.match(await page.locator('.section-page > .education-card').last().innerText(), /Certificate Level in Management \(CIMA\)[\s\S]*Achievers Lanka/);
-      assert.equal(await page.locator('.education-details .education-card').count(), 1);
-      assert.match(await page.locator('.education-details .education-card').textContent(), /Nalanda College/);
+      assert.equal(await page.locator('.section-page > .education-timeline .education-entry').count(), 3);
+      assert.equal(await page.locator('.section-page > .education-timeline .education-entry').last().locator('h2').textContent(), 'Achievers Lanka Business School');
+      assert.equal(await page.locator('.section-page > .education-timeline .education-entry').last().locator('.education-qualification').textContent(), 'Certificate Level in Management (CIMA)');
+      assert.equal(await page.locator('.education-details .education-entry').count(), 1);
+      assert.match(await page.locator('.education-details .education-entry').textContent(), /Nalanda College/);
     }
     for (const width of [1440, 390, 320]) {
       await page.setViewportSize({ width, height: 1100 });

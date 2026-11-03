@@ -1,18 +1,19 @@
+<ol class="education-timeline" role="list">
 {% for record in include.records %}
 {% assign organization = site.data.organizations[record.organization_id] %}
 {% assign institution = record.institution | default: record.organization %}
 {% assign heading_id = include.prefix | append: '-' | append: forloop.index %}
-<article class="education-card experience-card{% if institution == '' %} education-card--school{% endif %}" aria-labelledby="{{ heading_id }}">
-  <header class="experience-card-heading">
-    <div class="organization-logo">
-      <img src="{{ organization.logo | relative_url }}" alt="{{ organization.name | escape }} logo" width="{{ organization.width }}" height="{{ organization.height }}" decoding="async">
-    </div>
-    <{{ include.heading | default: 'h2' }} id="{{ heading_id }}">{{ record.title | escape }}</{{ include.heading | default: 'h2' }}>
-    {% if institution != '' %}<p class="experience-organization">{{ institution | escape }}</p>{% endif %}
-    <p class="experience-date">{{ record.date | escape }}</p>
+<li>
+<article class="education-entry" aria-labelledby="{{ heading_id }}">
+  <p class="education-date">{{ record.date | escape }}</p>
+  <div class="organization-logo">
+    <img src="{{ organization.logo | relative_url }}" alt="{{ organization.name | escape }} logo" width="{{ organization.width }}" height="{{ organization.height }}" decoding="async">
+  </div>
+  <header class="education-heading">
+    <{{ include.heading | default: 'h2' }} id="{{ heading_id }}">{% if institution != '' %}{{ institution | escape }}{% else %}{{ record.title | escape }}{% endif %}</{{ include.heading | default: 'h2' }}>
   </header>
-  {% if record.institution or record.paragraphs.size > 0 or record.coursework %}
-  <div class="experience-description">
+  <div class="education-content">
+    {% if institution != '' %}<p class="education-qualification">{{ record.title | escape }}</p>{% endif %}
     {% if record.institution %}<p class="education-department">{{ record.organization | escape }}</p>{% endif %}
     {% for paragraph in record.paragraphs %}<p>{{ paragraph | escape }}</p>{% endfor %}
     {% if record.coursework %}<details class="record-details" data-coursework>
@@ -20,6 +21,7 @@
       <p>{{ record.coursework | escape }}</p>
     </details>{% endif %}
   </div>
-  {% endif %}
 </article>
+</li>
 {% endfor %}
+</ol>

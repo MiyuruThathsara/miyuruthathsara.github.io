@@ -210,10 +210,24 @@ summary::marker { color: var(--accent); }
 .experience-description { margin-top: 1rem; font-size: 0.85rem; }
 .experience-description p { margin-bottom: 0.5rem; }
 .experience-description p:last-child { margin-bottom: 0; }
-.education-card { margin-bottom: 1.25rem; }
-.education-card:last-child { margin-bottom: 0; }
-.education-card--school .experience-card-heading { grid-template-areas: "logo title" "logo date"; }
-.education-department { color: var(--muted); }
+.education-timeline { --education-axis: 132px; --education-marker-y: 32px; list-style: none; margin: 0; padding: 0; }
+.education-timeline > li { position: relative; padding: 0 0 2.5rem 164px; }
+.education-timeline > li:last-child { padding-bottom: 0; }
+.education-timeline > li::before { content: ""; position: absolute; top: 0; bottom: 0; left: var(--education-axis); width: 1px; transform: translateX(-50%); background: var(--line); }
+.education-timeline > li:first-child::before { top: var(--education-marker-y); }
+.education-timeline > li:last-child::before { bottom: calc(100% - var(--education-marker-y)); }
+.education-timeline > li::after { content: ""; position: absolute; top: var(--education-marker-y); left: var(--education-axis); width: 12px; height: 12px; transform: translate(-50%, -50%); border: 2px solid var(--heading); border-radius: 50%; background: var(--paper); }
+#education > .education-timeline > li:first-child::after { background: var(--heading); }
+.education-entry { display: grid; grid-template-columns: 64px minmax(0, 1fr); grid-template-areas: "logo heading" "logo content"; align-items: start; gap: 0.3rem 1.25rem; }
+.education-entry .organization-logo { width: 64px; height: 64px; padding: 5px; border: 1px solid #e4e6e8; border-radius: 8px; }
+.education-heading { grid-area: heading; min-width: 0; }
+.education-heading h2, .education-heading h3 { margin: 0; font-family: inherit; font-size: 1.06rem; font-weight: 600; letter-spacing: 0; line-height: 1.5; }
+.education-date { position: absolute; top: calc(var(--education-marker-y) - 11px); left: 0; width: 112px; margin: 0; color: var(--muted); font-size: 0.8rem; font-weight: 500; line-height: 22px; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.education-content { grid-area: content; min-width: 0; }
+.education-content > p { margin: 0 0 0.3rem; color: var(--muted); font-size: 0.84rem; line-height: 1.65; }
+.education-content > .education-qualification { margin-bottom: 0.4rem; color: var(--ink); font-size: 0.94rem; font-weight: 500; }
+.education-content > p:last-child { margin-bottom: 0; }
+.education-content .record-details { margin-top: 0.25rem; }
 /* A small white backing preserves each mark's original colors in dark mode. */
 .organization-logo { grid-area: logo; display: flex; align-items: center; justify-content: center; width: 64px; height: 72px; padding: 4px; border-radius: 3px; background: #fff; }
 .organization-logo img { width: 100%; height: 100%; object-fit: contain; }
@@ -221,8 +235,13 @@ summary::marker { color: var(--accent); }
 .record-details p, .award-details p { margin: 0.25rem 0 0.6rem; max-width: 42rem; font-size: 0.82rem; color: var(--muted); }
 .award-details { grid-column: 1 / -1; }
 .degree-status { font-weight: 400; font-size: 0.85rem; }
-.education-details { margin-top: 1.5rem; }
-.education-details[open] summary { margin-bottom: 1.5rem; }
+.education-details { margin-top: 1.75rem; }
+.education-details > summary { display: list-item; min-height: 44px; margin-left: 164px; padding: 0.5rem 0; }
+.education-details[open] > summary { margin-bottom: 1rem; }
+#education #awards { margin-top: 2.5rem; }
+#education #awards .section-heading h2 { font-size: 1.5rem; }
+#education .award-list li { grid-template-columns: minmax(0, 1fr) auto; }
+#education .award-list span { text-align: right; }
 .award-list { list-style: none; padding: 0; margin: 0; }
 .award-list li { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 0.75rem 0; border-bottom: 1px solid var(--line); font-size: 0.83rem; }
 .award-list li:first-child { padding-top: 0; }
@@ -263,6 +282,14 @@ summary::marker { color: var(--accent); }
 }
 
 @media (max-width: 800px) {
+  .education-timeline { --education-axis: 6px; --education-marker-y: 11px; }
+  .education-timeline > li { padding-left: 30px; padding-bottom: 2rem; }
+  .education-entry { grid-template-columns: 56px minmax(0, 1fr); grid-template-areas: "date date" "logo heading" "content content"; gap: 0.75rem 0.875rem; }
+  .education-entry .organization-logo { width: 56px; height: 56px; padding: 4px; }
+  .education-heading { align-self: center; }
+  .education-heading h2, .education-heading h3 { font-size: 1rem; line-height: 1.45; }
+  .education-date { position: static; grid-area: date; width: auto; text-align: left; }
+  .education-details > summary { margin-left: 30px; }
   .research-map { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
   .profile-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "heading" "portrait" "links" "content" "interests"; column-gap: 0; }
   .profile-heading { text-align: center; }
@@ -292,12 +319,8 @@ summary::marker { color: var(--accent); }
   .experience-organization { margin: 0.875rem 0 0; font-size: 0.875rem; line-height: 1.6; }
   .experience-description { margin-top: 0.875rem; padding-top: 0.875rem; border-top: 1px solid var(--line); font-size: 0.875rem; line-height: 1.7; }
   .organization-logo { width: 60px; height: 60px; padding: 4px; border: 1px solid #e4e6e8; border-radius: 8px; }
-  .education-card .experience-card-heading { grid-template-areas: "logo organization" "logo date" "title title"; }
-  .education-card .experience-organization { margin: 0 0 0.3rem; font-weight: 600; }
-  .education-card h2 { margin: 0.875rem 0 0; padding-top: 0.875rem; border-top: 1px solid var(--line); }
-  .education-card .experience-description { margin-top: 0.5rem; padding-top: 0; border-top: 0; }
-  .education-card--school .experience-card-heading { grid-template-areas: "logo title" "logo date"; }
-  .education-card--school .experience-description { margin-top: 0.875rem; padding-top: 0.875rem; border-top: 1px solid var(--line); }
+  #education .award-list li { grid-template-columns: 1fr; gap: 0.15rem; }
+  #education .award-list span { text-align: left; }
 }
 
 @media (max-width: 540px) {
@@ -346,6 +369,7 @@ summary::marker { color: var(--accent); }
   .publication-media { min-height: 0; height: auto; }
   .record { grid-template-columns: 100px minmax(0, 1fr); }
   .experience-card { background: #fff; box-shadow: none; break-inside: avoid; }
+  .education-entry { break-inside: avoid; }
   .publication, .record, .award-list li, .research-map { break-inside: avoid; }
   .section-heading { break-after: avoid; }
 }
