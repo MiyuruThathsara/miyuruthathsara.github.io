@@ -829,7 +829,7 @@ try {
     delete saved.entries[fpl2025];
     // Renaming organizations must preserve saved role selections.
     for (const key of Object.keys(saved.entries).filter(key => key.startsWith('experience:'))) {
-      const previousKey = key.replace('Edge Intelligence Research Group', 'HESL, CCDS').replace('GTP Team', 'HWAC Team');
+      const previousKey = key.replace('Edge Intelligence Research Group', 'HESL, CCDS').replace('HWAC Team', 'GTP Team');
       if (previousKey === key) continue;
       saved.entries[previousKey] = false;
       delete saved.entries[key];
@@ -846,8 +846,8 @@ try {
   assert(!await page.locator('input[data-group="entries"][data-key*="Certificate Level in Management (CIMA)"]').isChecked(), 'Preserve the old explicit certificate selection');
   assert(!await page.locator('input[data-group="entries"][data-key*="FPGA Stereo Visual SLAM"]').isChecked(), 'Preserve an excluded FPL 2025 entry after its publication status changes');
   const roleSelections = await page.locator('input[data-group="entries"][data-key^="experience:"]').evaluateAll(inputs => inputs.map(input => ({ id: input.dataset.key, checked: input.checked })));
-  assert.equal(roleSelections.filter(role => /Edge Intelligence Research Group|GTP Team/.test(role.id)).length, 3);
-  assert(roleSelections.filter(role => /Edge Intelligence Research Group|GTP Team/.test(role.id)).every(role => !role.checked), 'Keep excluded roles excluded after organization names change');
+  assert.equal(roleSelections.filter(role => /Edge Intelligence Research Group|HWAC Team/.test(role.id)).length, 3);
+  assert(roleSelections.filter(role => /Edge Intelligence Research Group|HWAC Team/.test(role.id)).every(role => !role.checked), 'Keep excluded roles excluded after organization names change');
   assert(roleSelections.find(role => role.id.includes('Engineering Consultant')).checked, 'Include the new consulting role by default');
 
   await page.locator('input[name="audience"][value="company"]').check();

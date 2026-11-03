@@ -17,7 +17,7 @@ company_roles:
   Engineering Consultant:
     - Contributed FPGA virtualization and network-attached acceleration to the Cloud Native Logic platform.
   Engineer, Accelerated Systems:
-    - Built a multi-channel AXI DMA engine for LSEG's low-latency market data pipeline in the GTP team; contributed Linux driver integration and FPGA partial reconfiguration.
+    - In LSEG's HWAC team, built a multi-channel AXI DMA engine for the GTP product; contributed Linux driver integration and FPGA partial reconfiguration.
   ntu:Research Assistant:
     - Developed a systolic-array SONN classifier; explored pruning, quantization and Posits for inference.
   moratuwa:Research Assistant:

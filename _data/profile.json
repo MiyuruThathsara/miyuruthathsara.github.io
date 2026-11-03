@@ -48,9 +48,9 @@
       "title": "Engineer, Accelerated Systems",
       "date": "May 2021 – Aug 2022",
       "organization_id": "lseg",
-      "organization": "GTP Team · LSEG Technologies, Sri Lanka",
+      "organization": "HWAC Team · LSEG Technologies, Sri Lanka",
       "paragraphs": [
-        "Worked within the GTP team, developing FPGA-based solutions for low-latency financial market data dissemination. Designed and implemented a custom multi-channel AXI DMA engine integrated into LSEG's market data distribution pipeline. Also contributed to Linux device driver integration and FPGA partial reconfiguration for hardware acceleration workflows."
+        "Worked within the HWAC team on the GTP product, developing FPGA-based solutions for low-latency financial market data dissemination. Designed and implemented a custom multi-channel AXI DMA engine integrated into LSEG's market data distribution pipeline. Also contributed to Linux device driver integration and FPGA partial reconfiguration for hardware acceleration workflows."
       ]
     },
     {

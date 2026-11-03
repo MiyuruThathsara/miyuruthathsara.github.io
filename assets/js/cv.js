@@ -77,7 +77,7 @@ function restore() {
   // Keep include/exclude choices when the research group and LSEG team names change.
   for (const item of sections.find(section => section.id === 'experience').items) {
     if (typeof saved?.entries?.[item.id] === 'boolean') continue;
-    const previousId = item.id.replace('Edge Intelligence Research Group', 'HESL, CCDS').replace('GTP Team', 'HWAC Team');
+    const previousId = item.id.replace('Edge Intelligence Research Group', 'HESL, CCDS').replace('HWAC Team', 'GTP Team');
     if (typeof saved?.entries?.[previousId] === 'boolean') state.entries[item.id] = saved.entries[previousId];
   }
   // Retain explicit certificate choices saved before it moved out of Earlier education.
