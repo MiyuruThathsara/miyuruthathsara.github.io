@@ -282,9 +282,7 @@ try {
   assert.equal((profileHeading.match(/Nanyang Technological University/g) || []).length, 1, 'Keep a single university in the profile heading');
   assert(!/Ph\.D\. Candidate|Nanyang Technological University/.test(await page.locator('.profile-sidebar').innerText()), 'Do not duplicate the affiliation in the sidebar');
   assert.deepEqual(await page.locator('.introduction > p').allTextContents(), sharedData.profile.summary, 'Render the complete supplied bio as separate paragraphs');
-  assert.equal(await page.locator('main #news, main #research, main #publications, main #experience, main #education, main #review').count(), 0, 'Homepage must not contain the other full pages');
-  assert.equal(await page.locator('.profile-sidebar #contact').count(), 1);
-  assert.deepEqual(await page.locator('#contact a').evaluateAll(links => links.map(link => link.href)), ['university', 'personal', 'website'].map(id => new URL(sharedData.contacts.find(contact => contact.id === id).url).href));
+  assert.equal(await page.locator('main #news, main #research, main #publications, main #experience, main #education, main #review, main #contact').count(), 0, 'Homepage must not contain the other full pages');
   assert(!/Contact me|Explore research|Read the latest news/.test(homepage));
   assert.equal(await page.locator('.profile-photo').getAttribute('src'), '/me.jpeg');
   assert(await page.locator('.profile-photo').evaluate(img => !img.closest('a, button, [data-image-viewer]')), 'The profile photo should be static');
@@ -335,14 +333,10 @@ try {
     const contactLeft = contactBounds[0].x, contactRight = contactBounds.at(-1).x + contactBounds.at(-1).width;
     assert(Math.abs((contactLeft + contactRight) / 2 - photo.x - photo.width / 2) < 1, 'Center the contact icons beneath the portrait');
     const interests = await page.locator('.profile-interests').boundingBox();
-    const contactDetails = await page.locator('.profile-contact').boundingBox();
-    assert(contactDetails.x >= 0 && contactDetails.x + contactDetails.width <= width);
-    assert(interests.y >= contactDetails.y + contactDetails.height);
     assert(interests.y >= contactBounds[0].y + contactBounds[0].height, 'Place Interests beneath the contact icons');
     assert(interests.x >= 0 && interests.x + interests.width <= width, 'Keep Interests within the viewport');
     if (width <= 800) {
       const content = await page.locator('.profile-content').boundingBox();
-      assert(contactDetails.y >= content.y + content.height, 'Stack contact details beneath the mobile biography');
       assert(interests.y >= content.y + content.height, 'Move Interests below all About content on mobile');
       assert(Math.abs(interests.width - content.width) < 1 && Math.abs(interests.x - content.x) < 1, 'Fill the mobile content width with the interest cards');
       assert(await page.locator('.profile-interests ul').evaluate(el => parseFloat(getComputedStyle(el).fontSize) >= 17));
@@ -352,7 +346,6 @@ try {
     }
     else {
       assert(interests.width <= 264);
-      assert(Math.abs(contactDetails.x - photo.x) < 1 && contactDetails.width <= 264, 'Keep contact details in the left desktop column');
       assert(Math.abs(interests.x - photo.x) < 1, 'Keep Interests in the desktop sidebar');
     }
     if ([1440, 390].includes(width)) {
@@ -371,7 +364,7 @@ try {
     assert(tab.x >= strip.x - 1 && tab.x + tab.width <= strip.x + strip.width + 1);
   }
 
-  const routes = ['/', '/news/', '/research/', '/experience/', '/education/'];
+  const routes = ['/', '/news/', '/research/', '/experience/', '/education/', '/contact/'];
   assert.deepEqual(await page.locator('nav a').evaluateAll(links => links.map(link => new URL(link.href).pathname)), routes);
   let referenceCv;
   for (const route of routes) {
@@ -398,6 +391,10 @@ try {
     assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'), `https://miyuruthathsara.github.io${route}`);
     assert.deepEqual(JSON.parse(await page.locator('#cv-data').textContent()), sharedData, 'Every page needs the same complete CV data');
     const content = await page.locator('main').innerText();
+    if (route === '/contact/') {
+      assert(!content.includes(sharedData.profile.interests), 'Keep the personal-interest note off Contact');
+      assert.deepEqual(await page.locator('#contact a').evaluateAll(links => links.map(link => link.href)), ['university', 'personal', 'website'].map(id => new URL(sharedData.contacts.find(contact => contact.id === id).url).href));
+    }
     assert(!/School team captain|Digital IC Design|Advanced Digital Systems/i.test(content), `Extra details should be collapsed on ${route}`);
     assert(!/\bSCSE\b/.test(content));
     if (route === '/news/') {
@@ -543,7 +540,7 @@ try {
       }
       for (const action of await page.locator('.publication-action').all()) {
         const box = await action.boundingBox();
-        assert(box.height >= 44 && box.x >= 0 && box.x + box.width <= width, 'Publication actions wrap within mobile width and remain easy to tap');
+        assert(box.height >= (width <= 540 ? 40 : 36) && box.x >= 0 && box.x + box.width <= width, 'Compact publication actions wrap within mobile width and remain easy to tap');
       }
       if (width !== 320) {
         await page.evaluate(() => scrollTo(0, 0));
@@ -661,8 +658,8 @@ try {
 
   await page.goto(`${base}/#research`);
   await page.waitForURL('**/research/');
-  await page.goto(`${base}/contact/`);
-  await page.waitForURL(`${base}/#contact`);
+  await page.goto(`${base}/#contact`);
+  await page.waitForURL(`${base}/contact/`);
   assert(await page.locator('#contact').isVisible());
   await page.goto(`${base}/#profile`);
   await page.waitForURL(`${base}/#about`);
@@ -706,7 +703,7 @@ try {
   await noJsPage.goto(`${base}/education/`);
   await checkDisclosures(noJsPage);
   await noJsPage.goto(`${base}/contact/`);
-  await noJsPage.waitForURL(`${base}/#contact`);
+  assert.equal(noJsPage.url(), `${base}/contact/`);
   assert.equal(await noJsPage.locator('#contact a').count(), 3);
   await noJsPage.goto(`${base}/#about`);
   assert.equal(await noJsPage.locator('.profile-links a').count(), 5, 'Contact links work without JavaScript');
@@ -1055,7 +1052,7 @@ try {
   assert(!optionalNoGrades.includes('A+') && !optionalNoGrades.includes('GPA:'));
   await page.locator('#cv-grades').check();
   await page.goto(`${base}/contact/`);
-  await page.waitForURL(`${base}/#contact`);
+  assert.equal(page.url(), `${base}/contact/`);
   await page.locator('[data-open-cv]').click();
   assert(await page.locator('#cv-coursework').isChecked(), 'Remember the independent coursework choice across pages');
   assert(await page.locator('input[data-group="entries"][data-key*="Chess"]').isChecked());

@@ -17,7 +17,9 @@ const records = values => values.map(record => ({
 }));
 const publications = values => values.map(paper => ({
   ...entry(paper.title, [paper.venue, paper.credit].filter(Boolean).join(' '), [paper.summary], paper.url),
-  cvId: paper.id, citationMeta: [paper.venue, paper.credit].filter(Boolean).join(' | ')
+  // Preserve saved selections independently of changes to displayed credit/status labels.
+  id: `${paper.contribution ? 'contributions' : 'publications'}:${paper.title}:${paper.selection_key || [paper.venue, paper.credit].filter(Boolean).join(' ')}`,
+  cvId: paper.id, citationMeta: [paper.venue, [paper.credit, paper.status].filter(Boolean).join(' · ')].filter(Boolean).join(' | ')
 }));
 
 // Shared build-time data keeps every page's CV complete. News is deliberately excluded.
@@ -136,7 +138,10 @@ function renderOptions() {
     if (section.items.length > 1 || section.items[0].title) {
       const details = element('details');
       details.append(element('summary', '', 'Choose entries'));
-      section.items.forEach(item => details.append(checkbox(item.title ? `${item.title}${item.meta ? ` — ${item.meta}` : ''}` : item.paragraphs[0], 'entries', item.id, state.entries[item.id])));
+      section.items.forEach(item => {
+        const meta = item.citationMeta ?? item.meta;
+        details.append(checkbox(item.title ? `${item.title}${meta ? ` — ${meta}` : ''}` : item.paragraphs[0], 'entries', item.id, state.entries[item.id]));
+      });
       group.append(details);
     }
     selections.append(group);

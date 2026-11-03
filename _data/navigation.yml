@@ -13,3 +13,6 @@
 - label: Education
   url: /education/
   section: education
+- label: Contact
+  url: /contact/
+  section: contact
