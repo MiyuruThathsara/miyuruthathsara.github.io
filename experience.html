@@ -5,18 +5,19 @@ section: experience
 permalink: /experience/
 description: Research and engineering experience in FPGA systems, embedded intelligence, and hardware acceleration.
 ---
-<ol class="experience-list" aria-label="Employment history, most recent first">
+<ol class="experience-list" aria-label="Professional experience">
   {% for record in site.data.profile.experience %}
   {% assign organization = site.data.organizations[record.organization_id] %}
+  {% assign record_date = record.date | default: '' %}
   <li>
     <article class="experience-card" aria-labelledby="experience-role-{{ forloop.index }}">
-      <header class="experience-card-heading">
+      <header class="experience-card-heading{% if record_date == '' %} experience-card-heading--undated{% endif %}">
         <div class="organization-logo">
           <img src="{{ organization.logo | relative_url }}" alt="{{ organization.name | escape }} logo" width="{{ organization.width }}" height="{{ organization.height }}" decoding="async">
         </div>
         <h2 id="experience-role-{{ forloop.index }}">{{ record.title | escape }}</h2>
         <p class="experience-organization">{{ record.organization | escape }}</p>
-        <p class="experience-date">{{ record.date | escape }}</p>
+        {% if record_date != '' %}<p class="experience-date">{{ record_date | escape }}</p>{% endif %}
       </header>
       <div class="experience-description">
         {% for paragraph in record.paragraphs %}<p>{{ paragraph | escape }}</p>{% endfor %}

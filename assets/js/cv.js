@@ -13,6 +13,7 @@ const records = values => values.map(record => ({
   // Preserve existing selection IDs while displaying institution lines with a separator.
   ...entry(record.title, [record.date, [record.organization, record.institution].filter(Boolean).join(' ')].filter(Boolean).join(' | '), record.paragraphs),
   date: record.date, organization: [record.organization, record.institution].filter(Boolean).join(' · '), coursework: record.coursework,
+  organizationId: record.organization_id,
   institution: record.institution || record.organization, department: record.institution ? record.organization : ''
 }));
 const publications = values => values.map(paper => ({
@@ -72,6 +73,12 @@ function restore() {
     for (const key of Object.keys(state[group])) {
       if (typeof saved?.[group]?.[key] === 'boolean') state[group][key] = saved[group][key];
     }
+  }
+  // Keep include/exclude choices when the research group and LSEG team names change.
+  for (const item of sections.find(section => section.id === 'experience').items) {
+    if (typeof saved?.entries?.[item.id] === 'boolean') continue;
+    const previousId = item.id.replace('Edge Intelligence Research Group', 'HESL, CCDS').replace('GTP Team', 'HWAC Team');
+    if (typeof saved?.entries?.[previousId] === 'boolean') state.entries[item.id] = saved.entries[previousId];
   }
   // Retain explicit certificate choices saved before it moved out of Earlier education.
   const certificate = sections.find(section => section.id === 'education').items.find(item => item.title === 'Certificate Level in Management (CIMA)');
@@ -153,7 +160,8 @@ function model() {
         if (id === 'research') values = [wording.research_focus];
         if (item.cvId && wording.publications[item.cvId]) values = [wording.publications[item.cvId]];
         if (state.audience === 'company') {
-          if (id === 'experience' && wording.company_roles[item.title]) values = wording.company_roles[item.title];
+          const companyRole = wording.company_roles[`${item.organizationId}:${item.title}`] || wording.company_roles[item.title];
+          if (id === 'experience' && companyRole) values = companyRole;
           if (item.cvId && wording.company_publications[item.cvId]) values = [wording.company_publications[item.cvId]];
           if (id === 'education' && item.title.startsWith('Doctor of Philosophy')) values = ['Final-year candidate (in progress).'];
         }

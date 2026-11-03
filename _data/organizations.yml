@@ -13,6 +13,13 @@ lseg:
   height: 39
   source: https://www.lseg.com/content/dam/lseg/en_us/images/logos/bespoke/lseg-logo.svg
 
+chiptip:
+  name: ChipTip Technologies
+  logo: /assets/img/logos/chiptip.png
+  width: 512
+  height: 512
+  source: https://chiptip.tech/wp-content/uploads/2025/09/icon_512Squear.png
+
 moratuwa:
   name: University of Moratuwa
   logo: /assets/img/logos/university-of-moratuwa.png

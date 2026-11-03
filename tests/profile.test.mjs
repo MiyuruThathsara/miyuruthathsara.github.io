@@ -453,7 +453,12 @@ try {
       assert.equal(await page.locator('#iciafs2018 .publication-venue span').innerText(), 'Acknowledged contributor');
     }
     if (route === '/experience/') {
-      assert.match(content, /HESL, CCDS/);
+      assert.match(content, /Edge Intelligence Research Group/);
+      assert.equal(await page.locator('.experience-card').count(), 5);
+      assert.deepEqual(await page.locator('.experience-description p').allTextContents(), sharedData.profile.experience.flatMap(record => record.paragraphs));
+      const consultingRole = page.locator('.experience-card').filter({ has: page.getByRole('heading', { name: 'Engineering Consultant', exact: true }) });
+      assert.equal(await consultingRole.locator('.experience-date').count(), 0, 'Leave the consulting role undated');
+      assert.equal(await consultingRole.locator('img').getAttribute('alt'), 'ChipTip Technologies logo');
       assert.match(await page.locator('#review').innerText(), /External Reviewer[\s\S]*ICCAD 2026/);
     }
     if (route === '/contact/') assert(!content.includes(sharedData.profile.interests), 'Keep the personal-interest note off the Contact page');
@@ -720,7 +725,7 @@ try {
   let pdfText = await downloadPdf('academic', true);
   assert.match(pdfText, /External Reviewer/);
   assert.match(pdfText, /ICCAD 2026/);
-  assert(pdfText.includes('HESL, CCDS') && !pdfText.includes('SCSE'));
+  assert(pdfText.includes('Edge Intelligence Research Group') && !pdfText.includes('SCSE'));
   assert.match(pdfText, /Hardware Accelerator for Feature Matching/);
   assert(!pdfText.includes('Nalanda College'));
   assert(pdfText.includes('Certificate Level in Management (CIMA)'));
@@ -822,6 +827,13 @@ try {
     const fpl2025 = Object.keys(saved.entries).find(key => key.startsWith('publications:FPGA Stereo Visual SLAM'));
     saved.entries[fpl2025.replace('First author · Published', 'First author · Accepted')] = false;
     delete saved.entries[fpl2025];
+    // Renaming organizations must preserve saved role selections.
+    for (const key of Object.keys(saved.entries).filter(key => key.startsWith('experience:'))) {
+      const previousKey = key.replace('Edge Intelligence Research Group', 'HESL, CCDS').replace('GTP Team', 'HWAC Team');
+      if (previousKey === key) continue;
+      saved.entries[previousKey] = false;
+      delete saved.entries[key];
+    }
     localStorage.setItem(key, JSON.stringify(saved));
   });
   await page.goto(`${base}/education/`);
@@ -833,6 +845,10 @@ try {
   assert(!await page.locator('#cv-coursework').isChecked(), 'Coursework starts optional for old saved presets');
   assert(!await page.locator('input[data-group="entries"][data-key*="Certificate Level in Management (CIMA)"]').isChecked(), 'Preserve the old explicit certificate selection');
   assert(!await page.locator('input[data-group="entries"][data-key*="FPGA Stereo Visual SLAM"]').isChecked(), 'Preserve an excluded FPL 2025 entry after its publication status changes');
+  const roleSelections = await page.locator('input[data-group="entries"][data-key^="experience:"]').evaluateAll(inputs => inputs.map(input => ({ id: input.dataset.key, checked: input.checked })));
+  assert.equal(roleSelections.filter(role => /Edge Intelligence Research Group|GTP Team/.test(role.id)).length, 3);
+  assert(roleSelections.filter(role => /Edge Intelligence Research Group|GTP Team/.test(role.id)).every(role => !role.checked), 'Keep excluded roles excluded after organization names change');
+  assert(roleSelections.find(role => role.id.includes('Engineering Consultant')).checked, 'Include the new consulting role by default');
 
   await page.locator('input[name="audience"][value="company"]').check();
   assert.equal(await page.locator('#cv-preview').getAttribute('data-audience'), 'company');
@@ -854,6 +870,9 @@ try {
   pdfText = await downloadPdf('company', true);
   assert.equal(pdfInspections.get('company').pageCount, 1, 'The default company CV should fit one page without a sparse continuation');
   assert(pdfText.includes('AXI DMA'));
+  assert(pdfText.includes('ChipTip Technologies') && pdfText.includes('Cloud Native Logic'));
+  assert.match(await page.locator('.cv-section-experience .cv-preview-item').filter({ hasText: 'Jul 2019' }).innerText(), /systolic-array SONN/);
+  assert.match(await page.locator('.cv-section-experience .cv-preview-item').filter({ hasText: 'Jan 2018' }).innerText(), /hexacopter flight controller/);
   assert(pdfText.indexOf('PROFESSIONAL EXPERIENCE') < pdfText.indexOf('EDUCATION'));
   assert(!pdfText.includes('External Reviewer'));
   assert(!pdfText.includes('SELECTED PUBLICATIONS'));

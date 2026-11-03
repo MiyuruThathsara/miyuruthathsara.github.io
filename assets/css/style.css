@@ -203,6 +203,7 @@ summary::marker { color: var(--accent); }
 .experience-list > li:first-child::after { background: var(--heading); }
 .experience-card { padding: 1.5rem; border: 1px solid var(--line); border-radius: 4px; background: var(--card); box-shadow: 0 2px 5px #14252e0d; }
 .experience-card-heading { display: grid; grid-template-columns: 64px minmax(0, 1fr); grid-template-areas: "logo title" "logo organization" "logo date"; align-items: start; column-gap: 1rem; }
+.experience-card-heading--undated { grid-template-areas: "logo title" "logo organization"; }
 .experience-card h2 { grid-area: title; margin: 0 0 0.2rem; font-family: inherit; font-size: 1rem; font-weight: 600; letter-spacing: 0; line-height: 1.5; }
 .experience-organization { grid-area: organization; margin: 0 0 0.2rem; font-size: 0.85rem; }
 .experience-date { grid-area: date; margin: 0; color: var(--muted); font-size: 0.76rem; font-variant-numeric: tabular-nums; }
@@ -280,6 +281,8 @@ summary::marker { color: var(--accent); }
   .experience-list > li::before, .experience-list > li::after { display: none; }
   .experience-card { padding: 1rem; border-radius: 8px; box-shadow: 0 2px 6px #14252e08; }
   .experience-card-heading { grid-template-columns: 60px minmax(0, 1fr); grid-template-areas: "logo title" "logo date" "organization organization"; column-gap: 0.875rem; }
+  .experience-card-heading--undated { grid-template-areas: "logo title" "organization organization"; }
+  .experience-card-heading--undated h2 { align-self: center; }
   .experience-card h2 { margin-bottom: 0.3rem; font-size: 1rem; line-height: 1.4; }
   .experience-date { font-size: 0.75rem; line-height: 1.5; }
   .experience-organization { margin: 0.875rem 0 0; font-size: 0.875rem; line-height: 1.6; }

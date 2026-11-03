@@ -13,9 +13,15 @@ engineering_results:
 # Company-only editing preserves the full source descriptions on the site and academic CV.
 company_roles:
   Project Officer (Research):
-    - Designed and prototyped FPGA-SoC visual SLAM, co-designing algorithms and hardware acceleration.
+    - Co-designed visual SLAM algorithms and custom hardware acceleration on the Kria KV260 FPGA SoC.
+  Engineering Consultant:
+    - Contributed FPGA virtualization and network-attached acceleration to the Cloud Native Logic platform.
   Engineer, Accelerated Systems:
-    - Built a multi-channel AXI DMA engine integrated into LSEG's market data pipeline; contributed partial reconfiguration support.
+    - Built a multi-channel AXI DMA engine for LSEG's low-latency market data pipeline in the GTP team; contributed Linux driver integration and FPGA partial reconfiguration.
+  ntu:Research Assistant:
+    - Developed a systolic-array SONN classifier; explored pruning, quantization and Posits for inference.
+  moratuwa:Research Assistant:
+    - Contributed a hexacopter flight controller to an MPhil UAV research project.
 company_publications:
   fpl2025: Integrated stereo visual SLAM on an FPGA SoC with low-latency feature matching and tracking-driven keyframes; evaluated on benchmarks and real-world sequences.
   fpt2024: Designed a streaming FPGA architecture for spatially uniform keypoint selection with variable input sizes and efficient resource use.
