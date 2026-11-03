@@ -1,4 +1,4 @@
-import { createCvPdf } from './cv-pdf.js?v=20261103-heading-pagination';
+import { createCvPdf } from './cv-pdf.js?v=20261104-flow-pagination';
 
 const dialog = document.querySelector('#cv-dialog');
 const form = document.querySelector('#cv-form');

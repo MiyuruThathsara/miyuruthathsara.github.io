@@ -37,7 +37,7 @@ export function createCvPdf(jsPDF, model, fonts) {
   }
 
   function ensure(height) {
-    if (y + height > bottom) newPage();
+    if (y + height > bottom + 0.001) newPage();
   }
 
   function paragraph(value, { style = 'normal', size = bodySize, color = ink, after = 2, url, align = 'left', indent = 0, maxWidth = width - indent, bullet = false } = {}) {
@@ -46,15 +46,28 @@ export function createCvPdf(jsPDF, model, fonts) {
     pdf.setFont(family, style).setFontSize(size);
     const lines = pdf.splitTextToSize(text, maxWidth);
     const lineHeight = size * 1.25;
-    for (const [index, line] of lines.entries()) {
-      ensure(lineHeight);
-      pdf.setFont(family, style).setFontSize(size).setTextColor(...color);
-      const textWidth = Math.min(maxWidth, pdf.getTextWidth(line));
-      const x = align === 'center' ? (pageWidth - textWidth) / 2 : margin + indent;
-      if (bullet && index === 0) pdf.text('•', x - 10, y + size);
-      pdf.text(line, x, y + size);
-      if (url) pdf.link(x, y, textWidth, lineHeight, { url });
-      y += lineHeight;
+    let index = 0;
+    while (index < lines.length) {
+      const remaining = lines.length - index;
+      let available = Math.max(0, Math.floor((bottom - y + 0.001) / lineHeight));
+      if (remaining > available) {
+        // Flow into the remaining space, with at least two lines on each side
+        // of a paragraph break. One- to three-line paragraphs stay together.
+        if (remaining - available === 1) available--;
+        if (available < 2) { newPage(); continue; }
+      }
+      const count = Math.min(remaining, available);
+      for (let offset = 0; offset < count; offset++, index++) {
+        const line = lines[index];
+        pdf.setFont(family, style).setFontSize(size).setTextColor(...color);
+        const textWidth = Math.min(maxWidth, pdf.getTextWidth(line));
+        const x = align === 'center' ? (pageWidth - textWidth) / 2 : margin + indent;
+        if (bullet && index === 0) pdf.text('•', x - 10, y + size);
+        pdf.text(line, x, y + size);
+        if (url) pdf.link(x, y, textWidth, lineHeight, { url });
+        y += lineHeight;
+      }
+      if (index < lines.length) newPage();
     }
     y += after;
   }
@@ -72,14 +85,12 @@ export function createCvPdf(jsPDF, model, fonts) {
     const titleWidth = width - indent - dateWidth;
     const titleHeight = item.title ? textHeight(item.title, titleSize, 'bold', titleWidth) : 0;
     const metaHeight = item.meta ? textHeight(item.meta, metaSize, 'normal', width - indent) + 2 : 0;
-    const bodyHeight = item.paragraphs.reduce((height, value) => height + textHeight(value, bodySize, 'normal', width - indent - (item.bullets ? 10 : 0)) + 2, 0);
-    return { indent, titleWidth, height: titleHeight + metaHeight + bodyHeight + (item.title ? entryGap : 0), startHeight: titleHeight + metaHeight + (bodyHeight ? 26 : 0) };
-  }
-
-  function reserveEntry(item) {
-    const layout = entryLayout(item);
-    // Keep normal CV entries together. Very long future entries can flow across pages.
-    return layout.height <= bottom - margin - 32 ? layout.height : layout.startHeight;
+    const firstParagraph = item.paragraphs.find(value => value.trim());
+    const firstBodyHeight = textHeight(firstParagraph, bodySize, 'normal', width - indent - (item.bullets ? 10 : 0));
+    const bodyStartHeight = firstBodyHeight > bodySize * 1.25 * 3 ? bodySize * 1.25 * 2 : firstBodyHeight;
+    // Keep the title, metadata, and beginning of the description together.
+    // Remaining paragraphs can flow instead of moving the entire entry.
+    return { indent, titleWidth, startHeight: titleHeight + metaHeight + bodyStartHeight };
   }
 
   function contactRows(contacts) {
@@ -138,9 +149,8 @@ export function createCvPdf(jsPDF, model, fonts) {
 
   for (const section of model.sections) {
     if (!section.items.length) continue;
-    const educationHeight = section.id === 'education' ? section.items.reduce((height, item) => height + entryLayout(item).height, 0) : 0;
-    const keepEducationTogether = educationHeight > 0 && educationHeight < (bottom - margin) / 2;
-    ensure(28 + (keepEducationTogether ? educationHeight : reserveEntry(section.items[0])));
+    // Reserve the section heading and the start of its first entry only.
+    ensure(26 + entryLayout(section.items[0]).startHeight);
     y += 7;
     // Optical small caps, like the reference's LaTeX section headings.
     let x = margin;
@@ -156,8 +166,8 @@ export function createCvPdf(jsPDF, model, fonts) {
     pdf.setDrawColor(...ink).setLineWidth(0.5).line(margin, y, pageWidth - margin, y);
     y += 4;
     for (const item of section.items) {
-      ensure(reserveEntry(item));
-      const { indent, titleWidth } = entryLayout(item);
+      const { indent, titleWidth, startHeight } = entryLayout(item);
+      ensure(startHeight);
       if (item.number) {
         pdf.setFont(family, 'normal').setFontSize(bodySize).setTextColor(...ink);
         pdf.text(`[${item.number}]`, margin, y + titleSize);
