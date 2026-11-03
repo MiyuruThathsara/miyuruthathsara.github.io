@@ -89,18 +89,9 @@ h3 { margin: 0 0 0.5rem; font-size: 1rem; font-weight: 600; line-height: 1.5; }
 .header-inner--about { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "nav actions"; }
 .header-actions { grid-area: actions; display: flex; align-items: center; gap: 0.5rem; padding-left: 1rem; border-left: 1px solid var(--line); }
 .header-tool { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: 44px; height: 44px; padding: 0; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--heading); font-size: 0.76rem; font-weight: 600; line-height: 1; white-space: nowrap; text-decoration: none; cursor: pointer; }
-.header-tool:hover, .theme-control[open] > summary { background: var(--wash); border-color: var(--line); text-decoration: none; }
+.header-tool:hover { background: var(--wash); border-color: var(--line); text-decoration: none; }
 .cv-trigger { width: auto; padding: 0 0.8rem; border-color: var(--line); }
 .tool-icon { display: block; flex-shrink: 0; width: 20px; height: 20px; }
-.theme-control { position: relative; }
-.theme-control > summary { list-style: none; }
-.theme-control > summary::-webkit-details-marker { display: none; }
-.theme-menu { position: absolute; z-index: 5; top: calc(100% + 0.7rem); right: 0; width: 208px; margin: 0; padding: 0.65rem; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: 0 8px 28px #14252e25; }
-.theme-menu-title { margin: 0; padding: 0.3rem 0.45rem 0.5rem; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-.theme-menu label { display: flex; align-items: center; gap: 0.65rem; min-height: 44px; padding: 0.5rem; border-radius: 4px; font-size: 0.82rem; line-height: 1.45; cursor: pointer; }
-.theme-menu label:hover, .theme-menu label:has(input:checked) { background: var(--wash); }
-.theme-menu input { width: 16px; height: 16px; margin: 0; flex-shrink: 0; accent-color: var(--heading); }
-.theme-menu small { display: block; margin-top: 0.15rem; color: var(--muted); font-size: 0.7rem; }
 .site-header nav { grid-area: nav; justify-content: center; }
 .site-brand { grid-area: brand; display: flex; align-items: center; min-height: 44px; font-size: 1.5rem; letter-spacing: -0.035em; line-height: 1.3; text-decoration: none; }
 nav { display: flex; flex-wrap: wrap; gap: 0.5rem 1.6rem; }

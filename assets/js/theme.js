@@ -16,11 +16,11 @@
       meta.content = theme === 'dark' ? '#151c22' : '#fcfbf8';
     });
     if (control) {
-      control.querySelectorAll('input').forEach(input => { input.checked = input.value === preference; });
-      control.querySelectorAll('[data-theme-icon]').forEach(icon => { icon.toggleAttribute('hidden', icon.dataset.themeIcon !== preference); });
-      const label = `Colour theme: ${preference[0].toUpperCase() + preference.slice(1)}`;
+      const nextTheme = theme === 'dark' ? 'light' : 'dark';
+      control.querySelectorAll('[data-theme-icon]').forEach(icon => { icon.toggleAttribute('hidden', icon.dataset.themeIcon !== nextTheme); });
+      const label = `Switch to ${nextTheme} theme`;
       control.querySelector('#theme-toggle-label').textContent = label;
-      control.querySelector('summary').title = label;
+      control.title = label;
     }
   }
 
@@ -35,30 +35,11 @@
   document.addEventListener('DOMContentLoaded', () => {
     control = document.querySelector('.theme-control');
     if (!control) return;
-    const toggle = control.querySelector('summary');
     applyTheme();
-    control.addEventListener('change', event => {
-      preference = validPreference(event.target.value);
+    control.addEventListener('click', () => {
+      preference = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
       applyTheme();
       try { localStorage.setItem(storageKey, preference); } catch { /* Still works for this page. */ }
-    });
-    // Leave the options open for keyboard arrow navigation; Escape or an outside
-    // click dismisses them without moving focus away from another control.
-    document.addEventListener('click', event => {
-      if (!control.contains(event.target)) control.open = false;
-    });
-    control.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && control.open) {
-        event.preventDefault();
-        control.open = false;
-        toggle.focus();
-      }
-    });
-    // Safari may blur the summary with relatedTarget === null before activating
-    // a tapped label/radio. Closing on that blur cancels the pending selection.
-    // Only dismiss when focus actually arrives at a control outside this menu.
-    document.addEventListener('focusin', event => {
-      if (!control.contains(event.target)) control.open = false;
     });
     control.hidden = false;
   }, { once: true });

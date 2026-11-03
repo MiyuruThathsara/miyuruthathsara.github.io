@@ -118,13 +118,13 @@ async function checkPublicationVideo(target = page) {
   assert.equal(await target.getByRole('link', { name: /^Watch video for/ }).getAttribute('href'), 'https://www.youtube.com/watch?v=vtGebB7Yoc8');
 }
 
-const currentTheme = (target = page) => target.locator('input[name="theme-preference"]:checked').inputValue();
+const currentTheme = (target = page) => target.locator('html').getAttribute('data-theme-preference');
 async function chooseTheme(value, target = page) {
-  const control = target.locator('.theme-control');
-  if (!await control.evaluate(el => el.open)) await target.locator('#theme-toggle').click();
-  await target.locator(`input[name="theme-preference"][value="${value}"]`).check();
-  assert.equal(await control.locator('[data-theme-icon]:not([hidden])').getAttribute('data-theme-icon'), value);
-  await target.locator('#theme-toggle').click();
+  if (await target.locator('html').getAttribute('data-theme') !== value) await target.locator('#theme-toggle').click();
+  assert.equal(await target.locator('html').getAttribute('data-theme'), value);
+  const nextTheme = value === 'dark' ? 'light' : 'dark';
+  assert.equal(await target.locator('[data-theme-icon]:not([hidden])').getAttribute('data-theme-icon'), nextTheme);
+  assert.equal(await target.locator('#theme-toggle').getAttribute('title'), `Switch to ${nextTheme} theme`);
 }
 
 async function checkDisclosures(target = page) {
@@ -142,37 +142,40 @@ async function checkDisclosures(target = page) {
 }
 
 async function checkThemeTaps() {
-  for (const blurBeforeClick of [false, true]) {
-    console.log(`Checking touch theme selection (null focus destination: ${blurBeforeClick})`);
-    const touchContext = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, colorScheme: 'light' });
+  for (const [colorScheme, blurBeforeClick] of [['light', false], ['light', true], ['dark', false], ['dark', true]]) {
+    console.log(`Checking one-tap themes (system: ${colorScheme}; null focus destination: ${blurBeforeClick})`);
+    const touchContext = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, colorScheme });
     const touchPage = await touchContext.newPage();
     try {
-      await touchPage.goto(base);
       if (blurBeforeClick) {
-        // Safari can blur the previous control without focusing a tapped radio.
-        // Reproduce that event ordering without pretending Chromium is Safari.
-        await touchPage.evaluate(() => document.addEventListener('mousedown', event => {
-          if (!event.target.closest('.theme-menu label')) return;
+        // Safari may blur without focusing the tapped control. Verify the click
+        // still works, without pretending Chromium replaces a physical iPhone.
+        await touchPage.addInitScript(() => document.addEventListener('mousedown', event => {
+          if (!event.target.closest('#theme-toggle')) return;
           event.preventDefault();
           document.activeElement.blur();
         }, true));
       }
-      await touchPage.locator('#theme-toggle').tap();
-      for (const [value, target] of [['dark', 'span'], ['light', 'input'], ['system', null]]) {
-        await touchPage.locator('#theme-toggle').focus();
-        const label = touchPage.locator('.theme-menu label').filter({ has: touchPage.locator(`input[value="${value}"]`) });
-        await (target ? label.locator(target) : label).tap();
-        assert.equal(await currentTheme(touchPage), value, `A ${target || 'label'} tap must apply ${value}, even with a null focus destination (${blurBeforeClick})`);
-        assert.equal(await touchPage.locator('html').getAttribute('data-theme'), value === 'system' ? 'light' : value);
-        assert(await touchPage.locator('.theme-control').evaluate(el => el.open), 'Focus loss must not dismiss the menu during a tap');
+      for (const route of ['/', '/news/', '/research/', '/experience/', '/education/', '/contact/']) {
+        await touchPage.goto(`${base}${route}`);
+        assert.equal(await touchPage.locator('html').getAttribute('data-theme'), colorScheme);
+        if (route === '/') assert.equal(await currentTheme(touchPage), 'system', 'First visit starts with the device setting');
+        for (const selector of ['#theme-toggle', '#theme-toggle [data-theme-icon]:not([hidden])']) {
+          const previous = await touchPage.locator('html').getAttribute('data-theme');
+          const next = previous === 'dark' ? 'light' : 'dark';
+          await touchPage.locator('#theme-toggle').focus();
+          await touchPage.locator(selector).tap();
+          assert.equal(await touchPage.locator('html').getAttribute('data-theme'), next, `One tap switches ${route} to ${next}`);
+          assert.equal(await currentTheme(touchPage), next);
+          assert.equal(await touchPage.locator('#theme-toggle').getAttribute('title'), `Switch to ${previous} theme`);
+          assert.equal(await touchPage.locator('[data-theme-icon]:not([hidden])').getAttribute('data-theme-icon'), previous);
+        }
+        await touchPage.reload();
+        assert.equal(await currentTheme(touchPage), colorScheme, 'Keep the manual choice after reloading');
       }
-      await touchPage.touchscreen.tap(5, 100);
-      assert(!await touchPage.locator('.theme-control').evaluate(el => el.open));
-      await touchPage.reload();
-      assert.equal(await currentTheme(touchPage), 'system');
     } finally { await touchContext.close(); }
   }
-  console.log('PASS: real touch taps on theme labels, text, and radios, including Safari-style null-focus event ordering');
+  console.log('PASS: one-tap themes on every page, both system defaults, icon taps, saved choices, and Safari-style null-focus event ordering');
 }
 
 async function readPdf(bytes, name, render = false) {
@@ -311,16 +314,12 @@ try {
     assert.equal(await page.locator('[data-open-cv]').getAttribute('aria-label'), 'CV: Generate PDF');
     assert.equal(await page.locator('[data-open-cv]').getAttribute('title'), 'Generate PDF');
     assert.equal(await page.locator('.cv-trigger-label').textContent(), 'CV');
-    await page.locator('#theme-toggle').click();
-    const menu = await page.locator('.theme-menu').boundingBox();
-    assert(menu.x >= 0 && menu.x + menu.width <= width, 'Keep the theme menu within the viewport');
+    assert.equal(await page.getByRole('button', { name: 'Switch to dark theme' }).count(), 1);
+    assert.equal(await page.locator('.theme-menu, input[name="theme-preference"]').count(), 0, 'Use one direct toggle without a menu');
     if ([1440, 390].includes(width)) {
       await audit();
-      await page.screenshot({ path: join(artifacts, `theme-menu-${width}.png`) });
+      await page.screenshot({ path: join(artifacts, `theme-toggle-${width}.png`) });
     }
-    await page.keyboard.press('Escape');
-    assert(!await page.locator('.theme-control').evaluate(el => el.open));
-    assert(await page.locator('#theme-toggle').evaluate(el => document.activeElement === el));
     const frame = await page.locator('.profile-photo-frame').boundingBox();
     const photo = await page.locator('.profile-photo').boundingBox();
     assert(frame.width >= 220);
@@ -619,39 +618,31 @@ try {
   await sibling.close();
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
-  await chooseTheme('light');
-  await chooseTheme('system');
-  assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark', 'Choosing System restores the live device preference');
+  assert.equal(await currentTheme(), 'system', 'Clearing the saved choice restores live device changes');
   await page.emulateMedia({ colorScheme: 'light' });
   await page.waitForFunction(() => document.documentElement.dataset.theme === 'light');
-  assert.equal(await currentTheme(), 'system');
   await page.locator('#theme-toggle').focus();
   await page.keyboard.press('Enter');
-  await page.locator('input[name="theme-preference"]:checked').focus();
-  await page.keyboard.press('ArrowDown');
-  assert.equal(await currentTheme(), 'light', 'Native arrow keys change the theme');
-  await page.keyboard.press('ArrowDown');
+  assert.equal(await currentTheme(), 'dark', 'Enter switches the theme once');
+  await page.keyboard.press('Space');
+  assert.equal(await currentTheme(), 'light', 'Space switches the theme once');
+  await page.keyboard.press('Enter');
   assert.equal(await currentTheme(), 'dark');
-  assert.equal(await page.locator('[data-theme-icon]:not([hidden])').getAttribute('data-theme-icon'), 'dark');
-  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('[data-theme-icon]:not([hidden])').getAttribute('data-theme-icon'), 'light');
+  assert(await page.getByRole('button', { name: 'Switch to light theme' }).isVisible());
+  assert(await page.locator('#theme-toggle').evaluate(el => document.activeElement === el), 'Keep keyboard focus on the toggle');
   for (const width of [1440, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });
-    await page.locator('#theme-toggle').click();
     await audit();
-    const menu = await page.locator('.theme-menu').boundingBox();
-    assert(menu.x >= 0 && menu.x + menu.width <= width);
-    await page.screenshot({ path: join(artifacts, `dark-theme-menu-${width}.png`) });
-    await page.mouse.click(5, 100); // The page margin remains outside the menu at every width.
-    assert(!await page.locator('.theme-control').evaluate(el => el.open), 'Outside clicks close the theme menu');
+    const toggle = await page.locator('#theme-toggle').boundingBox();
+    assert(toggle.x >= 0 && toggle.x + toggle.width <= width);
+    await page.screenshot({ path: join(artifacts, `dark-theme-toggle-${width}.png`) });
   }
-  await page.locator('#theme-toggle').click();
-  await page.locator('input[name="theme-preference"]:checked').focus();
+  await page.locator('#theme-toggle').focus();
   await page.keyboard.press('Tab');
-  assert(!await page.locator('.theme-control').evaluate(el => el.open), 'Tabbing out closes the theme menu');
-  await chooseTheme('system');
-  await page.locator('#theme-toggle').click();
+  assert(!await page.locator('#theme-toggle').evaluate(el => document.activeElement === el), 'The toggle must not trap keyboard focus');
+  await chooseTheme('light');
   await page.locator('[data-open-cv]').click();
-  assert(!await page.locator('.theme-control').evaluate(el => el.open), 'Opening the CV should dismiss the theme menu');
   assert(await page.locator('#cv-dialog').isVisible());
   await page.locator('[data-close-cv]').click();
   console.log('PASS: system/light/dark themes, device changes, cross-page and cross-tab preferences, dark accessibility, white CV preview/PDF, and light print styles');

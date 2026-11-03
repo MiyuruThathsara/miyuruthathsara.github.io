@@ -28,7 +28,7 @@ Open `http://localhost:4000`. To build without starting a server, run `bundle ex
 - `_data/cv.yml`: CV-only professional/academic summaries, engineering results, company role/publication wording, research focus, and technical expertise. Publication keys match the IDs in `_data/publications.json`.
 - `_data/news.yml`: website-only news, newest first, with confirmed years/dates and links to the relevant sections. News is deliberately excluded from CV options and PDF generation.
 - `_includes/profile-tools.html`: CV options and the image viewer.
-- `_includes/theme-control.html`: compact theme disclosure with native radio options.
+- `_includes/theme-control.html`: a single sun/moon button that switches directly between light and dark.
 - `_includes/profile-links.html`: centered LinkedIn, Google Scholar, GitHub, university email, and personal website icon links beneath the homepage portrait. Destinations come from `_config.yml`.
 - `_includes/social-icon.html`: inline SVG icons from [Font Awesome Free 6.7.2](https://github.com/FortAwesome/Font-Awesome/tree/6.7.2), © 2024 Fonticons, Inc., licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Original paths and attribution are retained; wrappers add theme-aware styling and accessibility attributes. No external icon font or script is required.
 - `_includes/cv-data.html`: embeds the full shared CV data into every page, without fetching or scraping other pages. News is not included.
@@ -36,7 +36,7 @@ Open `http://localhost:4000`. To build without starting a server, run `bundle ex
 - `assets/js/cv-pdf.js`: formal A4 PDF layout and pagination.
 - `assets/js/images.js`: image enlargement and zoom controls.
 - `assets/js/navigation.js`: redirects old homepage section bookmarks (such as `/#research`) to their new pages.
-- `assets/js/theme.js`: applies the colour preference before styles load and keeps the shared theme selector in sync.
+- `assets/js/theme.js`: applies the colour preference before styles load and keeps the shared appearance button in sync.
 - `assets/css/tools.css`: image viewer and CV builder layouts.
 
 The GitHub Pages address is the canonical URL. The separate personal website, [miyuruthathsara.com](https://miyuruthathsara.com), is linked from the profile, contact section, and footer.
@@ -45,9 +45,9 @@ The GitHub Pages address is the canonical URL. The separate personal website, [m
 
 The header uses the name **Miyuru Thathsara** in the same Georgia serif font and weight as the About-page name, sized at 24px on desktop and responsively scaled on small screens. This corner name is omitted on About only. CV/document and theme controls remain aligned. Individual section pages show their title without repeating the name above it. The CV label is shown on wide screens; compact screens use the labelled icon with a tooltip. On smaller screens, branding and controls share the first row and navigation sits below on a single line, centered when it fits and horizontally scrollable on the narrowest screens. The current or keyboard-focused tab is scrolled into view. Both controls and the homepage contact icons have at least 44-pixel touch targets. The five contact icons stay centered beneath the portrait, with accessible names, hover titles, and keyboard focus indicators; they inherit the active colour theme. At widths up to 800px, the uncropped photograph expands to the available width (up to 360px), and Interests moves below the complete biography in full-width, larger-text book-icon cards. This rearrangement uses CSS and works without JavaScript.
 
-The theme icon opens **System**, **Light**, and **Dark** options, with the selected setting represented by a monitor, sun, or moon. The menu supports keyboard navigation, Escape, and dismissal by clicking outside. System is the default and follows the browser/device colour preference, including changes while the site is open. Manual choices are saved locally as `miyuru-theme-v1`, persist across pages and visits, and synchronize between open tabs. With storage blocked, theme selection still works on the current page. With JavaScript disabled, the site follows the device setting without showing an inactive selector. Diagrams keep their original colours, and CV previews, downloaded PDFs, and printed pages remain light and print-friendly.
+The site follows the browser/device colour preference by default, including changes while it is open. One tap on the appearance button switches to the opposite theme: the moon offers dark mode, and the sun offers light mode. Its accessible name and tooltip describe the next action. The native button also supports Enter and Space. Manual choices are saved locally as `miyuru-theme-v1`, persist across pages and visits, and synchronize between open tabs. Existing saved choices remain valid. With storage blocked, switching still works on the current page. With JavaScript disabled, the site follows the device setting without showing an inactive button. Diagrams keep their original colours, and CV previews, downloaded PDFs, and printed pages remain light and print-friendly.
 
-The menu dismisses when focus arrives outside it, not when an element merely loses focus. This allows a label/radio tap to finish even when the browser blurs the previous control without providing a new focus target. The touch regression checks text, label, and radio taps and reproduces this event ordering in Chrome's touch emulation; it does not replace testing on a physical iPhone.
+The touch regression checks direct button and icon taps on every page, including Safari-style loss of focus before a click. It uses Chrome's touch emulation and does not replace testing on a physical iPhone.
 
 ## Downloading a CV
 
