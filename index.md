@@ -2,6 +2,11 @@
 title: About
 layout: default
 permalink: /
+profile_highlights:
+  - "final-year PhD candidate in Computer Science"
+  - "My research focuses on building efficient onboard computing systems"
+  - "computer vision, robotics, computer architecture, and hardware-software co-design"
+  - "my broader research direction is collaborative localization and autonomy"
 interests:
   - Embedded Intelligence
   - Computer Architecture
@@ -12,7 +17,7 @@ interests:
 <div class="profile-layout" id="about">
   <header class="profile-heading">
     <h1 id="profile-title">Miyuru Thathsara</h1>
-    <p class="intro-subtitle">{% include profile-text.html text=site.data.profile.headline %}, Singapore</p>
+    <p class="intro-subtitle">{{ site.data.profile.headline | escape }}, Singapore</p>
   </header>
   <aside class="profile-sidebar" aria-label="Photograph, profile links, and interests">
     <div class="profile-portrait">
@@ -26,7 +31,15 @@ interests:
   </aside>
   <div class="profile-content">
     <section class="introduction" aria-labelledby="profile-title">
-      {% for paragraph in site.data.profile.summary %}<p>{% include profile-text.html text=paragraph %}</p>{% endfor %}
+      {% for paragraph in site.data.profile.summary %}
+        {% assign bio_paragraph = paragraph | escape %}
+        {% for phrase in page.profile_highlights %}
+          {% assign escaped_phrase = phrase | escape %}
+          {% capture highlight %}<strong>{{ escaped_phrase }}</strong>{% endcapture %}
+          {% assign bio_paragraph = bio_paragraph | replace_first: escaped_phrase, highlight %}
+        {% endfor %}
+        <p>{{ bio_paragraph }}</p>
+      {% endfor %}
     </section>
   </div>
 </div>
