@@ -465,10 +465,10 @@ try {
     if (route === '/education/') {
       assert(content.includes('Honours & awards') && content.includes('NTU Research Scholarship'));
       assert(content.includes('Chess') && content.includes('Selected coursework'), 'Show discoverable disclosure labels');
-      assert.equal(await page.locator('.section-page > .record').count(), 3);
-      assert.match(await page.locator('.section-page > .record').last().innerText(), /Certificate Level in Management \(CIMA\)[\s\S]*Achievers Lanka/);
-      assert.equal(await page.locator('.education-details .record').count(), 1);
-      assert.match(await page.locator('.education-details .record').textContent(), /Nalanda College/);
+      assert.equal(await page.locator('.section-page > .education-card').count(), 3);
+      assert.match(await page.locator('.section-page > .education-card').last().innerText(), /Certificate Level in Management \(CIMA\)[\s\S]*Achievers Lanka/);
+      assert.equal(await page.locator('.education-details .education-card').count(), 1);
+      assert.match(await page.locator('.education-details .education-card').textContent(), /Nalanda College/);
     }
     for (const width of [1440, 390, 320]) {
       await page.setViewportSize({ width, height: 1100 });
@@ -482,7 +482,7 @@ try {
         assert(await page.locator('.site-brand').evaluate(el => parseFloat(getComputedStyle(el).fontSize)) >= (width > 540 ? 24 : 19.2));
       }
       for (const img of await page.locator('main img').all()) {
-        await img.scrollIntoViewIfNeeded();
+        if (await img.isVisible()) await img.scrollIntoViewIfNeeded();
         await img.evaluate(image => image.decode());
       }
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${route} overflow at ${width}`);

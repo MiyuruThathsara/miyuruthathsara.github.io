@@ -76,6 +76,7 @@
     {
       "title": "Doctor of Philosophy (in progress)",
       "date": "2023 – Present",
+      "organization_id": "ntu",
       "organization": "College of Computing and Data Science",
       "institution": "Nanyang Technological University, Singapore",
       "paragraphs": [
@@ -85,6 +86,7 @@
     {
       "title": "B.Sc. (Hons) in Electronics and Telecommunication Engineering",
       "date": "2016 – 2021",
+      "organization_id": "moratuwa",
       "organization": "University of Moratuwa, Sri Lanka",
       "paragraphs": [
         "First Class Honours · GPA: 3.74/4.2"
@@ -94,6 +96,7 @@
     {
       "title": "Certificate Level in Management (CIMA)",
       "date": "2015 – 2016",
+      "organization_id": "achievers",
       "organization": "Achievers Lanka Business School",
       "paragraphs": []
     }
@@ -102,6 +105,7 @@
     {
       "title": "Nalanda College, Colombo",
       "date": "2002 – 2015",
+      "organization_id": "nalanda",
       "organization": "",
       "paragraphs": [
         "A/L: A grades in Combined Mathematics, Chemistry, and Physics. Z-score: 2.5017; island rank: 119.",

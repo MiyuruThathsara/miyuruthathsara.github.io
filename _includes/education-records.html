@@ -1,0 +1,25 @@
+{% for record in include.records %}
+{% assign organization = site.data.organizations[record.organization_id] %}
+{% assign institution = record.institution | default: record.organization %}
+{% assign heading_id = include.prefix | append: '-' | append: forloop.index %}
+<article class="education-card experience-card{% if institution == '' %} education-card--school{% endif %}" aria-labelledby="{{ heading_id }}">
+  <header class="experience-card-heading">
+    <div class="organization-logo">
+      <img src="{{ organization.logo | relative_url }}" alt="{{ organization.name | escape }} logo" width="{{ organization.width }}" height="{{ organization.height }}" decoding="async">
+    </div>
+    <{{ include.heading | default: 'h2' }} id="{{ heading_id }}">{{ record.title | escape }}</{{ include.heading | default: 'h2' }}>
+    {% if institution != '' %}<p class="experience-organization">{{ institution | escape }}</p>{% endif %}
+    <p class="experience-date">{{ record.date | escape }}</p>
+  </header>
+  {% if record.institution or record.paragraphs.size > 0 or record.coursework %}
+  <div class="experience-description">
+    {% if record.institution %}<p class="education-department">{{ record.organization | escape }}</p>{% endif %}
+    {% for paragraph in record.paragraphs %}<p>{{ paragraph | escape }}</p>{% endfor %}
+    {% if record.coursework %}<details class="record-details" data-coursework>
+      <summary>Selected coursework</summary>
+      <p>{{ record.coursework | escape }}</p>
+    </details>{% endif %}
+  </div>
+  {% endif %}
+</article>
+{% endfor %}

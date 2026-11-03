@@ -5,10 +5,10 @@ section: education
 permalink: /education/
 description: Academic training, qualifications, and honours.
 ---
-{% include records.html records=site.data.profile.education %}
+{% include education-records.html records=site.data.profile.education prefix='education-record' %}
 <details class="education-details">
   <summary>Earlier education</summary>
-  {% include records.html records=site.data.profile.earlier heading='h3' %}
+  {% include education-records.html records=site.data.profile.earlier heading='h3' prefix='earlier-education-record' %}
 </details>
 <section class="content-section" id="awards" aria-labelledby="awards-title">
   <div class="section-heading"><h2 id="awards-title">Honours &amp; awards</h2></div>

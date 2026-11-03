@@ -26,3 +26,17 @@ moratuwa:
   width: 100
   height: 100
   source: https://uom.lk/sites/default/files/logoUoM_0_0_0.png
+
+achievers:
+  name: Achievers Lanka Business School
+  logo: /assets/img/logos/achievers.png
+  width: 300
+  height: 300
+  source: https://achieverslive.com/wp-content/uploads/2022/08/A-logo-300x300.png
+
+nalanda:
+  name: Nalanda College, Colombo
+  logo: /assets/img/logos/nalanda-college.png
+  width: 192
+  height: 192
+  source: https://nalandacollege.lk/wp-content/uploads/2024/05/cropped-Crest_of_Nalanda_College-192x192.png
